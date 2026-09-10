@@ -2,7 +2,7 @@
 
 > ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ (Color Palette Generation)
 
-[![Open In Colab](https://colab.research.google.com/drive/1J8FnYRJrf7A2H32wCOwMA44GQ7yjYV2L?usp=sharing)
+**Google Colab Notebook:** [กดที่นี่เพื่อเปิดดู Google Colab](https://colab.research.google.com/drive/1J8FnYRJrf7A2H32wCOwMA44GQ7yjYV2L?usp=sharing)
 
 ---
 
