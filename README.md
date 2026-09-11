@@ -1,36 +1,28 @@
 # Smart Art & Palette Sentiment Analyzer (Sprint 1)
 
-> ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ (Color Palette Generation)
+> ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบผ่าน Command Line Interface (CLI)
 
 **Google Colab Notebook:** [กดที่นี่เพื่อเปิดดู Google Colab](https://colab.research.google.com/drive/1J8FnYRJrf7A2H32wCOwMA44GQ7yjYV2L?usp=sharing)
 
 ---
 
-## สมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members & Roles)
+##  รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members & Roles)
 
-1. **ปฏิภาณ นามสีลี** 
-   * **ชื่อเล่น:** ท็อป
-   * **รหัสนักศึกษา:** 683380425-3
-   * **Email:** patiphan.na@kkumail.com
+1. **ปฏิภาณ นามสีลี (ท็อป)**  
+   * **รหัสนักศึกษา:** 683380425-3 | **Email:** patiphan.na@kkumail.com
    * **Role:** Coder 1 — NLP Pipeline & Model Integration (เชื่อมต่อ Pre-trained Model จาก Hugging Face, จัดการ Text Preprocessing และสกัดค่า Emotion Scores)
 
-2. **กฤษฎา สายวัน** 
-   * **ชื่อเล่น:** กาย
-   * **รหัสนักศึกษา:** 683380646-7
-   * **Email:** kitsada.sai@kkumail.com
-   * **Role:** Planner (พัฒนา Core Sentiment Pipeline และระบบแปลงค่าความรู้สึกเป็น Color Palette)
+2. **กฤษฎา สายวัน (กาย)**  
+   * **รหัสนักศึกษา:** 683380646-7 | **Email:** kitsada.sai@kkumail.com
+   * **Role:** Planner — System Architecture & Color Mapping (วางโครงสร้างระบบ CLI, กำหนด Definition of Done และจัดทำ Emotion-to-Palette Mapping ตามหลัก Color Psychology)
 
-3. **ภีรภัทร ด่านภูมิพัฒนา** 
-   * **ชื่อเล่น:** ภีม
-   * **รหัสนักศึกษา:** 683380436-8
-   * **Email:** peeraphat.da@kkumail.com
-   * **Role:** Debugger (ทำ Data Validation, Test Edge Cases, บรรจุระบบ Error Handling & Confidence Thresholds)
+3. **ภีรภัทร ด่านภูมิพัฒนา (ภีม)**  
+   * **รหัสนักศึกษา:** 683380436-8 | **Email:** peeraphat.da@kkumail.com
+   * **Role:** Debugger — Data Validation & Quality Assurance (ตรวจสอบ Input Validation, จัดการ Error Handling & Edge Cases และทดสอบการทำงานของ CLI Loop)
 
-4. **ปฏิพัฒน์ หอทอง** 
-   * **ชื่อเล่น:** ปลั๊ก
-   * **รหัสนักศึกษา:** 683380424-5
-   * **Email:** patipat.ho@kkumail.com
-   * **Role:** Color Generation Engine & Visualization (ออกแบบฟังก์ชันแปลงค่าอารมณ์เป็น Hex Codes และพัฒนาการเรนเดอร์ภาพแถบสีด้วย matplotlib)
+4. **ปฏิพัฒน์ หอทอง (ปลั๊ก)**  
+   * **รหัสนักศึกษา:** 683380424-5 | **Email:** patipat.ho@kkumail.com
+   * **Role:** Coder 2 — Color Engine & Visualization (ออกแบบฟังก์ชันแปลงค่าอารมณ์เป็น Hex Codes, พัฒนาการเรนเดอร์ภาพแถบสีด้วย `matplotlib` และเขียน CLI Main Loop)
 
 ---
 
@@ -38,31 +30,31 @@
 
 * **Project Name:** Smart Art & Palette Sentiment Analyzer
 * **Project Pitch:**
-  แอปพลิเคชันวิเคราะห์อารมณ์ความรู้สึกจากข้อความที่ต่อยอดไปสู่การช่วยงานครีเอทีฟ โดยไม่เพียงแค่จำแนกอารมณ์ว่าเป็น บวก/ลบ/สุข/เศร้า แต่จะคำนวณและแนะนำ **Color Palette (กลุ่มโค้ดสี Hex 5 สี)** ที่สะท้อนถึงมิติของอารมณ์นั้นๆ ตามหลักจิตวิทยาของสี (Color Psychology) เพื่อช่วยให้ดีไซเนอร์และนักสร้างสรรค์นำไปใช้เป็นแรงบันดาลใจในการออกแบบบรรจุภัณฑ์ แบรนด์ดิ้ง หรืองานกราฟิกได้อย่างรวดเร็ว
+  แอปพลิเคชันวิเคราะห์อารมณ์ความรู้สึกจากข้อความที่ต่อยอดไปสู่การช่วยงานครีเอทีฟ โดยไม่เพียงแค่จำแนกอารมณ์ว่าเป็น บวก/ลบ/สุข/เศร้า แต่จะคำนวณและแนะนำ **Color Palette (กลุ่มโค้ดสี Hex 5 สี)** ที่สะท้อนถึงมิติของอารมณ์นั้นๆ ตามหลักจิตวิทยาของสี (Color Psychology) ผ่านหน้าต่าง CLI เพื่อช่วยให้ดีไซเนอร์และนักสร้างสรรค์นำไปใช้เป็นแรงบันดาลใจในการออกแบบบรรจุภัณฑ์ แบรนด์ดิ้ง หรืองานกราฟิกได้อย่างรวดเร็ว
 
 ---
 
-## 2. Sprint 1 Plan
+## 2. Sprint 1 Plan & Definition of Done
 
-* **Goal:** พัฒนา Core Engine สำหรับวิเคราะห์อารมณ์จากข้อความ (6 อารมณ์หลัก: Joy, Sadness, Anger, Fear, Surprise, Love) พร้อม Mapping กับทฤษฎีสีเพื่อสร้าง Color Palette (Hex Codes) แสดงผลแถบสี (Color Swatches) ผ่าน Colab/CLI
-* **Task Allocation:**
-  * `[Planner]` ออกแบบแผนผังการจับคู่อารมณ์กับชุดสี (Emotion-to-Palette Mapping) ตามหลัก Color Psychology
-  * `[Coder 1]` เชื่อมต่อ Pre-trained Model (`bhadresh-savani/distilbert-base-uncased-emotion`) จาก Hugging Face และประมวลผล Text Input
-  * `[Coder 2]` เขียนระบบแมปค่าอารมณ์ไปเป็น Hex Codes และสร้างระบบสร้างแถบตัวอย่างสี (Visual Swatches) ด้วย `matplotlib`
-  * `[Debugger]` ทำ Data Validation แก้ไขปัญหา Output Parsing และจัดการ Edge Cases กรณีข้อความว่างเปล่า
+* **Sprint Goal:** พัฒนา Core Engine สำหรับวิเคราะห์อารมณ์จากข้อความ (6 อารมณ์หลัก: Joy, Sadness, Anger, Fear, Surprise, Love) ผ่านระบบ CLI Interactive Loop ที่รับอินพุตได้อย่างต่อเนื่อง พร้อม Mapping กับทฤษฎีสีเพื่อแสดงผล Hex Codes และเรนเดอร์แถบสี (Visual Swatches)
+* **Definition of Done (DoD):**
+  1. โปรแกรมแสดงข้อความต้อนรับและรับคำสั่งจากผู้ใช้ได้อย่างต่อเนื่องด้วย `while True` loop
+  2. เมื่อพิมพ์คำสั่ง `quit` หรือ `exit` (ไม่ว่าจะตัวพิมพ์เล็กหรือใหญ่) โปรแกรมต้องหยุดทำงานและออกจากระบบทันที
+  3. เมื่อผู้ใช้กด Enter โดยไม่พิมพ์ข้อความ โปรแกรมต้องแสดงคำเตือนและไม่พัง (Error Handling)
+  4. สามารถวิเคราะห์และเรนเดอร์ภาพแถบสี (Visual Swatches) ออกมาได้ถูกต้องตามอารมณ์ที่ประมวลผลได้
 
 ---
 
 ## 3. Execution & Source Code
 
-สามารถดูซอร์สโค้ดฉบับเต็มและการประมวลผลการรันแสดงผลได้ในไฟล์ Notebook [คลิกที่นี่เพื่อเปิดดูไฟล์ Notebook](./Sprint%20_1.ipynb)
+สามารถดูซอร์สโค้ดฉบับเต็มและการประมวลผลการรันแสดงผลได้ในไฟล์ Notebook  [Sprint_1.ipynb](./Sprint_1.ipynb)
 
 ```python
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from transformers import pipeline
 
-# [Coder - โชกุน] โหลด Pre-trained Model สำหรับ Emotion Classification
+# [Coder 1 - ท็อป] โหลด Pre-trained Model สำหรับ Emotion Classification
 print("Loading Emotion Analysis Model...")
 emotion_classifier = pipeline(
     "text-classification",
@@ -71,7 +63,7 @@ emotion_classifier = pipeline(
 )
 print("Model loaded successfully!\n")
 
-# [Planner - บอส] แผนผังสีตามทฤษฎีจิตวิทยาของสี (Color Psychology Mapping)
+# [Planner - กาย] แผนผังสีตามทฤษฎีจิตวิทยาของสี (Color Psychology Mapping)
 COLOR_PALETTE_MAP = {
     "joy": {
         "mood": "Joyful & Energetic",
@@ -107,14 +99,9 @@ COLOR_PALETTE_MAP = {
 
 def analyze_and_generate_palette(text: str):
     """
-    Core Pipeline Engine Function
+    Core Pipeline Engine Function (Coder 1 - ท็อป & Coder 2 - ปลั๊ก)
     """
-    # 1. Edge Case Handling (Debugger - โฟน)
-    if not text or not text.strip():
-        print("Error: Input text cannot be empty!")
-        return
-    
-    # 2. Emotion Prediction & Output Parsing (Coder - โชกุน & Debugger - โฟน)
+    # Emotion Prediction & Output Parsing Fix
     results = emotion_classifier(text)
     
     if isinstance(results[0], list):
@@ -127,42 +114,66 @@ def analyze_and_generate_palette(text: str):
     
     palette_data = COLOR_PALETTE_MAP.get(top_emotion, COLOR_PALETTE_MAP["joy"])
     
-    # 3. Print Structured Output
-    print("==================================================")
-    print(f"Input Text: \"{text}\"")
-    print(f"Primary Emotion: {top_emotion.upper()} ({top_score*100:.2f}% Confidence)")
-    print(f"Design Mood Concept: {palette_data['mood']}")
-    print("==================================================")
+    # Display Output Text
+    print("\n" + "="*50)
+    print(f" Input Text: \"{text}\"")
+    print(f" Primary Emotion: {top_emotion.upper()} ({top_score*100:.2f}% Confidence)")
+    print(f" Design Mood Concept: {palette_data['mood']}")
+    print("="*50)
     print("Suggested Hex Colors:")
     for hex_code, color_name in zip(palette_data['palette'], palette_data['names']):
         print(f"  • {hex_code} ({color_name})")
     print()
     
-    # 4. Render Visual Color Palette Block (Coder - โชกุน)
+    # [Coder 2 - ปลั๊ก] Render Visual Color Palette Block
     fig, ax = plt.subplots(figsize=(8, 2.2))
     ax.set_xlim(0, len(palette_data['palette']))
     ax.set_ylim(0, 1)
     ax.axis('off')
     
     for idx, (hex_code, color_name) in enumerate(zip(palette_data['palette'], palette_data['names'])):
-        rect = patches.Rectangle((idx, 0.3), 1, 0.7, linewidth=0, edgecolor='none', facecolor=hex_code)
+        rect = patches.Rectangle((idx, 0.3), 1, 0.7, linewidth=0, facecolor=hex_code)
         ax.add_patch(rect)
-        ax.text(idx + 0.5, 0.18, hex_code, horizontalalignment='center', verticalalignment='center', fontsize=9, fontweight='bold')
-        ax.text(idx + 0.5, 0.06, color_name, horizontalalignment='center', verticalalignment='center', fontsize=8, color='#555555')
+        ax.text(idx + 0.5, 0.18, hex_code, ha='center', va='center', fontsize=9, fontweight='bold')
+        ax.text(idx + 0.5, 0.06, color_name, ha='center', va='center', fontsize=8, color='#555555')
     
     plt.title(f"Smart Palette Preview — {top_emotion.upper()} ({palette_data['mood']})", fontsize=11, pad=10)
     plt.tight_layout()
     plt.show()
     print("\n")
 
-# --- Demo Test Execution ---
-test_prompts = [
-    "I am so excited and happy about winning the design award! It feels like a dream come true!",
-    "I feel lonely and sad walking through the cold empty streets tonight.",
-    "This frustrating error message is driving me absolutely insane! I am furious!",
-    "I fell deeply in love with the serene sunset over the ocean."
-]
+def main():
+    """
+    [Coder 2 - ปลั๊ก & Debugger - ภีม] CLI Interactive Loop
+    """
+    print("="*50)
+    print(" Welcome to Smart Art & Palette Sentiment Analyzer (CLI)")
+    print("คำแนะนำ: พิมพ์ข้อความภาษาอังกฤษเพื่อวิเคราะห์ หรือพิมพ์ 'quit' เพื่อออกจากระบบ")
+    print("="*50 + "\n")
+    
+    while True:
+        try:
+            # [Debugger - ภีม] Input Sanitization (.strip())
+            user_input = input("Enter your text prompt (or 'quit' to exit): ").strip()
+            
+            # [Debugger - ภีม] Checking Exit Command (.lower())
+            if user_input.lower() in ['quit', 'exit']:
+                print("\nขอบคุณที่ใช้งานระบบ Smart Art & Palette! ออกจากโปรแกรมเรียบร้อยแล้ว ")
+                break
+            
+            # [Debugger - ภีม] Edge Case: Empty String Checking
+            if not user_input:
+                print(" คำเตือน: ข้อความนำเข้าต้องไม่เป็นช่องว่าง! กรุณาลองใหม่อีกครั้ง\n")
+                continue
+                
+            # Run Analysis Pipeline
+            analyze_and_generate_palette(user_input)
+            
+        except KeyboardInterrupt:
+            print("\n\nยกเลิกการทำงาน ขอบคุณที่ใช้งานครับ ")
+            break
+        except Exception as e:
+            print(f"\n เกิดข้อผิดพลาดไม่คาดคิด: {e}\n")
 
-print(" RUNNING SPRINT 1 EXECUTION TEST...\n")
-for prompt in test_prompts:
-    analyze_and_generate_palette(prompt)
+if __name__ == "__main__":
+    main()
