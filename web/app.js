@@ -192,19 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // กรณีฉุกเฉิน / คำที่ไม่ใช่ภาษาอังกฤษ ให้คืนค่าการจำแนกด่วน
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const lower = text.toLowerCase();
-                let em = 'JOY';
-                if (['sad', 'cry', 'bad', 'died', 'hurt', 'เศร้า', 'ร้องไห้', 'แย่', 'เจ็บ', 'ดิ่ง'].some(w => lower.includes(w))) em = 'SADNESS';
-                else if (['angry', 'hate', 'โกรธ', 'เกลียด'].some(w => lower.includes(w))) em = 'ANGER';
-                else if (['scared', 'fear', 'กลัว'].some(w => lower.includes(w))) em = 'FEAR';
-                else if (['calm', 'relax', 'สงบ', 'ชิล'].some(w => lower.includes(w))) em = 'CALM';
-                
-                resolve({ emotion: em, confidence: (88 + Math.floor(Math.random() * 8)) + '.5%' });
-            }, 800); // หน่วงเวลาเล็กน้อยเพื่อให้เห็น Animation ชัดเจน
-        });
     }
 
     // ----------------------------------------------------
