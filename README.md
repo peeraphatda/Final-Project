@@ -11,19 +11,15 @@
 
 1. **ปฏิภาณ นามสีลี (ท็อป)**  
    * **รหัสนักศึกษา:** 683380425-3 | **Email:** patiphan.na@kkumail.com
-   * **Role:** Coder 1 — NLP Pipeline & Model Integration (เชื่อมต่อ Pre-trained Model จาก Hugging Face, จัดการ Text Preprocessing และสกัดค่า Emotion Scores)
 
 2. **กฤษฎา สายวัน (กาย)**  
    * **รหัสนักศึกษา:** 683380646-7 | **Email:** kitsada.sai@kkumail.com
-   * **Role:** Planner — System Architecture & Color Mapping (วางโครงสร้างระบบ CLI, กำหนด Definition of Done และจัดทำ Emotion-to-Palette Mapping ตามหลัก Color Psychology)
 
 3. **ภีรภัทร ด่านภูมิพัฒนา (ภีม)**  
    * **รหัสนักศึกษา:** 683380436-8 | **Email:** peeraphat.da@kkumail.com
-   * **Role:** Debugger — Data Validation & Quality Assurance (ตรวจสอบ Input Validation, จัดการ Error Handling & Edge Cases และทดสอบการทำงานของ CLI Loop)
 
 4. **ปฏิพัฒน์ หอทอง (ปลั๊ก)**  
    * **รหัสนักศึกษา:** 683380424-5 | **Email:** patipat.ho@kkumail.com
-   * **Role:** Coder 2 — Color Engine & Visualization (ออกแบบฟังก์ชันแปลงค่าอารมณ์เป็น Hex Codes, พัฒนาการเรนเดอร์ภาพแถบสีด้วย `matplotlib` และเขียน CLI Main Loop)
 
 ---
 #### 🔄 สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
