@@ -1,63 +1,66 @@
-// Web Interactive Logic & Bilingual Engine
-let currentLang = 'TH';
+document.addEventListener('DOMContentLoaded', () => {
+    // หา Element จาก ID ในหน้า web/index.html
+    const imageInput = document.getElementById('imageInput') || document.querySelector('input[type="file"]');
+    const paletteContainer = document.getElementById('paletteDisplay') || document.getElementById('palette');
 
-const i18n = {
-    TH: {
-        subTitle: "ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี",
-        inputHeading: "กรอกข้อความภาษาอังกฤษเพื่อวิเคราะห์อารมณ์",
-        analyzeBtn: "วิเคราะห์อารมณ์ (Analyze)",
-        uploadText: "อัปโหลดรูปภาพ (Extract Image)",
-        advisoryHeading: "💡 AI Design Advisory"
-    },
-    EN: {
-        subTitle: "Text Sentiment Analyzer & AI Color Palette Generator",
-        inputHeading: "Enter English text to analyze sentiment",
-        analyzeBtn: "Analyze Emotion",
-        uploadText: "Upload Image",
-        advisoryHeading: "💡 AI Design Advisory"
-    }
-};
+    if (!imageInput) return;
 
-document.getElementById('lang-toggle-btn').addEventListener('click', () => {
-    currentLang = currentLang === 'TH' ? 'EN' : 'TH';
-    document.getElementById('sub-title').innerText = i18n[currentLang].subTitle;
-    document.getElementById('input-heading').innerText = i18n[currentLang].inputHeading;
-    document.getElementById('analyze-btn').innerText = i18n[currentLang].analyzeBtn;
-    document.getElementById('upload-text').innerText = i18n[currentLang].uploadText;
-    document.getElementById('advisory-heading').innerText = i18n[currentLang].advisoryHeading;
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                // สร้าง Canvas จำลองสกัดสี 5 จุดหลักจากภาพ
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                // สุ่ม/ดึงค่าสีพิกเซลจากภาพ
+                const colors = extractColorsFromCanvas(ctx, canvas.width, canvas.height, 5);
+                
+                // แสดงผลจานสีบนหน้าจอ
+                displayExtractedPalette(colors);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
 });
 
-// Analyze Button Click Event
-document.getElementById('analyze-btn').addEventListener('click', () => {
-    const text = document.getElementById('text-input').value.trim();
-    if (!text) {
-        alert(currentLang === 'TH' ? 'กรุณากรอกข้อความก่อนกดวิเคราะห์!' : 'Please enter text first!');
-        return;
-    }
+// ฟังก์ชันสกัดสีสี่เหลี่ยมผืนผ้าจำลองจาก Canvas
+function extractColorsFromCanvas(ctx, width, height, count) {
+    const colors = [];
+    const stepX = Math.floor(width / (count + 1));
+    const stepY = Math.floor(height / 2);
 
-    // Mock Output Response (Demo Web UI)
-    document.getElementById('emotion-label').innerText = "JOY";
-    document.getElementById('confidence-score').innerText = "98.5%";
+    for (let i = 1; i <= count; i++) {
+        const pixel = ctx.getImageData(i * stepX, stepY, 1, 1).data;
+        const hex = "#" + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1);
+        colors.push(hex);
+    }
+    return colors;
+}
+
+// ฟังก์ชันแสดงผลแถบสีบน UI
+function displayExtractedPalette(colors) {
+    const container = document.getElementById('extractedPalette') || document.getElementById('palette');
+    if (!container) return;
     
-    const colors = ["#FFD700", "#FF8C00", "#FF69B4", "#00BFFF", "#32CD32"];
-    const swatchesContainer = document.getElementById('palette-swatches');
-    swatchesContainer.innerHTML = '';
-    
+    container.innerHTML = '';
     colors.forEach(color => {
         const div = document.createElement('div');
-        div.className = 'swatch-item';
         div.style.backgroundColor = color;
-        div.innerText = color;
-        div.onclick = () => {
-            navigator.clipboard.writeText(color);
-            alert(`Copied ${color} to clipboard!`);
-        };
-        swatchesContainer.appendChild(div);
+        div.style.width = '60px';
+        div.style.height = '60px';
+        div.style.borderRadius = '8px';
+        div.style.display = 'inline-block';
+        div.style.margin = '4px';
+        div.title = color;
+        container.appendChild(div);
     });
-
-    document.getElementById('adv-theme').innerText = "Vibrant Sunburst";
-    document.getElementById('adv-font').innerText = "Poppins / Montserrat";
-    document.getElementById('adv-usage').innerText = "E-Commerce, Festival Branding, UI Dashboard";
-    
-    document.getElementById('result-section').classList.remove('hidden');
-});
+}
