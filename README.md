@@ -27,10 +27,10 @@
 
 | สมาชิก | ชื่อเล่น | Sprint 1 : OOP & SQLite | Sprint 2 : AI, Report & Supabase | Sprint 3 : Web & Deployment |
 | :--- | :---: | :---: | :---: | :---: |
-| **นายกฤษฎา สายวัน** | กาย | **Planner / Architect** | **Coder / Dev** | **Debugger / QA** |
-| **นายปฏิภาณ นามสีลี** | ท็อป | **Coder / Dev (NLP Pipeline)** | **Debugger / QA** | **Planner / Architect** |
-| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder / Dev (Visualization)** | **Planner / Architect** | **Coder & DevOps** |
-| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger / QA** | **Coder / Dev** | **Debugger / QA & Deployment** |
+| **นายกฤษฎา สายวัน** | กาย | **Planner** | **Coder / Dev** | **Debugger / QA** |
+| **นายปฏิภาณ นามสีลี** | ท็อป | **Coder)** | **Debugger / QA** | **Planner / Architect** |
+| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder** | **Planner / Architect** | **Coder & DevOps** |
+| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger** | **Coder / Dev** | **Debugger / QA & Deployment** |
 
 ---
 
