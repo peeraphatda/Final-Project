@@ -1,13 +1,11 @@
 # Smart Art & Palette — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
 
-รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
-
+รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)  
 อาจารย์ผู้สอน: ผศ. บุญสืบ ไวคำ
-
 
 ---
 
-##  รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members)
+## 👥 รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members)
 
 1. **ปฏิภาณ นามสีลี (ท็อป)**  
    * **รหัสนักศึกษา:** 683380425-3 | **Email:** patiphan.na@kkumail.com
@@ -22,6 +20,7 @@
    * **รหัสนักศึกษา:** 683380424-5 | **Email:** patipat.ho@kkumail.com
 
 ---
+
 ## 🔄 สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
 
 เพื่อให้สมาชิกทุกคนในทีมได้ฝึกฝนทั้ง 3 บทบาทหลัก (**Planner / Architect**, **Coder / Dev**, **Debugger / QA & DevOps**) ครบทุกคน 100%:
@@ -32,65 +31,67 @@
 | **นายปฏิภาณ นามสีลี** | ท็อป | **Coder / Dev (NLP Pipeline)** | **Debugger / QA** | **Planner / Architect** |
 | **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder / Dev (Visualization)** | **Planner / Architect** | **Coder & DevOps** |
 | **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger / QA** | **Coder / Dev** | **Debugger / QA & Deployment** |
-## ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview)
-
-#### 🟢 ฟีเจอร์ที่พัฒนาเสร็จแล้ว (Current Implemented Features - Sprint 1)
-* 🎭 **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping ป้องกันข้อผิดพลาด
-* 🎨 **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
-* 📊 **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib`
-* 💻 **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface รับข้อความและประมวลผลทันที
-
-#### 🟡 ฟีเจอร์ตามแผนงานใน Sprint 2 (Persistence, Report & AI Advisory)
-* 💾 **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite
-* ☁️ **Cloud Database Migration (`src/data_store.py`):** ย้ายการจัดเก็บข้อมูลจาก Local SQLite ไปยัง Cloud Database (Supabase PostgreSQL)
-* 📤 **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์โครงสร้างที่นักออกแบบนำไปใช้จริงได้ทันที เช่น `.json`, `CSS variables`, และ `Tailwind config`
-* 📊 **Batch/Report Mode (`src/report_generator.py`):** อ่านข้อความหลายบรรทัดจากไฟล์ `.txt` / `.csv` สรุปเป็นรายงานสถิติ พร้อมภาพกราฟ Mood Board รวม
-* 🧠 **AI Design Advisory (`src/ai_advisory.py`):** ประมวลผลคำแนะนำด้านการออกแบบ เช่น ตั้งชื่อแนวคิดธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการจัดวาง Layout
-* ♿ **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 เพื่อแจ้งเตือนคู่สีที่อ่านยาก
-
-#### 🔴 ฟีเจอร์ตามแผนงานใน Sprint 3 (Web Dashboard & Deployment)
-* 🌐 **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และดูจานสี
-* 🌐 **Bilingual UI Support (`web/index.html`):** สลับภาษาในการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
-* 🖼️ **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
-* 🚀 **GitHub Pages Deployment (`.github/workflows/deploy.yml`):** ระบบ CI/CD จัดส่งหน้าเว็บไปยัง GitHub Pages อัตโนมัติ
 
 ---
 
-## 📅 แผนการทำงานภาพรวม (3 Sprints Roadmap)
+## ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview - Fully Implemented)
 
-#### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture**
-* **เป้าหมาย:** สร้างรากฐานสถาปัตยกรรมเชิงวัตถุ (OOP) ระบบประมวลผล NLP Sentiment analysis และ CLI Swatch Visualization
-* **รายละเอียดงาน:**
-  * `src/emotion_client.py`: เชื่อมต่อ Hugging Face DistilBERT Pipeline พร้อมระบบ Defensive Fallback
-  * `src/palette_engine.py`: ตารางแมปอารมณ์ 6 ประเภทสู่กลุ่มสีจิตวิทยา
-  * `src/visualizer.py`: วาดภาพ Swatch รูปแบบ PNG ผ่าน `matplotlib`
-  * `src/cli_app.py` & `main.py`: หน้าต่างปฏิสัมพันธ์ Command Line Interface และโหมด `--demo`
-  * `tests/`: ชุดทดสอบระบบอัตโนมัติ (Automated `pytest`)
-* **การใช้ Agile Kanban:** กำหนดข้อจำกัดงานในหมวด *In Progress* (**WIP Limit = 2**) เพื่อควบคุมขั้นตอนการพัฒนาและทำ Unit Test ก่อนส่งมอบทุกครั้ง
+#### 🟢 ฟีเจอร์แกนหลักและระบบวิเคราะห์ (Core Engine & NLP - Complete)
+* 🎭 **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping (ใช้ `isinstance` Check) ป้องกันข้อผิดพลาด[cite: 1]
+* 🎨 **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
+* 📊 **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib` ในโทน Dark Theme[cite: 1]
+* 💻 **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface พร้อมระบบ Input Validation[cite: 1]
 
-#### 2. **Sprint 2: Persistence, Report & AI Advisory**
-* **เป้าหมาย:** เพิ่มระบบบันทึกประวัติยั่งยืน การรายงานผล Batch File คำแนะนำดีไซน์ และการเชื่อมต่อ Cloud DB
-* **รายละเอียดงาน:**
-  * `src/data_store.py`: บันทึกข้อมูลลง SQLite (`data/palette_history.db`) พร้อม Sync ขึ้น Supabase Cloud PostgreSQL
-  * `src/report_generator.py`: Batch Processing ประมวลผลไฟล์ `.txt`/`.csv` และระบบ Export โค้ดสี JSON/CSS/Tailwind
-  * `src/ai_advisory.py`: สร้างคำแนะนำแนวคิดดีไซน์ และ Font Pairings ตามอารมณ์
-  * WCAG Accessibility Calculator: ฟังก์ชันคำนวณอัตราส่วนความต่างสี (Contrast Ratio)
+#### 🟢 ระบบบันทึกข้อมูล รายงานผล และ AI คำแนะนำ (Persistence & AI Advisory - Complete)
+* 💾 **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite (`palette_history.db`)
+* ☁️ **Cloud Database Migration (`src/data_store.py`):** รองรับโครงสร้างการจัดเก็บข้อมูลย้ายไปยัง Cloud Database (Supabase PostgreSQL)
+* 📤 **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์ `.json` และ `CSS variables` เพื่อให้นักพัฒนานำไปใช้งานต่อได้ทันที
+* 📊 **Batch Processing (`src/report_generator.py`):** อ่านข้อความหลายบรรทัดจากไฟล์ `.csv` สรุปผลการวิเคราะห์เป็นชุดข้อมูลส่งออก
+* 🧠 **AI Design Advisory (`src/ai_advisory.py`):** ประมวลผลคำแนะนำด้านการออกแบบ เช่น ชื่อแนวคิดธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการใช้งาน UI
+* ♿ **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 แจ้งเตือนสถานะ PASS (AAA) / PASS (AA) / FAIL
 
-#### 3. **Sprint 3: Web Dashboard & Deployment**
-* **เป้าหมาย:** พัฒนา Web Dashboard สไตล์ Glassmorphic รองรับสองภาษา ระบบ Image Mood Input และรัน CI/CD Deployment
+#### 🟢 หน้าเว็บแอปพลิเคชันและการติดตั้งระบบ (Web Dashboard & Deployment - Complete)
+* 🌐 **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และแสดงจานสี
+* 🌐 **Bilingual UI Support (`web/style.css`, `web/app.js`):** ระบบสลับภาษาการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
+* 🖼️ **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
+* 🚀 **GitHub Actions CI/CD (`.github/workflows/deploy-web.yml`):** ระบบ CI/CD จัดส่งหน้าเว็บไปยัง GitHub Pages อัตโนมัติเมื่อมี commit บนกิ่งหลัก
+
+---
+
+## 📅 สรุปผลการทำงานจริงตามแผนงาน (3 Sprints Roadmap)
+
+#### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture (Completed)**
+* **สถานะ:** เสร็จสมบูรณ์
 * **รายละเอียดงาน:**
-  * `web/index.html`: สถาปัตยกรรม Frontend แบบ Responsive Glassmorphic UI
-  * Bilingual Toggle & Image Color Extractor: สลับภาษา TH/EN และสกัดสีจากรูปภาพด้วย Canvas API
-  * `.github/workflows/`: ตั้งค่า GitHub Actions สั่ง Deploy หน้าเว็บไปยัง GitHub Pages
+  * พัฒนา `src/emotion_client.py` เชื่อมต่อ Hugging Face DistilBERT Pipeline พร้อมระบบ Defensive Fallback[cite: 1]
+  * พัฒนา `src/palette_engine.py` สื่อสารตารางแมปอารมณ์ 6 ประเภทสู่กลุ่มสีจิตวิทยา
+  * พัฒนา `src/visualizer.py` วาดภาพ Swatch รูปแบบ Visual Swatches ผ่าน `matplotlib`[cite: 1]
+  * พัฒนา `src/cli_app.py` & `main.py` ทำระบบ Interactive Command Line พร้อมโหมด `--batch`[cite: 1]
+  * พัฒนาชุดทดสอบระบบอัตโนมัติเบื้องต้นใน `tests/test_emotion_client.py`[cite: 1]
+
+#### 2. **Sprint 2: Persistence, Report & AI Advisory (Completed)**
+* **สถานะ:** เสร็จสมบูรณ์
+* **รายละเอียดงาน:**
+  * พัฒนา `src/data_store.py` บันทึกข้อมูลลง SQLite (`data/palette_history.db`) พร้อมรองรับการ Sync ขึ้น Cloud
+  * พัฒนา `src/report_generator.py` ประมวลผลไฟล์ Batch CSV และระบบ Export โค้ดสี JSON/CSS
+  * พัฒนา `src/ai_advisory.py` สร้างคำแนะนำแนวคิดดีไซน์ และ Font Pairings ตามอารมณ์
+  * เพิ่มฟังก์ชันคำนวณอัตราส่วนความต่างสี (WCAG Contrast Ratio) ใน `palette_engine.py`
+
+#### 3. **Sprint 3: Web Dashboard & Deployment (Completed)**
+* **สถานะ:** เสร็จสมบูรณ์
+* **รายละเอียดงาน:**
+  * พัฒนา `web/index.html`, `style.css`, `app.js` สร้าง Frontend Responsive Glassmorphic UI
+  * พัฒนาระบบ Bilingual Toggle (TH/EN) และ Image Color Extractor สกัดสีจากรูปภาพ
+  * ตั้งค่า GitHub Actions `.github/workflows/deploy-web.yml` สั่ง Deploy หน้าเว็บไปยัง GitHub Pages อัตโนมัติ
 
 ---
 
 ## 🧩 โมดูลหลักของระบบ (Core Components)
 
 1. **`src/emotion_client.py` (`EmotionClient`):**
-   * ทำหน้าที่เป็น Client Gateway รับข้อความภาษาอังกฤษและภาษาไทย
-   * ประมวลผลด้วยโมเดล `bhadresh-savani/distilbert-base-uncased-emotion`
-   * มีระบบ **Defensive Fallback Unwrapping** เพื่อป้องกัน `TypeError` กรณี Output คืนค่าเป็น Nested List
+   * ทำหน้าที่เป็น Client Gateway รับข้อความภาษาอังกฤษ[cite: 1]
+   * ประมวลผลด้วยโมเดล `bhadresh-savani/distilbert-base-uncased-emotion`[cite: 1]
+   * มีระบบ **Defensive Fallback Unwrapping** เช็ก `isinstance` เพื่อป้องกัน `TypeError` จาก Nested List Structure[cite: 1]
 
 2. **`src/palette_engine.py` (`PaletteEngine`):**
    * ทำหน้าที่แปลงอารมณ์ความรู้สึกให้เป็นกลุ่มสี Hex Code 5 สี ตามหลัก Color Psychology
@@ -98,49 +99,58 @@
 
 3. **`src/data_store.py` (`DataStore`):**
    * จัดเก็บข้อมูลยั่งยืน (Persistence Storage) ลงฐานข้อมูล **SQLite3** (`data/palette_history.db`)
-   * มีฟังก์ชัน Migrate และ Sync ข้อมูลไปยัง **Supabase Cloud Database**
+   * มีฟังก์ชันรองรับการ Migrate และ Sync ข้อมูลไปยัง **Supabase Cloud Database**
 
 4. **`src/ai_advisory.py` (`AIAdvisory`):**
-   * ทำหน้าที่เป็นครีเอทีฟผู้ช่วย ประมวลผลและเสนอชื่อธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการจัดวางองค์ประกอบให้เข้ากับอารมณ์นั้นๆ
+   * ทำหน้าที่เป็นผู้ช่วยดีไซเนอร์ ประมวลผลและเสนอชื่อธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และคำแนะนำการนำไปใช้งานตามอารมณ์
 
 5. **`src/report_generator.py` (`ReportGenerator`):**
-   * อ่านไฟล์ข้อมูลชุด (`.txt` หรือ `.csv`) สรุปเป็นสถิติสัดส่วนอารมณ์พร้อมสร้างภาพ Mood Board รวม
-   * แปลงข้อมูลจานสีให้อยู่ในรูปแบบที่โปรแกรมเมอร์/ดีไซเนอร์นำไปใช้งานได้ทันที (JSON, CSS Variables, Tailwind Config)
+   * อ่านไฟล์ข้อมูลชุด (`.csv`) วิเคราะห์อารมณ์และแนะนำจานสีแบบยกชุด
+   * แปลงข้อมูลจานสีให้อยู่ในรูปแบบไฟล์ `.json` และ `.css` (CSS Variables) เพื่อให้นักพัฒนานำไปใช้ต่อได้ทันที
 
 6. **`src/cli_app.py` (`CLIApp`):**
-   * หน้าต่างปฏิสัมพันธ์ Command Line Interface (CLI) รับอินพุต ทำความสะอาดข้อความด้วย `.strip()`
-   * วาดตารางแสดงผล พร้อมรายงานผล WCAG Contrast และ คำแนะนำ AI Advisory
+   * หน้าต่างปฏิสัมพันธ์ Command Line Interface (CLI) รับอินพุต ทำความสะอาดข้อความ[cite: 1]
+   * แสดงผลอารมณ์ ค่าความมั่นใจ จานสีแนะนำ พร้อมสั่งวาด Swatches และบันทึกประวัติอัตโนมัติ[cite: 1]
 
 7. **`main.py` (Main Controller):**
-   * จุดเริ่มต้นหลักของแอปพลิเคชัน รองรับทั้ง **Interactive CLI Mode** (`python main.py`), **Automated Demo Mode** (`python main.py --demo`), และ **Web Dashboard Mode** (`python main.py --web`)
+   * จุดเริ่มต้นหลักของแอปพลิเคชัน รองรับทั้ง **Interactive CLI Mode** (`python main.py --cli`) และ **Batch File Processing Mode** (`python main.py --batch <file_path>`)
 
 ---
 
-#### 📂 โครงสร้างไดเรกทอรี (Directory Structure)
+#### 📂 โครงสร้างไดเรกทอรีล่าสุด (Directory Structure)
 
 ```text
 Final-Project/
 ├── .github/
-│   └── workflows/             # GitHub Actions CI/CD Deploy Scripts
+│   └── workflows/             # GitHub Actions CI/CD Deployment Scripts
+│       └── deploy-web.yml
 ├── src/                       # Core Python Application Modules
+│   ├── __init__.py
 │   ├── emotion_client.py      # Hugging Face DistilBERT Classifier
 │   ├── palette_engine.py      # Color Psychology & WCAG Calculator
-│   ├── visualizer.py          # Matplotlib Swatch & Chart Renderer
+│   ├── visualizer.py          # Matplotlib Swatch Renderer
 │   ├── cli_app.py             # CLI Interactive Interface
-│   ├── data_store.py          # SQLite Local & Supabase Sync
-│   ├── report_generator.py    # Batch Mode & Palette Exports
+│   ├── data_store.py          # SQLite Local & Cloud Migration Support
+│   ├── report_generator.py    # Batch CSV Processing & Export (.css / .json)
 │   └── ai_advisory.py         # Design Advisory & Font Pairings
-├── web/                       # Frontend Web Application
-│   └── index.html             # Glassmorphic UI Dashboard
+├── web/                       # Frontend Web Application Dashboard
+│   ├── index.html             # Glassmorphic UI Dashboard
+│   ├── style.css              # Responsive Styling
+│   └── app.js                 # UI Interaction & Image Mood Extractor
 ├── tests/                     # Automated Unit Testing Suites
 │   ├── test_emotion_client.py
 │   ├── test_palette_engine.py
-│   └── test_data_store.py
-├── data/                      # Database & Output Storage
-│   └── palette_history.db     # SQLite Local Database
-├── test_cases/                # Sample files (.txt / .csv) for Batch Testing
-├── main.py                    # Main Entry Point (--cli, --demo, --web)
+│   ├── test_data_store.py
+│   └── test_report.py
+├── reports/                   # Sprint Progress Reports
+│   ├── SPRINT1.md
+│   ├── SPRINT2.md
+│   └── SPRINT3.md
+├── data/                      # Data Storage & Batch Processing
+│   ├── palette_history.db     # SQLite Local Database (Auto-generated)
+│   └── sample_batch.csv       # Sample File for Batch Mode Testing
+├── main.py                    # Main Entry Point (--cli, --batch)
 ├── requirements.txt           # Project Dependencies
 ├── README.md                  # Project Documentation
 ├── CHANGELOG.md               # Version History
-└── LEARNINGLOG.md             # Development Prompts & Reflection Log
+└── LEARNINGLOG.md             # Development Reflection Log
