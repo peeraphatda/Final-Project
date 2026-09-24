@@ -172,8 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ----------------------------------------------------
-    // 4. AI Pipeline Engine (ใช้ BERT Multilingual Model)
+   // ----------------------------------------------------
+    // 4. AI Pipeline Engine (Zero-Shot Classifier สำหรับแยก 6 อารมณ์)
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
@@ -181,31 +181,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
             
-            // ใช้ BERT Multilingual Model ของ Xenova ที่เปิดสิทธิ์ Public CDN 100%
+            // ใช้ Zero-Shot Classifier ของ Xenova ที่รองรับการแยกหมวดหมู่ตาม Candidate Labels
             sentimentPipeline = await pipeline(
-                'text-classification', 
-                'Xenova/bert-base-multilingual-uncased-sentiment'
+                'zero-shot-classification', 
+                'Xenova/typeform-distilbert-base-uncased-mnli'
             );
         }
         return sentimentPipeline;
-    }
-
-    // แปลงผลลัพธ์ของ BERT (1 star - 5 stars) เข้ากับกลุ่มอารมณ์
-    function mapStarRatingToEmotion(label) {
-        const stars = parseInt(label);
-        switch (stars) {
-            case 1:
-                return 'ANGER';    // 1 ดาว = เชิงลบแรง (โกรธ/โมโห)
-            case 2:
-                return 'SADNESS';  // 2 ดาว = เชิงลบกลาง (เศร้า/เสียใจ)
-            case 3:
-                return 'FEAR';     // 3 ดาว = กังวล/ไม่แน่นอน
-            case 4:
-            case 5:
-                return 'JOY';      // 4-5 ดาว = เชิงบวก (สุข/สดใส)
-            default:
-                return 'JOY';
-        }
     }
 
     // ----------------------------------------------------
@@ -232,22 +214,24 @@ document.addEventListener('DOMContentLoaded', () => {
             analyzeBtn.style.opacity = '0.7';
 
             try {
-                // เรียกใช้ Transformer AI
                 const classifier = await getAIPipeline();
                 
                 startLoadingAnimation(translations[currentLang].analyzingText);
 
-                // ประมวลผลข้อความด้วย AI
-                const output = await classifier(text);
+                // กำหนดอารมณ์ที่ต้องการให้ AI วิเคราะห์
+                const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
+
+                // ส่งไปให้ AI คำนวณความน่าจะเป็นของแต่ละอารมณ์
+                const output = await classifier(text, candidateLabels);
                 stopLoadingAnimation();
 
-                if (output && output[0]) {
-                    const rawLabel = output[0].label; // ได้เป็น '1 star' ถึง '5 stars'
-                    const confidenceScore = (output[0].score * 100).toFixed(1) + "%";
+                if (output && output.labels && output.labels.length > 0) {
+                    // ดึงอารมณ์ที่มีคะแนนสูงสุด
+                    const topEmotion = output.labels[0].toUpperCase(); // เช่น 'FEAR', 'ANGER'
+                    const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
                     
-                    const mappedEmotion = mapStarRatingToEmotion(rawLabel);
-                    
-                    updateUIResult(mappedEmotion, confidenceScore);
+                    // อัปเดต UI และชุดสี
+                    updateUIResult(topEmotion, confidenceScore);
                 }
             } catch (err) {
                 stopLoadingAnimation();
