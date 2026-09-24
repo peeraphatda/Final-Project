@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // UI Elements
     const textInput = document.getElementById('textInput');
     const analyzeBtn = document.getElementById('analyzeBtn');
@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const translations = {
         TH: {
             subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี',
-            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI',
-            placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad, รู้สึกเศร้าจัง หรือ I feel happy...',
+            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
+            placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
             analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
             uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
             extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
@@ -45,11 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
             advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
             recTheme: 'ธีมที่แนะนำ: ',
             typography: 'ชุดฟอนต์: ',
-            usageContext: 'การนำไปใช้งาน: '
+            usageContext: 'การนำไปใช้งาน: ',
+            loadingModel: 'กำลังโหลด AI Model...',
+            analyzingText: 'AI กำลังประมวลผล...'
         },
         EN: {
             subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
-            inputLabel: 'Enter Thai or English text to analyze sentiment via AI',
+            inputLabel: 'Enter text to analyze sentiment via Local AI Model',
             placeholder: 'i feel happy or feel sad...',
             analyzeBtn: 'Analyze Sentiment',
             uploadBtn: 'Upload Image (Extract)',
@@ -61,7 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
             advisoryTitle: 'AI Design Advisory',
             recTheme: 'Recommended Theme: ',
             typography: 'Typography: ',
-            usageContext: 'Usage Context: '
+            usageContext: 'Usage Context: ',
+            loadingModel: 'Loading AI Model...',
+            analyzingText: 'AI is Analyzing...'
         }
     };
 
@@ -74,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyLanguage(lang) {
         const t = translations[lang];
-        
         if (subTitle) subTitle.innerText = t.subTitle;
         if (inputLabel) inputLabel.innerText = t.inputLabel;
         if (textInput) textInput.placeholder = t.placeholder;
@@ -102,7 +105,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 2. ฐานข้อมูลและกฎจิตวิทยาของสี (Color Psychology Rules)
+    // 2. โหลด AI Model จริงบนเบราว์เซอร์ (Transformers.js)
+    // ----------------------------------------------------
+    let sentimentPipeline = null;
+
+    async function initAIModel() {
+        if (window.transformers) {
+            try {
+                if (emotionLabel) emotionLabel.innerText = translations[currentLang].loadingModel;
+                
+                // โหลด DistilBERT Sentiment Analysis Model
+                sentimentPipeline = await window.transformers.pipeline(
+                    'sentiment-analysis', 
+                    'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
+                );
+                
+                if (emotionLabel) emotionLabel.innerText = "READY";
+            } catch (err) {
+                console.error("Failed to load AI Model:", err);
+            }
+        }
+    }
+
+    // เริ่มโหลด AI Model ทันทีเมื่อเปิดเว็บ
+    initAIModel();
+
+    // ----------------------------------------------------
+    // 3. ฐานข้อมูลและกฎจิตวิทยาของสี
     // ----------------------------------------------------
     const emotionRules = {
         JOY: {
@@ -138,68 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    
-    // ----------------------------------------------------
-    // 4. ฟังก์ชันประมวลผลอารมณ์จากค่าสีของรูปภาพ
-    // ----------------------------------------------------
-    function analyzeColorSentiment(rgbColors) {
-        let totalR = 0, totalG = 0, totalB = 0;
-        
-        rgbColors.forEach(color => {
-            totalR += color.r;
-            totalG += color.g;
-            totalB += color.b;
-        });
-
-        const count = rgbColors.length;
-        const avgR = totalR / count;
-        const avgG = totalG / count;
-        const avgB = totalB / count;
-
-        const brightness = (avgR * 299 + avgG * 587 + avgB * 114) / 1000;
-
-        if (brightness < 80) {
-            return 'FEAR';
-        } else if (avgR > avgG * 1.3 && avgR > avgB * 1.3) {
-            return 'ANGER';
-        } else if (avgB > avgR * 1.1 && brightness < 150) {
-            return 'SADNESS';
-        } else if (avgG > avgR && avgB > avgR) {
-            return 'CALM';
-        } else {
-            return 'JOY';
-        }
-    }
-
-    // ----------------------------------------------------
-    // 5. ฟังก์ชันเคลียร์ค่าและซ่อนส่วนของรูปภาพ
-    // ----------------------------------------------------
-    function clearImageResult() {
-        if (extractedPaletteSection) {
-            extractedPaletteSection.style.display = 'none';
-        }
-        if (extractedPalette) {
-            extractedPalette.innerHTML = '';
-        }
-        if (imagePreview) {
-            imagePreview.src = '';
-        }
-        if (imageInput) {
-            imageInput.value = '';
-        }
-    }
-
-    if (textInput) {
-        textInput.addEventListener('input', () => {
-            clearImageResult();
-        });
-    }
-
-    // ----------------------------------------------------
-    // 6. ปุ่มวิเคราะห์ข้อความ (ประมวลผลทันทีใน 0.01 วินาที)
+    // 4. ปุ่มวิเคราะห์ด้วย AI Model
     // ----------------------------------------------------
     if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', (e) => {
+        analyzeBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const text = textInput ? textInput.value.trim() : '';
 
@@ -215,17 +186,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearImageResult();
 
-            // วิเคราะห์และอัปเดต UI ทันที
-            const emotionResult = detectTextSentimentInstant(text);
-            const confidenceScore = (90 + Math.floor(Math.random() * 9)) + '.5%';
-            
-            updateUIResult(emotionResult, confidenceScore);
+            if (emotionLabel) emotionLabel.innerText = translations[currentLang].analyzingText;
+
+            // ตรวจสอบว่าโมเดลพร้อมทำงานหรือไม่
+            if (sentimentPipeline) {
+                // วิเคราะห์ด้วย Deep Learning Model จริง
+                const output = await sentimentPipeline(text);
+                
+                // ผลลัพธ์ตัวอย่าง: [{ label: 'NEGATIVE', score: 0.998 }]
+                if (output && output[0]) {
+                    const label = output[0].label;
+                    const score = (output[0].score * 100).toFixed(1) + "%";
+
+                    let mappedEmotion = "JOY";
+                    if (label === 'NEGATIVE') {
+                        mappedEmotion = "SADNESS";
+                    } else {
+                        mappedEmotion = "JOY";
+                    }
+
+                    updateUIResult(mappedEmotion, score);
+                    return;
+                }
+            }
+
+            // หาก AI ยังโหลดไม่เสร็จ จะแสดงสถานะแจ้งเตือน
+            if (emotionLabel) emotionLabel.innerText = "Model is initializing...";
         });
     }
 
     // ----------------------------------------------------
-    // 7. เหตุการณ์ปุ่มอัปโหลดรูปภาพ
+    // 5. การประมวลผลรูปภาพและการจัดการ UI
     // ----------------------------------------------------
+    function clearImageResult() {
+        if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
+        if (extractedPalette) extractedPalette.innerHTML = '';
+        if (imagePreview) imagePreview.src = '';
+        if (imageInput) imageInput.value = '';
+    }
+
+    if (textInput) {
+        textInput.addEventListener('input', () => clearImageResult());
+    }
+
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', () => imageInput.click());
     }
@@ -239,9 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const reader = new FileReader();
             reader.onload = (event) => {
-                if (imagePreview) {
-                    imagePreview.src = event.target.result;
-                }
+                if (imagePreview) imagePreview.src = event.target.result;
 
                 const img = new Image();
                 img.onload = () => {
@@ -263,9 +264,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ----------------------------------------------------
-    // 8. ฟังก์ชันช่วยประมวลผล Canvas & แสดงผล UI
-    // ----------------------------------------------------
+    function analyzeColorSentiment(rgbColors) {
+        let totalR = 0, totalG = 0, totalB = 0;
+        rgbColors.forEach(color => {
+            totalR += color.r;
+            totalG += color.g;
+            totalB += color.b;
+        });
+
+        const count = rgbColors.length;
+        const brightness = ((totalR / count) * 299 + (totalG / count) * 587 + (totalB / count) * 114) / 1000;
+
+        if (brightness < 80) return 'FEAR';
+        if (totalR > totalG * 1.3 && totalR > totalB * 1.3) return 'ANGER';
+        if (totalB > totalR * 1.1 && brightness < 150) return 'SADNESS';
+        if (totalG > totalR && totalB > totalR) return 'CALM';
+        return 'JOY';
+    }
+
     function extractRGBColors(ctx, width, height, count) {
         const hexList = [];
         const rgbList = [];
