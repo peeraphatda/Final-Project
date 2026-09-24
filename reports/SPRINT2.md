@@ -4,11 +4,11 @@
 - **รายวิชา:** CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
 - **สัปดาห์ที่:** 2 (Sprint 2: Persistence, Report & AI Advisory)
 - **สมาชิกในทีม:**
-  - **นายปฏิพัฒน์ หอทอง** (ปลั๊ก) — **Planner** (วางโครงสร้าง Database Schema & Export Specification)
+  - **นายปฏิภาณ นามสีลี** (ท็อป)— **Planner** (วางโครงสร้าง Database Schema & Export Specification)
   - **นายกฤษฎา สายวัน** (กาย) — **Coder** (พัฒนา DataStore, SQLite Persistence & Supabase Integration)
   - **นายภีรภัทร ด่านภูมิพัฒนา** (ภีม) — **Coder** (พัฒนา Report Generator & AI Advisory Engine)
-  - **นายปฏิภาณ นามสีลี** (ท็อป) — **Debugger / QA** (ทดสอบ Batch File Processing & WCAG Calculation Validation)
-
+  - **นายปฏิพัฒน์ หอทอง** (ปลั๊ก) — **Debugger / QA** (ทดสอบ Batch File Processing & WCAG Calculation Validation)
+**นายปฏิภาณ นามสีลี** (ท็อป)
 ---
 
 ## 1. สรุปความก้าวหน้าของงาน (Sprint Progress Summary)
