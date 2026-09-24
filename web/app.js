@@ -1,3 +1,9 @@
+// นำเข้า Transformers.js ในรูปแบบ ES Module
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+// ปิดการเรียกใช้ Local Model Path
+env.allowLocalModels = false;
+
 document.addEventListener('DOMContentLoaded', () => {
     // UI Elements
     const textInput = document.getElementById('textInput');
@@ -167,22 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 4. AI Model Engine (Transformers.js 100%)
+    // 4. AI Pipeline Engine
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
     async function getAIPipeline() {
         if (!sentimentPipeline) {
-            if (!window.transformers) {
-                throw new Error("Transformers CDN Library is missing in index.html!");
-            }
-            // ปิดการดาวน์โหลดดึงไฟล์ local เพื่อป้องกัน Error บล็อก path
-            window.transformers.env.allowLocalModels = false;
-            
             startLoadingAnimation(translations[currentLang].loadingModel);
-            
-            // โหลด AI Model จาก Hugging Face CDN
-            sentimentPipeline = await window.transformers.pipeline(
+            // โหลดโมเดล AI Sentiment Analysis จาก Hugging Face
+            sentimentPipeline = await pipeline(
                 'sentiment-analysis', 
                 'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
             );
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 5. ปุ่มวิเคราะห์อารมณ์ด้วย AI Model
+    // 5. ปุ่มวิเคราะห์อารมณ์ด้วย AI
     // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async (e) => {
@@ -210,19 +209,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearImageResult();
 
-            // ล็อกปุ่มป้องกันกดรัว
             analyzeBtn.disabled = true;
             analyzeBtn.style.opacity = '0.7';
             if (confidenceValue) confidenceValue.innerText = "...";
 
             try {
-                // 1. เรียก/โหลด AI Pipeline
+                // เรียกใช้ AI
                 const classifier = await getAIPipeline();
                 
-                // 2. แสดง Animation กำลังวิเคราะห์
                 startLoadingAnimation(translations[currentLang].analyzingText);
 
-                // 3. ให้ Deep Learning AI ประมวลผลข้อความจริง
+                // ส่งประโยคให้ AI ประมวลผล
                 const output = await classifier(text);
                 
                 stopLoadingAnimation();
@@ -233,15 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const mappedEmotion = (label === 'NEGATIVE') ? "SADNESS" : "JOY";
                     
                     updateUIResult(mappedEmotion, score);
-                } else {
-                    throw new Error("Invalid output structure from AI Model");
                 }
-
             } catch (err) {
                 stopLoadingAnimation();
-                console.error("AI Processing Error:", err);
-                if (emotionLabel) emotionLabel.innerText = "AI Error (Check Console)";
-                alert("ไม่สามารถรัน AI Model ได้: " + err.message + "\n\n*ข้อแนะนำ: ให้ทดลองเปิดเว็บผ่าน Live Server (VS Code Extension) ครับ");
+                console.error("AI Error:", err);
+                if (emotionLabel) emotionLabel.innerText = "Error Loading AI";
+                alert("เกิดข้อผิดพลาดในการรัน AI: " + err.message);
             } finally {
                 analyzeBtn.disabled = false;
                 analyzeBtn.style.opacity = '1';

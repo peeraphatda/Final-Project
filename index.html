@@ -1,83 +1,72 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.14.0"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Art & Palette — Sentiment Analyzer</title>
+    <title>Smart AI Color Palette</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- เรียกใช้ app.js เป็น ES Module เพื่อนำเข้า AI Library (Transformers.js) -->
+    <script type="module" src="app.js"></script>
 </head>
 <body>
-
-    <div class="glass-container">
-        <!-- Header Section -->
+    <div class="container">
+        <!-- Header -->
         <header class="header">
-            <div class="logo-title">
-                <h2>Smart Art & Palette</h2>
-                <p id="subTitle">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
+            <div class="header-top">
+                <h1 class="logo">Smart AI Color Palette</h1>
+                <button id="langToggleBtn" class="lang-btn">EN / TH</button>
             </div>
-            <button id="langToggleBtn" class="btn-lang">EN / TH</button>
+            <p id="subTitle" class="subtitle">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
         </header>
 
-        <!-- Main Input Section -->
-        <main class="main-content">
-            <div class="input-card">
-                <label for="textInput" id="inputLabel" class="section-title">กรอกข้อความภาษาอังกฤษเพื่อวิเคราะห์อารมณ์</label>
+        <!-- Main Card -->
+        <main class="main-card">
+            <div class="input-section">
+                <label id="inputLabel" for="textInput" class="input-label">กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model</label>
+                <textarea id="textInput" class="text-input" rows="4" placeholder="พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy..."></textarea>
                 
-                <textarea id="textInput" placeholder="i feel sad..."></textarea>
-                
-                <div id="alertBox" class="alert-box" style="display: none; color: #ff4d4f; margin-bottom: 10px; font-weight: 500; font-size: 0.85rem;"></div>
+                <div id="alertBox" class="alert-box" style="display: none;"></div>
 
                 <div class="button-group">
                     <button id="analyzeBtn" class="btn btn-primary">วิเคราะห์อารมณ์ (Analyze)</button>
-                    <button id="uploadTriggerBtn" type="button" class="btn btn-secondary">อัปโหลดรูปภาพ (Extract Image)</button>
+                    <button id="uploadTriggerBtn" class="btn btn-secondary">อัปโหลดรูปภาพ (Extract Image)</button>
                     <input type="file" id="imageInput" accept="image/*" style="display: none;">
                 </div>
             </div>
 
-            <!-- Extracted Image Palette Result & Image Preview -->
-            <div id="extractedPaletteSection" class="result-card" style="display: none;">
-                <h3 class="result-title">Uploaded Image & Extracted Palette</h3>
-                
-                <!-- กล่องแสดงรูปภาพที่อัปโหลด -->
+            <!-- Uploaded Image Preview & Extracted Palette Section -->
+            <div id="extractedPaletteSection" class="extracted-section" style="display: none;">
+                <h3 class="result-title">รูปภาพที่อัปโหลดและจานสีที่สกัดได้</h3>
                 <div class="image-preview-container">
-                    <img id="imagePreview" src="" alt="Uploaded Preview">
+                    <img id="imagePreview" src="" alt="Preview" class="image-preview">
                 </div>
-
-                <div id="extractedPalette" class="palette-grid"></div>
+                <div id="extractedPalette" class="palette-display"></div>
             </div>
 
-            <!-- Emotion Analysis Result Section -->
-            <div id="resultSection" class="result-card">
-                <div class="emotion-header">
-                    <h3 id="resultEmotion">Emotion Result: <span id="emotionLabel">JOY</span></h3>
-                    <p id="resultConfidence">Confidence Score: <span id="confidenceValue">98.5%</span></p>
+            <hr class="divider">
+
+            <!-- Result Section -->
+            <div class="result-section">
+                <div class="emotion-info">
+                    <h2 id="resultEmotion" class="emotion-title">ผลลัพธ์อารมณ์: <span id="emotionLabel" class="highlight-emotion">READY</span></h2>
+                    <p id="resultConfidence" class="confidence-text">ค่าความเชื่อมั่น: <span id="confidenceValue">-</span></p>
                 </div>
 
-                <div class="palette-section">
-                    <h4 id="paletteTitle">Color Palette (WCAG Compliant)</h4>
-                    <div id="paletteDisplay" class="palette-grid">
-                        <div class="color-swatch" style="background-color: #FFD700;"><span>#FFD700</span></div>
-                        <div class="color-swatch" style="background-color: #FF8C00;"><span>#FF8C00</span></div>
-                        <div class="color-swatch" style="background-color: #FF69B4;"><span>#FF69B4</span></div>
-                        <div class="color-swatch" style="background-color: #00BFFF;"><span>#00BFFF</span></div>
-                        <div class="color-swatch" style="background-color: #32CD32;"><span>#32CD32</span></div>
-                    </div>
+                <div class="palette-container">
+                    <h3 id="paletteTitle" class="section-subtitle">ชุดจานสีแนะนำ (WCAG Compliant)</h3>
+                    <div id="paletteDisplay" class="palette-display"></div>
                 </div>
 
+                <!-- AI Design Advisory -->
                 <div class="advisory-section">
-                    <h4>AI Design Advisory</h4>
-                    <p><strong>Recommended Theme:</strong> <span id="themeName">Vibrant Sunburst</span></p>
-                    <p><strong>Typography:</strong> <span id="fontPairing">Poppins / Montserrat</span></p>
-                    <p><strong>Usage Context:</strong> <span id="usageContext">E-Commerce, Festival Branding, UI Dashboard</span></p>
+                    <h4>คำแนะนำการออกแบบโดย AI</h4>
+                    <p><strong>ธีมที่แนะนำ: </strong><span id="themeName">-</span></p>
+                    <p><strong>ชุดฟอนต์: </strong><span id="fontPairing">-</span></p>
+                    <p><strong>การนำไปใช้งาน: </strong><span id="usageContext">-</span></p>
                 </div>
             </div>
         </main>
     </div>
-
-    <script src="app.js"></script>
 </body>
 </html>
