@@ -22,7 +22,7 @@
    * **รหัสนักศึกษา:** 683380424-5 | **Email:** patipat.ho@kkumail.com
 
 ---
-#### 🔄 สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
+## 🔄 สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
 
 เพื่อให้สมาชิกทุกคนในทีมได้ฝึกฝนทั้ง 3 บทบาทหลัก (**Planner / Architect**, **Coder / Dev**, **Debugger / QA & DevOps**) ครบทุกคน 100%:
 
@@ -34,13 +34,13 @@
 | **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger / QA** | **Coder / Dev** | **Debugger / QA & Deployment** |
 ## ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview)
 
-##### 🟢 ฟีเจอร์ที่พัฒนาเสร็จแล้ว (Current Implemented Features - Sprint 1)
+#### 🟢 ฟีเจอร์ที่พัฒนาเสร็จแล้ว (Current Implemented Features - Sprint 1)
 * 🎭 **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping ป้องกันข้อผิดพลาด
 * 🎨 **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
 * 📊 **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib`
 * 💻 **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface รับข้อความและประมวลผลทันที
 
-##### 🟡 ฟีเจอร์ตามแผนงานใน Sprint 2 (Persistence, Report & AI Advisory)
+#### 🟡 ฟีเจอร์ตามแผนงานใน Sprint 2 (Persistence, Report & AI Advisory)
 * 💾 **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite
 * ☁️ **Cloud Database Migration (`src/data_store.py`):** ย้ายการจัดเก็บข้อมูลจาก Local SQLite ไปยัง Cloud Database (Supabase PostgreSQL)
 * 📤 **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์โครงสร้างที่นักออกแบบนำไปใช้จริงได้ทันที เช่น `.json`, `CSS variables`, และ `Tailwind config`
@@ -48,7 +48,7 @@
 * 🧠 **AI Design Advisory (`src/ai_advisory.py`):** ประมวลผลคำแนะนำด้านการออกแบบ เช่น ตั้งชื่อแนวคิดธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการจัดวาง Layout
 * ♿ **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 เพื่อแจ้งเตือนคู่สีที่อ่านยาก
 
-##### 🔴 ฟีเจอร์ตามแผนงานใน Sprint 3 (Web Dashboard & Deployment)
+#### 🔴 ฟีเจอร์ตามแผนงานใน Sprint 3 (Web Dashboard & Deployment)
 * 🌐 **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และดูจานสี
 * 🌐 **Bilingual UI Support (`web/index.html`):** สลับภาษาในการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
 * 🖼️ **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
@@ -56,9 +56,9 @@
 
 ---
 
-#### 📅 แผนการทำงานภาพรวม (3 Sprints Roadmap)
+## 📅 แผนการทำงานภาพรวม (3 Sprints Roadmap)
 
-##### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture**
+#### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture**
 * **เป้าหมาย:** สร้างรากฐานสถาปัตยกรรมเชิงวัตถุ (OOP) ระบบประมวลผล NLP Sentiment analysis และ CLI Swatch Visualization
 * **รายละเอียดงาน:**
   * `src/emotion_client.py`: เชื่อมต่อ Hugging Face DistilBERT Pipeline พร้อมระบบ Defensive Fallback
@@ -68,7 +68,7 @@
   * `tests/`: ชุดทดสอบระบบอัตโนมัติ (Automated `pytest`)
 * **การใช้ Agile Kanban:** กำหนดข้อจำกัดงานในหมวด *In Progress* (**WIP Limit = 2**) เพื่อควบคุมขั้นตอนการพัฒนาและทำ Unit Test ก่อนส่งมอบทุกครั้ง
 
-##### 2. **Sprint 2: Persistence, Report & AI Advisory**
+#### 2. **Sprint 2: Persistence, Report & AI Advisory**
 * **เป้าหมาย:** เพิ่มระบบบันทึกประวัติยั่งยืน การรายงานผล Batch File คำแนะนำดีไซน์ และการเชื่อมต่อ Cloud DB
 * **รายละเอียดงาน:**
   * `src/data_store.py`: บันทึกข้อมูลลง SQLite (`data/palette_history.db`) พร้อม Sync ขึ้น Supabase Cloud PostgreSQL
@@ -76,7 +76,7 @@
   * `src/ai_advisory.py`: สร้างคำแนะนำแนวคิดดีไซน์ และ Font Pairings ตามอารมณ์
   * WCAG Accessibility Calculator: ฟังก์ชันคำนวณอัตราส่วนความต่างสี (Contrast Ratio)
 
-##### 3. **Sprint 3: Web Dashboard & Deployment**
+#### 3. **Sprint 3: Web Dashboard & Deployment**
 * **เป้าหมาย:** พัฒนา Web Dashboard สไตล์ Glassmorphic รองรับสองภาษา ระบบ Image Mood Input และรัน CI/CD Deployment
 * **รายละเอียดงาน:**
   * `web/index.html`: สถาปัตยกรรม Frontend แบบ Responsive Glassmorphic UI
@@ -85,7 +85,7 @@
 
 ---
 
-#### 🧩 โมดูลหลักของระบบ (Core Components)
+## 🧩 โมดูลหลักของระบบ (Core Components)
 
 1. **`src/emotion_client.py` (`EmotionClient`):**
    * ทำหน้าที่เป็น Client Gateway รับข้อความภาษาอังกฤษและภาษาไทย
