@@ -49,6 +49,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // ----------------------------------------------------
+    // ฟังก์ชันล้างผลลัพธ์จากการอัปโหลดรูปภาพ
+    // ----------------------------------------------------
+    function clearImageResult() {
+        if (extractedPaletteSection) {
+            extractedPaletteSection.style.display = 'none';
+        }
+        if (extractedPalette) {
+            extractedPalette.innerHTML = '';
+        }
+        if (imageInput) {
+            imageInput.value = ''; // Reset input file
+        }
+    }
+
+    // เมื่อเริ่มพิมพ์ข้อความใหม่ ให้ซ่อนผลลัพธ์รูปภาพทันที
+    if (textInput) {
+        textInput.addEventListener('input', () => {
+            clearImageResult();
+        });
+    }
+
     function detectTextSentiment(text) {
         const lower = text.toLowerCase();
         if (lower.includes('sad') || lower.includes('cry') || lower.includes('depressed') || lower.includes('bad')) {
@@ -91,6 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ----------------------------------------------------
+    // กดปุ่มวิเคราะห์ข้อความ (Analyze)
+    // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -106,11 +131,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (alertBox) alertBox.style.display = 'none';
 
+            // ซ่อน/ล้างผลลัพธ์ของรูปภาพเมื่อวิเคราะห์ด้วยข้อความ
+            clearImageResult();
+
             const detectedEmotion = detectTextSentiment(text);
             updateUIResult(detectedEmotion, (88 + Math.floor(Math.random() * 11)) + '.5%');
         });
     }
 
+    // ----------------------------------------------------
+    // กดอัปโหลดรูปภาพ
+    // ----------------------------------------------------
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', () => imageInput.click());
     }
@@ -119,6 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
+            // เมื่อเริ่มวิเคราะห์รูปภาพ ล้างข้อความใน Textarea ออก
+            if (textInput) textInput.value = '';
 
             const reader = new FileReader();
             reader.onload = (event) => {
