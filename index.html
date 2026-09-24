@@ -1,61 +1,112 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Art & Palette Sentiment Analyzer</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="glass-container">
-        <!-- Header & Language Toggle -->
-        <header>
-            <div class="logo">
-                <h1>🎨 Smart Art & Palette</h1>
-                <p id="sub-title">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
-            </div>
-            <button id="lang-toggle-btn" class="glass-btn">EN / TH</button>
-        </header>
+document.addEventListener('DOMContentLoaded', () => {
+    const textInput = document.getElementById('textInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const alertBox = document.getElementById('alertBox');
+    
+    const uploadTriggerBtn = document.getElementById('uploadTriggerBtn');
+    const imageInput = document.getElementById('imageInput');
+    const extractedPalette = document.getElementById('extractedPalette');
+    const extractedPaletteSection = document.getElementById('extractedPaletteSection');
 
-        <!-- Main Input Section -->
-        <main>
-            <section class="input-card glass-card">
-                <h2 id="input-heading">กรอกข้อความภาษาอังกฤษเพื่อวิเคราะห์อารมณ์</h2>
-                <textarea id="text-input" placeholder="e.g., I feel deeply happy and full of excitement today..."></textarea>
-                
-                <div class="button-group">
-                    <button id="analyze-btn" class="primary-btn">วิเคราะห์อารมณ์ (Analyze)</button>
-                    <label for="image-upload" class="glass-btn upload-label">
-                        📁 <span id="upload-text">อัปโหลดรูปภาพ (Extract Image)</span>
-                    </label>
-                    <input type="file" id="image-upload" accept="image/*" hidden>
-                </div>
-            </section>
+    // ----------------------------------------------------
+    // 1. ระบบตรวจเช็กข้อความว่าง (Validation)
+    // ----------------------------------------------------
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const text = textInput ? textInput.value.trim() : '';
 
-            <!-- Results Section -->
-            <section id="result-section" class="result-card glass-card hidden">
-                <div class="result-header">
-                    <h2>Emotion Result: <span id="emotion-label">-</span></h2>
-                    <p>Confidence Score: <span id="confidence-score">0%</span></p>
-                </div>
+            if (!text) {
+                if (alertBox) {
+                    alertBox.innerText = '⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
+                    alertBox.style.display = 'block';
+                } else {
+                    alert('⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!');
+                }
+                return;
+            }
 
-                <!-- Palette Display -->
-                <div class="palette-container">
-                    <h3>Color Palette (WCAG Compliant)</h3>
-                    <div id="palette-swatches" class="swatches"></div>
-                </div>
+            if (alertBox) alertBox.style.display = 'none';
+            console.log('Analyzing:', text);
+            // สั่งประมวลผลต่อตาม Logic ของคุณ...
+        });
+    }
 
-                <!-- AI Design Advisory -->
-                <div class="advisory-container glass-card">
-                    <h3 id="advisory-heading">💡 AI Design Advisory</h3>
-                    <p><strong>Recommended Theme:</strong> <span id="adv-theme">-</span></p>
-                    <p><strong>Typography:</strong> <span id="adv-font">-</span></p>
-                    <p><strong>Usage Context:</strong> <span id="adv-usage">-</span></p>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script src="app.js"></script>
-</body>
-</html>
+    // ----------------------------------------------------
+    // 2. ระบบผูกปุ่มอัปโหลดรูปภาพ (Trigger File Input)
+    // ----------------------------------------------------
+    if (uploadTriggerBtn && imageInput) {
+        uploadTriggerBtn.addEventListener('click', () => {
+            imageInput.click(); // สั่งเปิดหน้าต่างเลือกไฟล์
+        });
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    // สร้าง Canvas สกัดสีจากภาพ
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const colors = extractColors(ctx, canvas.width, canvas.height, 5);
+                    renderPalette(colors);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ฟังก์ชันดึงสีจาก Canvas
+    function extractColors(ctx, width, height, count) {
+        const colors = [];
+        const stepX = Math.floor(width / (count + 1));
+        const stepY = Math.floor(height / 2);
+
+        for (let i = 1; i <= count; i++) {
+            const p = ctx.getImageData(i * stepX, stepY, 1, 1).data;
+            const hex = '#' + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
+            colors.push(hex);
+        }
+        return colors;
+    }
+
+    // ฟังก์ชันวาดจานสีลง UI
+    function renderPalette(colors) {
+        if (!extractedPalette) return;
+        extractedPalette.innerHTML = '';
+        if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
+
+        colors.forEach(color => {
+            const box = document.createElement('div');
+            box.style.backgroundColor = color;
+            box.style.width = '55px';
+            box.style.height = '55px';
+            box.style.borderRadius = '8px';
+            box.style.display = 'inline-block';
+            box.style.margin = '5px';
+            box.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+            box.title = color;
+
+            const label = document.createElement('span');
+            label.innerText = color;
+            label.style.display = 'block';
+            label.style.fontSize = '10px';
+            label.style.textAlign = 'center';
+            label.style.marginTop = '60px';
+            label.style.color = '#fff';
+
+            box.appendChild(label);
+            extractedPalette.appendChild(box);
+        });
+    }
+});
