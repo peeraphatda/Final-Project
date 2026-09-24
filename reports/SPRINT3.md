@@ -9,10 +9,10 @@
 
 | สมาชิก | ชื่อเล่น | บทบาทหน้าที่ใน Sprint 3 |
 | :--- | :---: | :--- |
+| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Planner** (ตรวจสอบระบบ GitHub Pages Deployment & Automated Build Scripts) |
 | **นายปฏิภาณ นามสีลี** | ท็อป | **Coder** (วางโครงสร้าง Web Architecture, UI/UX Glassmorphism & i18n System) |
 | **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder** (พัฒนา Frontend Dashboard, JavaScript Core & GitHub Actions CI/CD) |
 | **นายกฤษฎา สายวัน** | กาย | **Debugger** (ทดสอบการสกัดสีจากรูปภาพ Image Extractor & Cross-Browser Testing) |
-| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Planner** (ตรวจสอบระบบ GitHub Pages Deployment & Automated Build Scripts) |
 
 ---
 
