@@ -1,13 +1,14 @@
 # Smart Art & Palette — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
 
 รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
+
 อาจารย์ผู้สอน: ผศ. บุญสืบ ไวคำ
 
 **Google Colab Notebook:** [กดที่นี่เพื่อเปิดดู Google Colab](https://colab.research.google.com/drive/10bgPo_R8iiEEitrnFC8ZJkmdZS2GU6Hr?usp=sharing)
 
 ---
 
-##  รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members & Roles)
+##  รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members)
 
 1. **ปฏิภาณ นามสีลี (ท็อป)**  
    * **รหัสนักศึกษา:** 683380425-3 | **Email:** patiphan.na@kkumail.com
@@ -32,170 +33,115 @@
 | **นายปฏิภาณ นามสีลี** | ท็อป | **Coder / Dev (NLP Pipeline)** | **Debugger / QA** | **Planner / Architect** |
 | **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder / Dev (Visualization)** | **Planner / Architect** | **Coder & DevOps** |
 | **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger / QA** | **Coder / Dev** | **Debugger / QA & Deployment** |
-## 1. Project Overview & Pitch
+#### ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview)
 
-* **Project Name:** Smart Art & Palette Sentiment Analyzer
-* **Project Pitch:**
-  แอปพลิเคชันวิเคราะห์อารมณ์ความรู้สึกจากข้อความที่ต่อยอดไปสู่การช่วยงานครีเอทีฟ โดยไม่เพียงแค่จำแนกอารมณ์ว่าเป็น บวก/ลบ/สุข/เศร้า แต่จะคำนวณและแนะนำ **Color Palette (กลุ่มโค้ดสี Hex 5 สี)** ที่สะท้อนถึงมิติของอารมณ์นั้นๆ ตามหลักจิตวิทยาของสี (Color Psychology) ผ่านหน้าต่าง CLI เพื่อช่วยให้ดีไซเนอร์และนักสร้างสรรค์นำไปใช้เป็นแรงบันดาลใจในการออกแบบบรรจุภัณฑ์ แบรนด์ดิ้ง หรืองานกราฟิกได้อย่างรวดเร็ว
+##### 🟢 ฟีเจอร์ที่พัฒนาเสร็จแล้ว (Current Implemented Features - Sprint 1)
+* 🎭 **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping ป้องกันข้อผิดพลาด
+* 🎨 **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
+* 📊 **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib`
+* 💻 **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface รับข้อความและประมวลผลทันที
+
+##### 🟡 ฟีเจอร์ตามแผนงานใน Sprint 2 (Persistence, Report & AI Advisory)
+* 💾 **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite
+* ☁️ **Cloud Database Migration (`src/data_store.py`):** ย้ายการจัดเก็บข้อมูลจาก Local SQLite ไปยัง Cloud Database (Supabase PostgreSQL)
+* 📤 **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์โครงสร้างที่นักออกแบบนำไปใช้จริงได้ทันที เช่น `.json`, `CSS variables`, และ `Tailwind config`
+* 📊 **Batch/Report Mode (`src/report_generator.py`):** อ่านข้อความหลายบรรทัดจากไฟล์ `.txt` / `.csv` สรุปเป็นรายงานสถิติ พร้อมภาพกราฟ Mood Board รวม
+* 🧠 **AI Design Advisory (`src/ai_advisory.py`):** ประมวลผลคำแนะนำด้านการออกแบบ เช่น ตั้งชื่อแนวคิดธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการจัดวาง Layout
+* ♿ **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 เพื่อแจ้งเตือนคู่สีที่อ่านยาก
+
+##### 🔴 ฟีเจอร์ตามแผนงานใน Sprint 3 (Web Dashboard & Deployment)
+* 🌐 **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และดูจานสี
+* 🌐 **Bilingual UI Support (`web/index.html`):** สลับภาษาในการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
+* 🖼️ **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
+* 🚀 **GitHub Pages Deployment (`.github/workflows/deploy.yml`):** ระบบ CI/CD จัดส่งหน้าเว็บไปยัง GitHub Pages อัตโนมัติ
 
 ---
 
-## 2. Sprint 1 Plan & Definition of Done
+#### 📅 แผนการทำงานภาพรวม (3 Sprints Roadmap)
 
-* **Sprint Goal:** พัฒนา Core Engine สำหรับวิเคราะห์อารมณ์จากข้อความ (6 อารมณ์หลัก: Joy, Sadness, Anger, Fear, Surprise, Love) ผ่านระบบ CLI Interactive Loop ที่รับอินพุตได้อย่างต่อเนื่อง พร้อม Mapping กับทฤษฎีสีเพื่อแสดงผล Hex Codes และเรนเดอร์แถบสี (Visual Swatches)
-* **Definition of Done (DoD):**
-  1. โปรแกรมแสดงข้อความต้อนรับและรับคำสั่งจากผู้ใช้ได้อย่างต่อเนื่องด้วย `while True` loop
-  2. เมื่อพิมพ์คำสั่ง `quit` หรือ `exit` (ไม่ว่าจะตัวพิมพ์เล็กหรือใหญ่) โปรแกรมต้องหยุดทำงานและออกจากระบบทันที
-  3. เมื่อผู้ใช้กด Enter โดยไม่พิมพ์ข้อความ โปรแกรมต้องแสดงคำเตือนและไม่พัง (Error Handling)
-  4. สามารถวิเคราะห์และเรนเดอร์ภาพแถบสี (Visual Swatches) ออกมาได้ถูกต้องตามอารมณ์ที่ประมวลผลได้
+##### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture**
+* **เป้าหมาย:** สร้างรากฐานสถาปัตยกรรมเชิงวัตถุ (OOP) ระบบประมวลผล NLP Sentiment analysis และ CLI Swatch Visualization
+* **รายละเอียดงาน:**
+  * `src/emotion_client.py`: เชื่อมต่อ Hugging Face DistilBERT Pipeline พร้อมระบบ Defensive Fallback
+  * `src/palette_engine.py`: ตารางแมปอารมณ์ 6 ประเภทสู่กลุ่มสีจิตวิทยา
+  * `src/visualizer.py`: วาดภาพ Swatch รูปแบบ PNG ผ่าน `matplotlib`
+  * `src/cli_app.py` & `main.py`: หน้าต่างปฏิสัมพันธ์ Command Line Interface และโหมด `--demo`
+  * `tests/`: ชุดทดสอบระบบอัตโนมัติ (Automated `pytest`)
+* **การใช้ Agile Kanban:** กำหนดข้อจำกัดงานในหมวด *In Progress* (**WIP Limit = 2**) เพื่อควบคุมขั้นตอนการพัฒนาและทำ Unit Test ก่อนส่งมอบทุกครั้ง
+
+##### 2. **Sprint 2: Persistence, Report & AI Advisory**
+* **เป้าหมาย:** เพิ่มระบบบันทึกประวัติยั่งยืน การรายงานผล Batch File คำแนะนำดีไซน์ และการเชื่อมต่อ Cloud DB
+* **รายละเอียดงาน:**
+  * `src/data_store.py`: บันทึกข้อมูลลง SQLite (`data/palette_history.db`) พร้อม Sync ขึ้น Supabase Cloud PostgreSQL
+  * `src/report_generator.py`: Batch Processing ประมวลผลไฟล์ `.txt`/`.csv` และระบบ Export โค้ดสี JSON/CSS/Tailwind
+  * `src/ai_advisory.py`: สร้างคำแนะนำแนวคิดดีไซน์ และ Font Pairings ตามอารมณ์
+  * WCAG Accessibility Calculator: ฟังก์ชันคำนวณอัตราส่วนความต่างสี (Contrast Ratio)
+
+##### 3. **Sprint 3: Web Dashboard & Deployment**
+* **เป้าหมาย:** พัฒนา Web Dashboard สไตล์ Glassmorphic รองรับสองภาษา ระบบ Image Mood Input และรัน CI/CD Deployment
+* **รายละเอียดงาน:**
+  * `web/index.html`: สถาปัตยกรรม Frontend แบบ Responsive Glassmorphic UI
+  * Bilingual Toggle & Image Color Extractor: สลับภาษา TH/EN และสกัดสีจากรูปภาพด้วย Canvas API
+  * `.github/workflows/`: ตั้งค่า GitHub Actions สั่ง Deploy หน้าเว็บไปยัง GitHub Pages
 
 ---
 
-## 3. Execution & Source Code
+#### 🧩 โมดูลหลักของระบบ (Core Components)
 
-สามารถดูซอร์สโค้ดฉบับเต็มและการประมวลผลการรันแสดงผลได้ในไฟล์ Notebook  [Sprint_1.ipynb](./Sprint_1.ipynb)
+1. **`src/emotion_client.py` (`EmotionClient`):**
+   * ทำหน้าที่เป็น Client Gateway รับข้อความภาษาอังกฤษและภาษาไทย
+   * ประมวลผลด้วยโมเดล `bhadresh-savani/distilbert-base-uncased-emotion`
+   * มีระบบ **Defensive Fallback Unwrapping** เพื่อป้องกัน `TypeError` กรณี Output คืนค่าเป็น Nested List
 
-```python
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from transformers import pipeline
+2. **`src/palette_engine.py` (`PaletteEngine`):**
+   * ทำหน้าที่แปลงอารมณ์ความรู้สึกให้เป็นกลุ่มสี Hex Code 5 สี ตามหลัก Color Psychology
+   * คำนวณค่าสัมพัทธ์ความสว่าง (Relative Luminance) และค่า **Contrast Ratio** ตามมาตรฐาน WCAG 2.1
 
-# [Coder 1 - ท็อป] โหลด Pre-trained Model สำหรับ Emotion Classification
-print("Loading Emotion Analysis Model...")
-emotion_classifier = pipeline(
-    "text-classification",
-    model="bhadresh-savani/distilbert-base-uncased-emotion",
-    return_all_scores=True
-)
-print("Model loaded successfully!\n")
+3. **`src/data_store.py` (`DataStore`):**
+   * จัดเก็บข้อมูลยั่งยืน (Persistence Storage) ลงฐานข้อมูล **SQLite3** (`data/palette_history.db`)
+   * มีฟังก์ชัน Migrate และ Sync ข้อมูลไปยัง **Supabase Cloud Database**
 
-# [Planner - กาย] แผนผังสีตามทฤษฎีจิตวิทยาของสี (Color Psychology Mapping)
-COLOR_PALETTE_MAP = {
-    "joy": {
-        "mood": "Joyful & Energetic",
-        "palette": ["#FFD700", "#FFA500", "#FF69B4", "#FFFACD", "#20B2AA"],
-        "names": ["Golden Yellow", "Bright Orange", "Hot Pink", "Lemon Chiffon", "Light Sea Green"]
-    },
-    "sadness": {
-        "mood": "Melancholy & Calming",
-        "palette": ["#1C2D42", "#3B5998", "#6C7A89", "#A2B9BC", "#E0E7E9"],
-        "names": ["Midnight Blue", "Muted Navy", "Slate Grey", "Dusty Blue", "Soft Fog"]
-    },
-    "anger": {
-        "mood": "Intense & Fiery",
-        "palette": ["#8B0000", "#D32F2F", "#FF5722", "#333333", "#FFC107"],
-        "names": ["Crimson Red", "Vibrant Red", "Burnt Orange", "Charcoal Black", "Amber Gold"]
-    },
-    "fear": {
-        "mood": "Mysterious & Tense",
-        "palette": ["#211A1E", "#4A3E3D", "#8E7DBE", "#2A4747", "#D1D5DB"],
-        "names": ["Dark Shadow", "Deep Espresso", "Muted Purple", "Deep Teal", "Ash Grey"]
-    },
-    "surprise": {
-        "mood": "Vibrant & Unexpected",
-        "palette": ["#FF007F", "#7B1FA2", "#00E5FF", "#CCFF00", "#2D1E2F"],
-        "names": ["Electric Pink", "Deep Violet", "Cyan Neon", "Lime Accent", "Dark Plum"]
-    },
-    "love": {
-        "mood": "Warm & Romantic",
-        "palette": ["#E91E63", "#F48FB1", "#FFCDD2", "#880E4F", "#FFF8E7"],
-        "names": ["Rose Pink", "Soft Blush", "Pastel Pink", "Deep Rose", "Warm Vanilla"]
-    }
-}
+4. **`src/ai_advisory.py` (`AIAdvisory`):**
+   * ทำหน้าที่เป็นครีเอทีฟผู้ช่วย ประมวลผลและเสนอชื่อธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการจัดวางองค์ประกอบให้เข้ากับอารมณ์นั้นๆ
 
-def analyze_and_generate_palette(text: str):
-    """
-    Core Pipeline Engine Function (Coder 1 - ท็อป & Coder 2 - ปลั๊ก)
-    """
-    # Emotion Prediction & Output Parsing Fix
-    results = emotion_classifier(text)
-    
-    if isinstance(results[0], list):
-        sorted_results = sorted(results[0], key=lambda x: x['score'], reverse=True)
-        top_emotion = sorted_results[0]['label']
-        top_score = sorted_results[0]['score']
-    else:
-        top_emotion = results[0]['label']
-        top_score = results[0]['score']
-    
-    palette_data = COLOR_PALETTE_MAP.get(top_emotion, COLOR_PALETTE_MAP["joy"])
-    
-    # Display Output Text
-    print("\n" + "="*50)
-    print(f" Input Text: \"{text}\"")
-    print(f" Primary Emotion: {top_emotion.upper()} ({top_score*100:.2f}% Confidence)")
-    print(f" Design Mood Concept: {palette_data['mood']}")
-    print("="*50)
-    print("Suggested Hex Colors:")
-    for hex_code, color_name in zip(palette_data['palette'], palette_data['names']):
-        print(f"  • {hex_code} ({color_name})")
-    print()
-    
-    # [Coder 2 - ปลั๊ก] Render Visual Color Palette Block
-    fig, ax = plt.subplots(figsize=(8, 2.2))
-    ax.set_xlim(0, len(palette_data['palette']))
-    ax.set_ylim(0, 1)
-    ax.axis('off')
-    
-    for idx, (hex_code, color_name) in enumerate(zip(palette_data['palette'], palette_data['names'])):
-        rect = patches.Rectangle((idx, 0.3), 1, 0.7, linewidth=0, facecolor=hex_code)
-        ax.add_patch(rect)
-        ax.text(idx + 0.5, 0.18, hex_code, ha='center', va='center', fontsize=9, fontweight='bold')
-        ax.text(idx + 0.5, 0.06, color_name, ha='center', va='center', fontsize=8, color='#555555')
-    
-    plt.title(f"Smart Palette Preview — {top_emotion.upper()} ({palette_data['mood']})", fontsize=11, pad=10)
-    plt.tight_layout()
-    plt.show()
-    print("\n")
+5. **`src/report_generator.py` (`ReportGenerator`):**
+   * อ่านไฟล์ข้อมูลชุด (`.txt` หรือ `.csv`) สรุปเป็นสถิติสัดส่วนอารมณ์พร้อมสร้างภาพ Mood Board รวม
+   * แปลงข้อมูลจานสีให้อยู่ในรูปแบบที่โปรแกรมเมอร์/ดีไซเนอร์นำไปใช้งานได้ทันที (JSON, CSS Variables, Tailwind Config)
 
-def main():
-    """
-    [Coder 2 - ปลั๊ก & Debugger - ภีม] CLI Interactive Loop
-    """
-    print("="*50)
-    print(" Welcome to Smart Art & Palette Sentiment Analyzer (CLI)")
-    print("คำแนะนำ: พิมพ์ข้อความภาษาอังกฤษเพื่อวิเคราะห์ หรือพิมพ์ 'quit' เพื่อออกจากระบบ")
-    print("="*50 + "\n")
-    
-    while True:
-        try:
-            # [Debugger - ภีม] Input Sanitization (.strip())
-            user_input = input("Enter your text prompt (or 'quit' to exit): ").strip()
-            
-            # [Debugger - ภีม] Checking Exit Command (.lower())
-            if user_input.lower() in ['quit', 'exit']:
-                print("\nขอบคุณที่ใช้งานระบบ Smart Art & Palette! ออกจากโปรแกรมเรียบร้อยแล้ว ")
-                break
-            
-            # [Debugger - ภีม] Edge Case: Empty String Checking
-            if not user_input:
-                print(" คำเตือน: ข้อความนำเข้าต้องไม่เป็นช่องว่าง! กรุณาลองใหม่อีกครั้ง\n")
-                continue
-                
-            # Run Analysis Pipeline
-            analyze_and_generate_palette(user_input)
-            
-        except KeyboardInterrupt:
-            print("\n\nยกเลิกการทำงาน ขอบคุณที่ใช้งานครับ ")
-            break
-        except Exception as e:
-            print(f"\n เกิดข้อผิดพลาดไม่คาดคิด: {e}\n")
+6. **`src/cli_app.py` (`CLIApp`):**
+   * หน้าต่างปฏิสัมพันธ์ Command Line Interface (CLI) รับอินพุต ทำความสะอาดข้อความด้วย `.strip()`
+   * วาดตารางแสดงผล พร้อมรายงานผล WCAG Contrast และ คำแนะนำ AI Advisory
 
-if __name__ == "__main__":
-    main()
+7. **`main.py` (Main Controller):**
+   * จุดเริ่มต้นหลักของแอปพลิเคชัน รองรับทั้ง **Interactive CLI Mode** (`python main.py`), **Automated Demo Mode** (`python main.py --demo`), และ **Web Dashboard Mode** (`python main.py --web`)
+
 ---
-```
-## 4. QA Report & Retrospective
 
-### 4.1 ตารางผลการทดสอบระบบ (Quality Assurance & Debugging Report)
+#### 📂 โครงสร้างไดเรกทอรี (Directory Structure)
 
-| รายการทดสอบ | อินพุตที่ใช้ (Input) | ผลลัพธ์ที่คาดหวัง (Expected) | ผลการทดสอบจริง (Actual) | สถานะ |
-| :--- | :--- | :--- | :--- | :---: |
-| **การออกจากโปรแกรม** | `QUIT` หรือ `exit` | แสดงข้อความอำลาและหยุดทำงานออกจาก Loop | แสดงข้อความอำลาและหลุดจาก Loop เรียบร้อย | **PASSED** |
-| **การกรอกข้อมูลว่าง** | ` ` (กด Spacebar แล้ว Enter) | แสดงข้อความแจ้งเตือน ไม่ให้โปรแกรมพัง | แสดงเตือน: "คำเตือน: ข้อความนำเข้าต้องไม่เป็นช่องว่าง!" | **PASSED** |
-| **การวิเคราะห์ข้อความปกติ** | `I am so happy and excited!` | แสดงค่าอารมณ์ JOY และเรนเดอร์แถบสีโทนเหลือง/ส้ม | แสดงอารมณ์ JOY (99.8%) พร้อมภาพ Palette | **PASSED** |
-
-### 4.2 สรุปบทเรียนประจำสัปดาห์ (Retrospective: Wow! & Whoops!)
-
-* **Wow! (ส่วนที่ทำได้ดี):** สามารถแบ่งหน้าที่ภายในทีม 4 คน ได้ชัดเจน พัฒนาโครงสร้างโปรแกรม CLI ที่ทำงานซ้ำได้อย่างราบรื่น และเชื่อมต่อ AI Model เข้ากับการเรนเดอร์ภาพแถบสี (Visual Swatches) ได้สำเร็จตาม DoD
-* **Whoops! (ปัญหาที่พบและแนวทางแก้ไข):** พบปัญหา `TypeError` ในช่วงแรกเนื่องจากโครงสร้าง Output ที่ส่งอกจาก Hugging Face Model เป็น List ซ้อน List Debugger ได้ทำการ Refactor โค้ดเพิ่ม Condition Checking ทำให้ระบบทนทานและไม่พังเมื่อเจอรูปแบบข้อมูลที่ต่างออกไป
+```text
+Final-Project/
+├── .github/
+│   └── workflows/             # GitHub Actions CI/CD Deploy Scripts
+├── src/                       # Core Python Application Modules
+│   ├── emotion_client.py      # Hugging Face DistilBERT Classifier
+│   ├── palette_engine.py      # Color Psychology & WCAG Calculator
+│   ├── visualizer.py          # Matplotlib Swatch & Chart Renderer
+│   ├── cli_app.py             # CLI Interactive Interface
+│   ├── data_store.py          # SQLite Local & Supabase Sync
+│   ├── report_generator.py    # Batch Mode & Palette Exports
+│   └── ai_advisory.py         # Design Advisory & Font Pairings
+├── web/                       # Frontend Web Application
+│   └── index.html             # Glassmorphic UI Dashboard
+├── tests/                     # Automated Unit Testing Suites
+│   ├── test_emotion_client.py
+│   ├── test_palette_engine.py
+│   └── test_data_store.py
+├── data/                      # Database & Output Storage
+│   └── palette_history.db     # SQLite Local Database
+├── test_cases/                # Sample files (.txt / .csv) for Batch Testing
+├── main.py                    # Main Entry Point (--cli, --demo, --web)
+├── requirements.txt           # Project Dependencies
+├── README.md                  # Project Documentation
+├── CHANGELOG.md               # Version History
+└── LEARNINGLOG.md             # Development Prompts & Reflection Log
