@@ -1,7 +1,7 @@
 // นำเข้า Transformers.js ในรูปแบบ ES Module
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-// ปิดการดึง Local Model เพื่อป้องกันปัญหา Path
+// ปิดการดึง Local Model เพื่อบังคับให้ดึงไฟล์จาก CDN ของ Xenova
 env.allowLocalModels = false;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 4. AI Pipeline Engine (โมเดลแยก 6 อารมณ์)
+    // 4. AI Pipeline Engine (ใช้ BERT Multilingual Model)
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
@@ -181,36 +181,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
             
-            // เปลี่ยนมาใช้ Xenova/emotion ซึ่งโหลดได้ชัวร์ ไม่ติด Unauthorized 100%
+            // ใช้ BERT Multilingual Model ของ Xenova ที่เปิดสิทธิ์ Public CDN 100%
             sentimentPipeline = await pipeline(
                 'text-classification', 
-                'Xenova/emotion'
+                'Xenova/bert-base-multilingual-uncased-sentiment'
             );
         }
         return sentimentPipeline;
     }
 
-    // Mapping เลเบลจาก AI ให้เข้ากับกฎชุดสีที่มีอยู่
-    function mapModelLabelToEmotion(label) {
-        const uppercaseLabel = label.toUpperCase();
-        switch (uppercaseLabel) {
-            case 'JOY':
-            case 'LOVE':
-            case 'SURPRISE':
-                return 'JOY';
-            case 'SADNESS':
-                return 'SADNESS';
-            case 'ANGER':
-                return 'ANGER';
-            case 'FEAR':
-                return 'FEAR';
+    // แปลงผลลัพธ์ของ BERT (1 star - 5 stars) เข้ากับกลุ่มอารมณ์
+    function mapStarRatingToEmotion(label) {
+        const stars = parseInt(label);
+        switch (stars) {
+            case 1:
+                return 'ANGER';    // 1 ดาว = เชิงลบแรง (โกรธ/โมโห)
+            case 2:
+                return 'SADNESS';  // 2 ดาว = เชิงลบกลาง (เศร้า/เสียใจ)
+            case 3:
+                return 'FEAR';     // 3 ดาว = กังวล/ไม่แน่นอน
+            case 4:
+            case 5:
+                return 'JOY';      // 4-5 ดาว = เชิงบวก (สุข/สดใส)
             default:
                 return 'JOY';
         }
     }
 
     // ----------------------------------------------------
-    // 5. ปุ่มวิเคราะห์อารมณ์ด้วย AI
+    // 5. ปุ่มวิเคราะห์อารมณ์ด้วย AI Model
     // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async (e) => {
@@ -231,32 +230,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
             analyzeBtn.disabled = true;
             analyzeBtn.style.opacity = '0.7';
-            if (confidenceValue) confidenceValue.innerText = "...";
 
             try {
-                // เรียกใช้โมเดล AI
+                // เรียกใช้ Transformer AI
                 const classifier = await getAIPipeline();
                 
                 startLoadingAnimation(translations[currentLang].analyzingText);
 
-                // ส่งประโยคให้ AI จำแนกอารมณ์
+                // ประมวลผลข้อความด้วย AI
                 const output = await classifier(text);
-                
                 stopLoadingAnimation();
 
                 if (output && output[0]) {
-                    const rawLabel = output[0].label; // เช่น 'anger', 'joy', 'sadness'
-                    const score = (output[0].score * 100).toFixed(1) + "%";
+                    const rawLabel = output[0].label; // ได้เป็น '1 star' ถึง '5 stars'
+                    const confidenceScore = (output[0].score * 100).toFixed(1) + "%";
                     
-                    const mappedEmotion = mapModelLabelToEmotion(rawLabel);
+                    const mappedEmotion = mapStarRatingToEmotion(rawLabel);
                     
-                    updateUIResult(mappedEmotion, score);
+                    updateUIResult(mappedEmotion, confidenceScore);
                 }
             } catch (err) {
                 stopLoadingAnimation();
-                console.error("AI Error:", err);
-                if (emotionLabel) emotionLabel.innerText = "Error Loading AI";
-                alert("เกิดข้อผิดพลาดในการรัน AI: " + err.message);
+                console.error("AI Model Error:", err);
+                if (emotionLabel) emotionLabel.innerText = "Error Loading AI Model";
+                alert("เกิดข้อผิดพลาดในการรัน AI Model: " + err.message);
             } finally {
                 analyzeBtn.disabled = false;
                 analyzeBtn.style.opacity = '1';
