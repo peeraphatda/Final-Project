@@ -181,10 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
             
-            // ใช้โมเดลสำหรับจำแนกอารมณ์แบบละเอียด (sadness, joy, love, anger, fear, surprise)
+            // เปลี่ยนมาใช้ Xenova/emotion ซึ่งโหลดได้ชัวร์ ไม่ติด Unauthorized 100%
             sentimentPipeline = await pipeline(
                 'text-classification', 
-                'Xenova/bhadresh-savani-distilbert-base-uncased-emotion'
+                'Xenova/emotion'
             );
         }
         return sentimentPipeline;
