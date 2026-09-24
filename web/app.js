@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 4. AI Pipeline Engine (Zero-Shot Classifier สำหรับแยก 6 อารมณ์)
+    // 4. AI Pipeline Engine (ใช้ DistilBERT MNLI เปิดสิทธิ์ Public 100%)
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
@@ -187,10 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
             
-            // ใช้ Zero-Shot Classification Model ที่เปิดสิทธิ์ Public 100%
+            // ใช้ Xenova/distilbert-base-uncased-mnli ที่ไฟล์ Config/Tokenizer ไม่ติด Gate Access
             sentimentPipeline = await pipeline(
                 'zero-shot-classification', 
-                'Xenova/typeform-distilbert-base-uncased-mnli'
+                'Xenova/distilbert-base-uncased-mnli'
             );
         }
         return sentimentPipeline;
@@ -227,16 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // กำหนดอารมณ์เป้าหมาย 6 หมวดหมู่
                 const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
 
-                // ส่งคำไปให้ AI คำนวณ Zero-Shot Classification
+                // ส่งข้อความประมวลผล Zero-Shot Classification
                 const output = await classifier(text, candidateLabels);
                 stopLoadingAnimation();
 
                 if (output && output.labels && output.labels.length > 0) {
-                    // ดึงชื่ออารมณ์ที่ AI คำนวณได้อันดับ 1
                     const topEmotion = output.labels[0].toUpperCase();
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
                     
-                    // อัปเดต UI และชุดสี
                     updateUIResult(topEmotion, confidenceScore);
                 }
             } catch (err) {
