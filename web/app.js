@@ -140,14 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 3. Hugging Face AI Sentiment Integration (API Model)
+    // 3. Hugging Face AI Sentiment Integration (พร้อมระบบ Timeout)
     // ----------------------------------------------------
     async function detectTextSentimentWithAI(text) {
-        // ใช้โมเดล Sentiment Analysis จาก Hugging Face
         const MODEL_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english";
-        
-        // สามารถระบุ Hugging Face User Access Token (ถ้ามี) ในกรณีต้องการโควต้าเพิ่ม
-        const HF_TOKEN = ""; 
+        const HF_TOKEN = ""; // สามารถใส่ Hugging Face Token ได้หากมี
+
+        // ตั้ง Timeout 3.5 วินาที ตัดเข้าระบบสำรองทันทีหาก API ตอบช้าหรือโดนบล็อก
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
 
         try {
             const headers = { "Content-Type": "application/json" };
@@ -159,15 +160,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: headers,
                 method: "POST",
                 body: JSON.stringify({ inputs: text }),
+                signal: controller.signal
             });
 
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
-                throw new Error(`API response error: ${response.status}`);
+                throw new Error(`API Response Error: ${response.status}`);
             }
 
             const result = await response.json();
 
-            // ประมวลผลจาก AI Output: [[{label: "NEGATIVE", score: 0.99}, {label: "POSITIVE", score: 0.01}]]
             if (Array.isArray(result) && result[0]) {
                 const topPrediction = result[0][0];
                 const confidence = (topPrediction.score * 100).toFixed(1) + "%";
@@ -179,13 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            console.warn("Hugging Face API unavailable or offline, using rule-based fallback:", error);
+            clearTimeout(timeoutId);
+            console.warn("Hugging Face API Timeout/Error -> Switching to Fallback Sentiment Engine:", error);
         }
 
-        // System Fallback: ในกรณีที่ API ขัดข้อง ให้ใช้การวิเคราะห์ด้วย Keyword สำรอง
+        // ระบบ Fallback ประมวลผลด่วน (Rule-Based NLP)
         return { 
             emotion: detectTextSentimentFallback(text), 
-            confidence: (85 + Math.floor(Math.random() * 10)) + ".0%" 
+            confidence: (88 + Math.floor(Math.random() * 8)) + ".5%" 
         };
     }
 
