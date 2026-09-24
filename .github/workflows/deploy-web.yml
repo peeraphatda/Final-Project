@@ -1,18 +1,21 @@
-name: Deploy Web Dashboard to GitHub Pages
+name: 🚀 Deploy Web Dashboard to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches:
+      - main
+  workflow_dispatch: # ปรับให้สามารถกดสั่ง Run Manual จากหน้า GitHub ได้
 
+# กำหนด Permissions ให้ปลอดภัยตามหลัก Least Privilege
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# ป้องกันไม่ให้มี Job ซ้อนกันเมื่อมีการ Push ถี่ๆ
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -21,17 +24,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: ⚙️ Setup Pages
+        uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      - name: 📦 Upload Artifact (Web Directory)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # หรือ 'web' ขึ้นอยู่กับว่าวาง index.html ไว้ที่ไหน
+          path: './web'
 
-      - name: Deploy to GitHub Pages
+      - name: 🚀 Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
