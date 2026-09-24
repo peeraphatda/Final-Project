@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const translations = {
         TH: {
             subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี',
-            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI',
+            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
             placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
             analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
             uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
@@ -46,11 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
             recTheme: 'ธีมที่แนะนำ: ',
             typography: 'ชุดฟอนต์: ',
             usageContext: 'การนำไปใช้งาน: ',
-            analyzingText: 'กำลังวิเคราะห์ด้วย AI'
+            loadingModel: 'กำลังโหลด AI Model',
+            analyzingText: 'AI กำลังประมวลผล'
         },
         EN: {
             subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
-            inputLabel: 'Enter text to analyze sentiment via AI',
+            inputLabel: 'Enter text to analyze sentiment via AI Model',
             placeholder: 'i feel happy or feel sad...',
             analyzeBtn: 'Analyze Sentiment',
             uploadBtn: 'Upload Image (Extract)',
@@ -63,7 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
             recTheme: 'Recommended Theme: ',
             typography: 'Typography: ',
             usageContext: 'Usage Context: ',
-            analyzingText: 'Analyzing with AI'
+            loadingModel: 'Loading AI Model',
+            analyzingText: 'AI is Analyzing'
         }
     };
 
@@ -113,12 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (emotionLabel) emotionLabel.innerText = baseText + '.';
 
         loadingInterval = setInterval(() => {
-            dotCount = (dotCount + 1) % 4; // วนรอบ 0 -> 1 -> 2 -> 3
+            dotCount = (dotCount + 1) % 4;
             const dots = '.'.repeat(dotCount === 0 ? 1 : dotCount);
             if (emotionLabel) {
                 emotionLabel.innerText = baseText + dots;
             }
-        }, 350); // เปลี่ยนจุดทุกๆ 350ms
+        }, 350);
     }
 
     function stopLoadingAnimation() {
@@ -165,37 +167,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 4. AI Sentiment Processing Engine (Async non-blocking)
+    // 4. AI Model Engine (Transformers.js 100%)
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
-    async function analyzeSentimentWithAI(text) {
-        // ถ้ามี Transformers.js ให้ลองใช้โมเดล AI ในเครื่อง
-        if (window.transformers && !sentimentPipeline) {
-            try {
-                sentimentPipeline = await window.transformers.pipeline(
-                    'sentiment-analysis', 
-                    'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
-                );
-            } catch (err) {
-                console.warn("AI Model load fallback:", err);
+    async function getAIPipeline() {
+        if (!sentimentPipeline) {
+            if (!window.transformers) {
+                throw new Error("Transformers CDN Library is missing in index.html!");
             }
+            // ปิดการดาวน์โหลดดึงไฟล์ local เพื่อป้องกัน Error บล็อก path
+            window.transformers.env.allowLocalModels = false;
+            
+            startLoadingAnimation(translations[currentLang].loadingModel);
+            
+            // โหลด AI Model จาก Hugging Face CDN
+            sentimentPipeline = await window.transformers.pipeline(
+                'sentiment-analysis', 
+                'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
+            );
         }
-
-        if (sentimentPipeline) {
-            const output = await sentimentPipeline(text);
-            if (output && output[0]) {
-                const label = output[0].label;
-                const score = (output[0].score * 100).toFixed(1) + "%";
-                const mappedEmotion = (label === 'NEGATIVE') ? "SADNESS" : "JOY";
-                return { emotion: mappedEmotion, confidence: score };
-            }
-        }
-
+        return sentimentPipeline;
     }
 
     // ----------------------------------------------------
-    // 5. ปุ่มวิเคราะห์อารมณ์ (พร้อมระบบ Loading & Animation)
+    // 5. ปุ่มวิเคราะห์อารมณ์ด้วย AI Model
     // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async (e) => {
@@ -214,26 +210,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearImageResult();
 
-            // ปิดปุ่มชั่วคราว + เริ่ม Animation จุดวิ่ง
+            // ล็อกปุ่มป้องกันกดรัว
             analyzeBtn.disabled = true;
             analyzeBtn.style.opacity = '0.7';
             if (confidenceValue) confidenceValue.innerText = "...";
-            
-            startLoadingAnimation(translations[currentLang].analyzingText);
 
             try {
-                // ประมวลผลด้วย AI
-                const result = await analyzeSentimentWithAI(text);
+                // 1. เรียก/โหลด AI Pipeline
+                const classifier = await getAIPipeline();
                 
-                // หยุด Animation แล้วอัปเดตผลลัพธ์
+                // 2. แสดง Animation กำลังวิเคราะห์
+                startLoadingAnimation(translations[currentLang].analyzingText);
+
+                // 3. ให้ Deep Learning AI ประมวลผลข้อความจริง
+                const output = await classifier(text);
+                
                 stopLoadingAnimation();
-                updateUIResult(result.emotion, result.confidence);
+
+                if (output && output[0]) {
+                    const label = output[0].label;
+                    const score = (output[0].score * 100).toFixed(1) + "%";
+                    const mappedEmotion = (label === 'NEGATIVE') ? "SADNESS" : "JOY";
+                    
+                    updateUIResult(mappedEmotion, score);
+                } else {
+                    throw new Error("Invalid output structure from AI Model");
+                }
+
             } catch (err) {
-                console.error("Analysis Error:", err);
                 stopLoadingAnimation();
-                if (emotionLabel) emotionLabel.innerText = "Error";
+                console.error("AI Processing Error:", err);
+                if (emotionLabel) emotionLabel.innerText = "AI Error (Check Console)";
+                alert("ไม่สามารถรัน AI Model ได้: " + err.message + "\n\n*ข้อแนะนำ: ให้ทดลองเปิดเว็บผ่าน Live Server (VS Code Extension) ครับ");
             } finally {
-                // เปิดการทำงานของปุ่มกลับคืนมา
                 analyzeBtn.disabled = false;
                 analyzeBtn.style.opacity = '1';
             }
