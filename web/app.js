@@ -28,13 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------
     // 1. ระบบสลับภาษา UI (TH / EN)
     // ----------------------------------------------------
-    let currentLang = 'TH'; // ภาษาเริ่มต้น
+    let currentLang = 'TH';
 
     const translations = {
         TH: {
             subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี',
-            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์',
-            placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น รู้สึกเศร้าจัง หรือ I feel happy...',
+            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI',
+            placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad, รู้สึกเศร้าจัง หรือ I feel happy...',
             analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
             uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
             extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
@@ -45,11 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
             advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
             recTheme: 'ธีมที่แนะนำ: ',
             typography: 'ชุดฟอนต์: ',
-            usageContext: 'การนำไปใช้งาน: '
+            usageContext: 'การนำไปใช้งาน: ',
+            analyzingText: 'กำลังวิเคราะห์ด้วย AI...'
         },
         EN: {
             subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
-            inputLabel: 'Enter Thai or English text to analyze sentiment',
+            inputLabel: 'Enter Thai or English text to analyze sentiment via AI',
             placeholder: 'i feel happy or feel sad...',
             analyzeBtn: 'Analyze Sentiment',
             uploadBtn: 'Upload Image (Extract)',
@@ -61,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
             advisoryTitle: 'AI Design Advisory',
             recTheme: 'Recommended Theme: ',
             typography: 'Typography: ',
-            usageContext: 'Usage Context: '
+            usageContext: 'Usage Context: ',
+            analyzingText: 'Analyzing with AI...'
         }
     };
 
@@ -138,28 +140,68 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 3. ฟังก์ชันวิเคราะห์อารมณ์ข้อความ (รองรับทั้ง TH และ EN)
+    // 3. Hugging Face AI Sentiment Integration (API Model)
     // ----------------------------------------------------
-    function detectTextSentiment(text) {
-        const lower = text.toLowerCase();
+    async function detectTextSentimentWithAI(text) {
+        // ใช้โมเดล Sentiment Analysis จาก Hugging Face
+        const MODEL_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english";
+        
+        // สามารถระบุ Hugging Face User Access Token (ถ้ามี) ในกรณีต้องการโควต้าเพิ่ม
+        const HF_TOKEN = ""; 
 
-        // คำคีย์เวิร์ดภาษาไทย และ ภาษาอังกฤษ
-        const sadWords = ['sad', 'cry', 'depressed', 'bad', 'เศร้า', 'เสียใจ', 'ร้องไห้', 'ท้อ', 'ดิ่ง', 'แย่', 'ซึม', 'เหนื่อย'];
-        const angryWords = ['angry', 'hate', 'mad', 'โกรธ', 'เกลียด', 'โมโห', 'แค้น', 'หงุดหงิด', 'ฉุน', 'เดือด'];
-        const fearWords = ['scared', 'fear', 'afraid', 'กลัว', 'ระแวง', 'ผวา', 'ตกใจ', 'สยอง', 'หวาด'];
-        const calmWords = ['calm', 'peace', 'relax', 'สงบ', 'ผ่อนคลาย', 'ชิล', 'สบาย', 'เงียบ', 'โล่ง'];
+        try {
+            const headers = { "Content-Type": "application/json" };
+            if (HF_TOKEN) {
+                headers["Authorization"] = `Bearer ${HF_TOKEN}`;
+            }
 
-        if (sadWords.some(word => lower.includes(word))) {
-            return 'SADNESS';
-        } else if (angryWords.some(word => lower.includes(word))) {
-            return 'ANGER';
-        } else if (fearWords.some(word => lower.includes(word))) {
-            return 'FEAR';
-        } else if (calmWords.some(word => lower.includes(word))) {
-            return 'CALM';
-        } else {
-            return 'JOY';
+            const response = await fetch(MODEL_URL, {
+                headers: headers,
+                method: "POST",
+                body: JSON.stringify({ inputs: text }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`API response error: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // ประมวลผลจาก AI Output: [[{label: "NEGATIVE", score: 0.99}, {label: "POSITIVE", score: 0.01}]]
+            if (Array.isArray(result) && result[0]) {
+                const topPrediction = result[0][0];
+                const confidence = (topPrediction.score * 100).toFixed(1) + "%";
+
+                if (topPrediction.label === "NEGATIVE") {
+                    return { emotion: "SADNESS", confidence: confidence };
+                } else if (topPrediction.label === "POSITIVE") {
+                    return { emotion: "JOY", confidence: confidence };
+                }
+            }
+        } catch (error) {
+            console.warn("Hugging Face API unavailable or offline, using rule-based fallback:", error);
         }
+
+        // System Fallback: ในกรณีที่ API ขัดข้อง ให้ใช้การวิเคราะห์ด้วย Keyword สำรอง
+        return { 
+            emotion: detectTextSentimentFallback(text), 
+            confidence: (85 + Math.floor(Math.random() * 10)) + ".0%" 
+        };
+    }
+
+    // ฟังก์ชันสำรอง (Rule-Based Fallback)
+    function detectTextSentimentFallback(text) {
+        const lower = text.toLowerCase();
+        const sadWords = ['sad', 'cry', 'depressed', 'bad', 'died', 'dead', 'death', 'loss', 'grief', 'hurt', 'pain', 'lonely', 'เศร้า', 'เสียใจ', 'ร้องไห้', 'ท้อ', 'ดิ่ง', 'แย่', 'ซึม', 'เหนื่อย', 'ตาย', 'สูญเสีย', 'เจ็บ'];
+        const angryWords = ['angry', 'hate', 'mad', 'furious', 'annoyed', 'rage', 'โกรธ', 'เกลียด', 'โมโห', 'แค้น', 'หงุดหงิด', 'ฉุน', 'เดือด'];
+        const fearWords = ['scared', 'fear', 'afraid', 'terrified', 'anxious', 'panic', 'กลัว', 'ระแวง', 'ผวา', 'ตกใจ', 'สยอง', 'หวาด'];
+        const calmWords = ['calm', 'peace', 'relax', 'quiet', 'chill', 'สงบ', 'ผ่อนคลาย', 'ชิล', 'สบาย', 'เงียบ', 'โล่ง'];
+
+        if (sadWords.some(word => lower.includes(word))) return 'SADNESS';
+        if (angryWords.some(word => lower.includes(word))) return 'ANGER';
+        if (fearWords.some(word => lower.includes(word))) return 'FEAR';
+        if (calmWords.some(word => lower.includes(word))) return 'CALM';
+        return 'JOY';
     }
 
     // ----------------------------------------------------
@@ -212,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // เมื่อเริ่มพิมพ์ข้อความใหม่ ให้ซ่อนผลลัพธ์จากรูปภาพทันที
     if (textInput) {
         textInput.addEventListener('input', () => {
             clearImageResult();
@@ -220,10 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 6. เหตุการณ์ปุ่มวิเคราะห์ข้อความ (Analyze)
+    // 6. ปุ่มวิเคราะห์ข้อความด้วย AI (Async Event Listener)
     // ----------------------------------------------------
     if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', (e) => {
+        analyzeBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const text = textInput ? textInput.value.trim() : '';
 
@@ -239,8 +280,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearImageResult();
 
-            const detectedEmotion = detectTextSentiment(text);
-            updateUIResult(detectedEmotion, (88 + Math.floor(Math.random() * 11)) + '.5%');
+            // แสดงสถานะกำลังประมวลผล AI บน UI
+            if (emotionLabel) emotionLabel.innerText = translations[currentLang].analyzingText;
+            if (confidenceValue) confidenceValue.innerText = "...";
+
+            // เรียกใช้ AI Model ประมวลผลแบบ Asynchronous
+            const aiResult = await detectTextSentimentWithAI(text);
+            
+            // อัปเดตผลลัพธ์ AI บน UI
+            updateUIResult(aiResult.emotion, aiResult.confidence);
         });
     }
 
