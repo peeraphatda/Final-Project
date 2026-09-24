@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 3. ฐานข้อมูลและกฎจิตวิทยาของสี
+    // 3. ฐานข้อมูลและกฎจิตวิทยาของสี (รองรับ 6 อารมณ์)
     // ----------------------------------------------------
     const emotionRules = {
         JOY: {
@@ -164,15 +164,21 @@ document.addEventListener('DOMContentLoaded', () => {
             font: 'Cinzel / Inter',
             context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools'
         },
-        CALM: {
-            palette: ['#A8DADC', '#457B9D', '#1D3557', '#F1FAEE', '#E63946'],
-            theme: 'Serene Ocean',
-            font: 'Nunito / Quicksand',
-            context: 'Meditation Apps, Wellness Sites, Eco-Friendly Products'
+        LOVE: {
+            palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'],
+            theme: 'Romantic Bloom',
+            font: 'Playfair Display / Great Vibes',
+            context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms'
+        },
+        SURPRISE: {
+            palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'],
+            theme: 'Electric Wonder',
+            font: 'Plus Jakarta Sans / Space Grotesk',
+            context: 'Entertainment Apps, Promotional Banners, Interactive Art'
         }
     };
 
-   // ----------------------------------------------------
+    // ----------------------------------------------------
     // 4. AI Pipeline Engine (Zero-Shot Classifier สำหรับแยก 6 อารมณ์)
     // ----------------------------------------------------
     let sentimentPipeline = null;
@@ -181,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
             
-            // ใช้ Zero-Shot Classifier ของ Xenova ที่รองรับการแยกหมวดหมู่ตาม Candidate Labels
+            // ใช้ Zero-Shot Classification Model ที่เปิดสิทธิ์ Public 100%
             sentimentPipeline = await pipeline(
                 'zero-shot-classification', 
                 'Xenova/typeform-distilbert-base-uncased-mnli'
@@ -218,16 +224,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 startLoadingAnimation(translations[currentLang].analyzingText);
 
-                // กำหนดอารมณ์ที่ต้องการให้ AI วิเคราะห์
+                // กำหนดอารมณ์เป้าหมาย 6 หมวดหมู่
                 const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
 
-                // ส่งไปให้ AI คำนวณความน่าจะเป็นของแต่ละอารมณ์
+                // ส่งคำไปให้ AI คำนวณ Zero-Shot Classification
                 const output = await classifier(text, candidateLabels);
                 stopLoadingAnimation();
 
                 if (output && output.labels && output.labels.length > 0) {
-                    // ดึงอารมณ์ที่มีคะแนนสูงสุด
-                    const topEmotion = output.labels[0].toUpperCase(); // เช่น 'FEAR', 'ANGER'
+                    // ดึงชื่ออารมณ์ที่ AI คำนวณได้อันดับ 1
+                    const topEmotion = output.labels[0].toUpperCase();
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
                     
                     // อัปเดต UI และชุดสี
@@ -308,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (brightness < 80) return 'FEAR';
         if (totalR > totalG * 1.3 && totalR > totalB * 1.3) return 'ANGER';
         if (totalB > totalR * 1.1 && brightness < 150) return 'SADNESS';
-        if (totalG > totalR && totalB > totalR) return 'CALM';
+        if (totalG > totalR && totalB > totalR) return 'JOY';
         return 'JOY';
     }
 
