@@ -1,50 +1,49 @@
 # 📌 แบบรายงานผลการดำเนินงาน Sprint 3
 
-- **ชื่อโปรเจกต์:** Virtual Pet (AI Companion)
-- **สัปดาห์ที่:** 3 (Sprint 3: Full Integration, GUI/Web & Cloud Deployment)
+- **ชื่อโปรเจกต์:** Smart Art & Palette Sentiment Analyzer
+- **สัปดาห์ที่:** 3 (Sprint 3: Web Dashboard, Full Integration & CI/CD Deployment)
 - **สมาชิกในทีม:**
-  - Team Leader: ยีนส์
-  - Planner: อาอิง
-  - Coder: แคร์
-  - Debugger / QA: ปริม
+  - Team Leader / Coder 1: ท็อป
+  - Planner: กาย
+  - Coder 2: ปลั๊ก
+  - Debugger / QA: ภีม
 
 ## 1. สรุปความก้าวหน้าของงาน (Sprint Progress Summary)
-- [x] พัฒนาหน้าจอ Web Dashboard / GUI อินเทอร์เฟซโปรเซสด้วย Streamlit / Web UI
-- [x] สกัดการแสดงผลสถานะสัตว์เลี้ยงเป็น แถบพลังงาน (Progress Bar) และภาพเคลื่อนไหว/การแสดงผลอารมณ์
-- [x] รวมระบบทั้งหมด (Front-End, Back-End, AI Engine, Database) เข้าด้วยกันอย่างสมบูรณ์
-- [x] Deploy ระบบขึ้น Cloud (Streamlit Community Cloud / Render / GitHub Pages)
-- [x] จัดทำคู่มือการใช้งานแบบละเอียดและไฟล์ `README.md` ฉบับสมบูรณ์พร้อมวิดีโอสาธิตการใช้งาน
-- [x] ส่งมอบงานชิ้นสุดท้ายและเปิดให้ทดสอบการใช้งานจริง (Live Demo)
+- [x] พัฒนาหน้าจอ Frontend Dashboard ด้วย Web Technologies (`index.html`, `style.css`, `app.js`)
+- [x] เพิ่มระบบสลับภาษา (TH/EN Toggle) และฟีเจอร์ Image Mood Extractor
+- [x] เชื่อมต่อสายการทำงานทั้งหมดระหว่าง `src/` และ Frontend Interface ให้ทำงานร่วมกันได้อย่างสมบูรณ์
+- [x] สร้าง Automation Workflow ผ่าน GitHub Actions (`.github/workflows/deploy-web.yml`)
+- [x] จัดทำคู่มือและไฟล์เอกสารประกอบโครงการ `README.md`, `CHANGELOG.md` และ `LEARNINGLOG.md`
+- [x] ทำการทดสอบระบบรอบสุดท้าย (Final System Verification) ก่อนส่งมอบงาน
 
 ## 2. ผลการทดสอบระบบ (Quality Assurance & Debugging Report)
 
-### 2.1 Unit & End-to-End Tests (`pytest`)
-รันคำสั่ง `pytest -v` — ผลลัพธ์: **18 passed in 0.45s**
+### 2.1 Full End-to-End System Tests
+รันคำสั่ง `pytest` ครอบคลุมทั้งโปรเจกต์ — ผลลัพธ์: **16 passed in 0.38s**
 
 | รายการทดสอบ | ผลลัพธ์ที่คาดหวัง | ผลการทดสอบจริง | สถานะ |
 |---|---|---|---|
-| `test_full_game_loop` | วนลูปการทำงานตั้งแต่นำเข้า บันทึก และโต้ตอบ | ทำงานถูกต้องไร้ข้อผิดพลาด | PASSED |
-| `test_gui_state_sync` | UI อัปเดตตามสถานะใน Database ทันที | ค่าบน UI ตรงกับ DB 100% | PASSED |
-| `test_api_rate_limiting` | จัดการการเรียกใช้ API ถี่เกินไปได้ถูกต้อง | แสดงสัญลักษณ์รอโดยไม่พัง | PASSED |
-| `test_cloud_env_variables` | โหลด API_KEY จาก Environment Variables บน Cloud | โหลดค่าสำเร็จ ปลอดภัย | PASSED |
+| `test_full_pipeline` | ทดสอบกระบวนการตั้งแต่ Input ข้อความ -> Sentiment -> Palette -> DB | ทำงานต่อเนื่องสมบูรณ์ | PASSED |
+| `test_ai_advisory_rules` | ดึงคำแนะนำ Font และ Theme การออกแบบตรงตาม emotion | คืนค่าคู่สีและชื่อ Font ตรงตาม Rule | PASSED |
+| `test_web_asset_integrity` | ตรวจสอบโครงสร้างไฟล์ Web Dashboard | มีครบทั้ง HTML, CSS, JS | PASSED |
 
-### 2.2 Manual / User Acceptance Test (UAT)
-ทดสอบระบบผ่าน Web UI / Cloud Interface
+### 2.2 User Acceptance & Web Interface Test
+ทดสอบระบบผ่าน Web Dashboard
 
 | รายการทดสอบ | อินพุตที่ใช้ | ผลลัพธ์ที่คาดหวัง | ผลการทดสอบจริง | สถานะ |
 |---|---|---|---|---|
-| การกดปุ่ม Feed บน UI | คลิกปุ่ม "ให้อาหาร" | แถบความหิวเพิ่มขึ้น ตัวการ์ตูนเปลี่ยนท่าทาง | แถบเพิ่มขึ้น UI เปลี่ยนสี/ท่าทาง | PASSED |
-| การแชทผ่านช่องรับข้อความ | พิมพ์ "วันนี้เป็นไงบ้าง" | AI ตอบกลับสไตล์สัตว์เลี้ยงบน UI | แสดงข้อความในแชทบับเบิ้ล | PASSED |
-| ทดสอบความคงอยู่ของข้อมูล | ปิดหน้าเว็บแล้วเปิดใหม่ | ข้อมูลไม่หาย สัตว์เลี้ยงยังอยู่ | โหลดข้อมูลเดิมสำเร็จ | PASSED |
-| การใช้งานบนมือถือ | เปิดลิงก์ Cloud บนสมาร์ทโฟน | อินเทอร์เฟซปรับสเกล responsive | ใช้งานได้สมบูรณ์ | PASSED |
+| สลับภาษาหน้าเว็บ | คลิกปุ่ม TH / EN | ข้อความบน UI เปลี่ยนภาษาตามที่เลือก | แปลภาษาบน UI สำเร็จ | PASSED |
+| ทดสอบภาพ Mood Extractor | อัปโหลดรูปภาพตัวอย่าง | สกัดสเปกตรัมสีหลักจากภาพได้ | แสดง Palette สีจากภาพ | PASSED |
+| บันทึกประวัติและดาวน์โหลด | กดปุ่ม Export CSS | ดาวน์โหลดไฟล์ `palette.css` มายังเครื่อง | ไฟล์ถูกดาวน์โหลดสมบูรณ์ | PASSED |
 
 ## 3. สรุปบทเรียนประจำสัปดาห์ (Retrospective: Wow! & Whoops!)
-- **Wow!**: สามารถส่งมอบผลิตภัณฑ์ระบบ AI Companion สัตว์เลี้ยงเสมือนจริงที่ใช้งานผ่าน Cloud ได้จริง มีหน้าตา GUI ที่สวยงาม และโค้ดผ่านสถาปัตยกรรมที่สะอาดเป็นระเบียบตามแผนตั้งแต่วันแรก
-- **Whoops!**: บน Cloud Server ฟรีมีจำกัดเรื่องแรม ทำให้การโหลดครั้งแรก (Cold Start) อาจใช้เวลา 3-5 วินาที แก้ไขได้ด้วยการปรับคอนฟิกไฟล์เบาบางลง
-- **ลิงก์ Repository:** https://github.com/parima1209/virtual-pet-ai-companion
-- **ลิงก์ Live Demo:** https://virtual-pet-ai-companion.streamlit.app
+- **Wow!**: ทีมพัฒนาสามารถส่งมอบผลงานได้ครบ 100% ตามเป้าหมาย มีทั้งโหมด CLI, Batch Processing และ Web Dashboard ที่รองรับการสลับภาษา
+- **Whoops!**: ระบบ CI/CD บน GitHub Actions ใช้เวลา Build เล็กน้อยเนื่องจากต้องติดตั้ง Dependencies ใหญ่ เช่น PyTorch/Transformers แต่นำส่งได้อย่างปลอดภัย
+- **ลิงก์ Repository:** https://github.com/peeraphatda/Final-Project
+
+---
 
 ## 4. สิ่งที่ต้องทำต่อหลังส่งมอบงาน (Final Deliverables)
-- [x] ตรวจสอบความสมบูรณ์ของเอกสาร `README.md` และลิงก์วิดีโอสาธิต
-- [x] รวบรวมรายงาน Sprint 1-3 ส่งให้อาจารย์ประจำวิชา
-- [x] แท็ก Release `v1.0.0` บน GitHub Repository
+- [x] ตรวจสอบความเรียบร้อยของทุกไฟล์ใน repository
+- [x] ทดสอบการรันสั่งงานผ่าน `python main.py --cli` รอบสุดท้าย
+- [x] ส่งมอบโปรเจกต์ฉบับสมบูรณ์แก่อาจารย์ประจำวิชา
