@@ -1,7 +1,7 @@
 // นำเข้า Transformers.js ในรูปแบบ ES Module
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-// ปิดการเรียกใช้ Local Model Path
+// ปิดการดึง Local Model เพื่อป้องกันปัญหา Path
 env.allowLocalModels = false;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -173,20 +173,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // 4. AI Pipeline Engine
+    // 4. AI Pipeline Engine (โมเดลแยก 6 อารมณ์)
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
     async function getAIPipeline() {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
-            // โหลดโมเดล AI Sentiment Analysis จาก Hugging Face
+            
+            // ใช้โมเดลสำหรับจำแนกอารมณ์แบบละเอียด (sadness, joy, love, anger, fear, surprise)
             sentimentPipeline = await pipeline(
-                'sentiment-analysis', 
-                'Xenova/distilbert-base-uncased-finetuned-sst-2-english'
+                'text-classification', 
+                'Xenova/bhadresh-savani-distilbert-base-uncased-emotion'
             );
         }
         return sentimentPipeline;
+    }
+
+    // Mapping เลเบลจาก AI ให้เข้ากับกฎชุดสีที่มีอยู่
+    function mapModelLabelToEmotion(label) {
+        const uppercaseLabel = label.toUpperCase();
+        switch (uppercaseLabel) {
+            case 'JOY':
+            case 'LOVE':
+            case 'SURPRISE':
+                return 'JOY';
+            case 'SADNESS':
+                return 'SADNESS';
+            case 'ANGER':
+                return 'ANGER';
+            case 'FEAR':
+                return 'FEAR';
+            default:
+                return 'JOY';
+        }
     }
 
     // ----------------------------------------------------
@@ -214,20 +234,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confidenceValue) confidenceValue.innerText = "...";
 
             try {
-                // เรียกใช้ AI
+                // เรียกใช้โมเดล AI
                 const classifier = await getAIPipeline();
                 
                 startLoadingAnimation(translations[currentLang].analyzingText);
 
-                // ส่งประโยคให้ AI ประมวลผล
+                // ส่งประโยคให้ AI จำแนกอารมณ์
                 const output = await classifier(text);
                 
                 stopLoadingAnimation();
 
                 if (output && output[0]) {
-                    const label = output[0].label;
+                    const rawLabel = output[0].label; // เช่น 'anger', 'joy', 'sadness'
                     const score = (output[0].score * 100).toFixed(1) + "%";
-                    const mappedEmotion = (label === 'NEGATIVE') ? "SADNESS" : "JOY";
+                    
+                    const mappedEmotion = mapModelLabelToEmotion(rawLabel);
                     
                     updateUIResult(mappedEmotion, score);
                 }
