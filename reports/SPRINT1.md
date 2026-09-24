@@ -1,11 +1,6 @@
----
-
-### 📄 `reports/SPRINT1.md`
-
-```markdown
 # 🚀 Sprint 1 Report: Core System Foundation & OOP CLI Architecture
 
-**รายวิชา:** CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)  
+**รายวิชา:** CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
 **ชื่อโครงการ:** Smart Art & Palette — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
 
 ---
@@ -37,6 +32,7 @@
 ---
 
 ## 🛠️ เทคโนโลยีและมอดูลที่ใช้
+
 * **Language:** Python 3.9+
 * **Libraries:** `transformers`, `torch`, `matplotlib`, `pytest`
 * **Architecture Pattern:** Object-Oriented Programming (OOP) & Modular Architecture
