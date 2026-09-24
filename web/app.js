@@ -189,20 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // ฟังก์ชันสำรอง (Rule-Based Fallback)
-    function detectTextSentimentFallback(text) {
-        const lower = text.toLowerCase();
-        const sadWords = ['sad', 'cry', 'depressed', 'bad', 'died', 'dead', 'death', 'loss', 'grief', 'hurt', 'pain', 'lonely', 'เศร้า', 'เสียใจ', 'ร้องไห้', 'ท้อ', 'ดิ่ง', 'แย่', 'ซึม', 'เหนื่อย', 'ตาย', 'สูญเสีย', 'เจ็บ'];
-        const angryWords = ['angry', 'hate', 'mad', 'furious', 'annoyed', 'rage', 'โกรธ', 'เกลียด', 'โมโห', 'แค้น', 'หงุดหงิด', 'ฉุน', 'เดือด'];
-        const fearWords = ['scared', 'fear', 'afraid', 'terrified', 'anxious', 'panic', 'กลัว', 'ระแวง', 'ผวา', 'ตกใจ', 'สยอง', 'หวาด'];
-        const calmWords = ['calm', 'peace', 'relax', 'quiet', 'chill', 'สงบ', 'ผ่อนคลาย', 'ชิล', 'สบาย', 'เงียบ', 'โล่ง'];
-
-        if (sadWords.some(word => lower.includes(word))) return 'SADNESS';
-        if (angryWords.some(word => lower.includes(word))) return 'ANGER';
-        if (fearWords.some(word => lower.includes(word))) return 'FEAR';
-        if (calmWords.some(word => lower.includes(word))) return 'CALM';
-        return 'JOY';
-    }
 
     // ----------------------------------------------------
     // 4. ฟังก์ชันประมวลผลอารมณ์จากค่าสีของรูปภาพ
