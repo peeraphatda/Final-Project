@@ -1,6 +1,7 @@
-# Smart Art & Palette Sentiment Analyzer (Sprint 1)
+# Smart Art & Palette — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
 
-> ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบผ่าน Command Line Interface (CLI)
+รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
+อาจารย์ผู้สอน: ผศ. บุญสืบ ไวคำ
 
 **Google Colab Notebook:** [กดที่นี่เพื่อเปิดดู Google Colab](https://colab.research.google.com/drive/10bgPo_R8iiEEitrnFC8ZJkmdZS2GU6Hr?usp=sharing)
 
