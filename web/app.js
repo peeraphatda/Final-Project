@@ -1,38 +1,72 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // หา Element จาก ID ในหน้า web/index.html
+    // ==========================================
+    // 1. ระบบวิเคราะห์ข้อความ + แจ้งเตือนเมื่อข้อความว่าง
+    // ==========================================
+    const textInput = document.getElementById('textInput') || document.querySelector('textarea');
+    const analyzeBtn = document.getElementById('analyzeBtn') || document.querySelector('button');
+    const alertBox = document.getElementById('alertBox') || document.getElementById('errorMessage');
+
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const textValue = textInput ? textInput.value.trim() : '';
+
+            // ถ้าไม่ใส่ข้อความ ให้แสดงการแจ้งเตือน
+            if (!textValue) {
+                if (alertBox) {
+                    alertBox.innerText = '⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
+                    alertBox.style.display = 'block';
+                    alertBox.style.color = '#ff4d4f';
+                } else {
+                    alert('⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!');
+                }
+                return;
+            }
+
+            // ซ่อนกล่องแจ้งเตือนเมื่อมีข้อความถูกต้อง
+            if (alertBox) alertBox.style.display = 'none';
+
+            // ประมวลผลวิเคราะห์อารมณ์ (ส่วนเชื่อมต่อระบบ)
+            console.log('Analyzing text:', textValue);
+        });
+    }
+
+    // ==========================================
+    // 2. ระบบอัปโหลดและสกัดสีจากรูปภาพ (Image Extractor)
+    // ==========================================
     const imageInput = document.getElementById('imageInput') || document.querySelector('input[type="file"]');
-    const paletteContainer = document.getElementById('paletteDisplay') || document.getElementById('palette');
+    const extractedPalette = document.getElementById('extractedPalette') || document.getElementById('paletteDisplay');
 
-    if (!imageInput) return;
+    if (imageInput) {
+        imageInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = new Image();
+                img.onload = function () {
+                    // วาดภาพลง Canvas จำลอง
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
 
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = new Image();
-            img.onload = function() {
-                // สร้าง Canvas จำลองสกัดสี 5 จุดหลักจากภาพ
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
+                    // สกัดสี 5 จุดหลัก
+                    const colors = extractColorsFromCanvas(ctx, canvas.width, canvas.height, 5);
 
-                // สุ่ม/ดึงค่าสีพิกเซลจากภาพ
-                const colors = extractColorsFromCanvas(ctx, canvas.width, canvas.height, 5);
-                
-                // แสดงผลจานสีบนหน้าจอ
-                displayExtractedPalette(colors);
+                    // แสดงผลจานสีบนหน้าเว็บ
+                    renderExtractedColors(colors, extractedPalette);
+                };
+                img.src = event.target.result;
             };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
+            reader.readAsDataURL(file);
+        });
+    }
 });
 
-// ฟังก์ชันสกัดสีสี่เหลี่ยมผืนผ้าจำลองจาก Canvas
+// ฟังก์ชันดึงสีจาก Canvas
 function extractColorsFromCanvas(ctx, width, height, count) {
     const colors = [];
     const stepX = Math.floor(width / (count + 1));
@@ -46,21 +80,31 @@ function extractColorsFromCanvas(ctx, width, height, count) {
     return colors;
 }
 
-// ฟังก์ชันแสดงผลแถบสีบน UI
-function displayExtractedPalette(colors) {
-    const container = document.getElementById('extractedPalette') || document.getElementById('palette');
+// ฟังก์ชันวาดแถบสีลงหน้า HTML
+function renderExtractedColors(colors, container) {
     if (!container) return;
-    
     container.innerHTML = '';
+
     colors.forEach(color => {
-        const div = document.createElement('div');
-        div.style.backgroundColor = color;
-        div.style.width = '60px';
-        div.style.height = '60px';
-        div.style.borderRadius = '8px';
-        div.style.display = 'inline-block';
-        div.style.margin = '4px';
-        div.title = color;
-        container.appendChild(div);
+        const swatch = document.createElement('div');
+        swatch.style.backgroundColor = color;
+        swatch.style.width = '60px';
+        swatch.style.height = '60px';
+        swatch.style.borderRadius = '10px';
+        swatch.style.display = 'inline-block';
+        swatch.style.margin = '6px';
+        swatch.style.boxShadow = '0 4px 10px rgba(0,0,0,0.15)';
+        swatch.title = color;
+
+        const label = document.createElement('span');
+        label.innerText = color;
+        label.style.display = 'block';
+        label.style.fontSize = '11px';
+        label.style.textAlign = 'center';
+        label.style.marginTop = '65px';
+        label.style.color = '#fff';
+
+        swatch.appendChild(label);
+        container.appendChild(swatch);
     });
 }
