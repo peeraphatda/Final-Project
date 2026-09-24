@@ -154,3 +154,19 @@ Final-Project/
 ├── README.md                  # Project Documentation
 ├── CHANGELOG.md               # Version History
 └── LEARNINGLOG.md             # Development Reflection Log
+
+
+## 🛠️ วิธีติดตั้งและใช้งาน (Installation & Usage Guide)
+
+### 1. ความต้องการของระบบ (Prerequisites)
+* Python 3.9 ขึ้นไป
+* Git
+
+---
+
+### 2. ขั้นตอนการติดตั้ง (Installation)
+
+1. **Cloning Repository:**
+   ```bash
+   git clone [https://github.com/peeraphatda/Final-Project.git](https://github.com/peeraphatda/Final-Project.git)
+   cd Final-Project
