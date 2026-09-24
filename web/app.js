@@ -1,21 +1,109 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // UI Elements
     const textInput = document.getElementById('textInput');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const alertBox = document.getElementById('alertBox');
+    const subTitle = document.getElementById('subTitle');
+    const inputLabel = document.getElementById('inputLabel');
+    const langToggleBtn = document.getElementById('langToggleBtn');
     
     const uploadTriggerBtn = document.getElementById('uploadTriggerBtn');
     const imageInput = document.getElementById('imageInput');
     const extractedPalette = document.getElementById('extractedPalette');
     const extractedPaletteSection = document.getElementById('extractedPaletteSection');
+    const extractedTitle = document.querySelector('#extractedPaletteSection .result-title');
+    const imagePreview = document.getElementById('imagePreview');
 
     // UI Result Elements
+    const resultEmotionText = document.getElementById('resultEmotion');
+    const resultConfidenceText = document.getElementById('resultConfidence');
     const emotionLabel = document.getElementById('emotionLabel');
     const confidenceValue = document.getElementById('confidenceValue');
+    const paletteTitle = document.getElementById('paletteTitle');
     const paletteDisplay = document.getElementById('paletteDisplay');
     const themeName = document.getElementById('themeName');
     const fontPairing = document.getElementById('fontPairing');
     const usageContext = document.getElementById('usageContext');
 
+    // ----------------------------------------------------
+    // 1. ระบบสลับภาษา UI (TH / EN)
+    // ----------------------------------------------------
+    let currentLang = 'TH'; // ภาษาเริ่มต้น
+
+    const translations = {
+        TH: {
+            subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี',
+            inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์',
+            placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น รู้สึกเศร้าจัง หรือ I feel happy...',
+            analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
+            uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
+            extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
+            resultEmotionLabel: 'ผลลัพธ์อารมณ์: ',
+            resultConfidenceLabel: 'ค่าความเชื่อมั่น: ',
+            paletteTitle: 'ชุดจานสีแนะนำ (WCAG Compliant)',
+            alertEmpty: 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!',
+            advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
+            recTheme: 'ธีมที่แนะนำ: ',
+            typography: 'ชุดฟอนต์: ',
+            usageContext: 'การนำไปใช้งาน: '
+        },
+        EN: {
+            subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
+            inputLabel: 'Enter Thai or English text to analyze sentiment',
+            placeholder: 'i feel happy or feel sad...',
+            analyzeBtn: 'Analyze Sentiment',
+            uploadBtn: 'Upload Image (Extract)',
+            extractedTitle: 'Uploaded Image & Extracted Palette',
+            resultEmotionLabel: 'Emotion Result: ',
+            resultConfidenceLabel: 'Confidence Score: ',
+            paletteTitle: 'Recommended Color Palette (WCAG Compliant)',
+            alertEmpty: 'Please enter text before analyzing!',
+            advisoryTitle: 'AI Design Advisory',
+            recTheme: 'Recommended Theme: ',
+            typography: 'Typography: ',
+            usageContext: 'Usage Context: '
+        }
+    };
+
+    if (langToggleBtn) {
+        langToggleBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'TH' ? 'EN' : 'TH';
+            applyLanguage(currentLang);
+        });
+    }
+
+    function applyLanguage(lang) {
+        const t = translations[lang];
+        
+        if (subTitle) subTitle.innerText = t.subTitle;
+        if (inputLabel) inputLabel.innerText = t.inputLabel;
+        if (textInput) textInput.placeholder = t.placeholder;
+        if (analyzeBtn) analyzeBtn.innerText = t.analyzeBtn;
+        if (uploadTriggerBtn) uploadTriggerBtn.innerText = t.uploadBtn;
+        if (extractedTitle) extractedTitle.innerText = t.extractedTitle;
+        if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
+
+        if (resultEmotionText && emotionLabel) {
+            resultEmotionText.childNodes[0].nodeValue = t.resultEmotionLabel;
+        }
+        if (resultConfidenceText && confidenceValue) {
+            resultConfidenceText.childNodes[0].nodeValue = t.resultConfidenceLabel;
+        }
+
+        const advisoryHeader = document.querySelector('.advisory-section h4');
+        if (advisoryHeader) advisoryHeader.innerText = t.advisoryTitle;
+
+        const advisoryParagraphs = document.querySelectorAll('.advisory-section p strong');
+        if (advisoryParagraphs.length >= 3) {
+            advisoryParagraphs[0].innerText = t.recTheme;
+            advisoryParagraphs[1].innerText = t.typography;
+            advisoryParagraphs[2].innerText = t.usageContext;
+        }
+    }
+
+    // ----------------------------------------------------
+    // 2. ฐานข้อมูลและกฎจิตวิทยาของสี (Color Psychology Rules)
+    // ----------------------------------------------------
     const emotionRules = {
         JOY: {
             palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'],
@@ -50,40 +138,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ----------------------------------------------------
-    // ฟังก์ชันล้างผลลัพธ์จากการอัปโหลดรูปภาพ
+    // 3. ฟังก์ชันวิเคราะห์อารมณ์ข้อความ (รองรับทั้ง TH และ EN)
     // ----------------------------------------------------
-    function clearImageResult() {
-        if (extractedPaletteSection) {
-            extractedPaletteSection.style.display = 'none';
-        }
-        if (extractedPalette) {
-            extractedPalette.innerHTML = '';
-        }
-        if (imageInput) {
-            imageInput.value = ''; // Reset input file
-        }
-    }
-
-    // เมื่อเริ่มพิมพ์ข้อความใหม่ ให้ซ่อนผลลัพธ์รูปภาพทันที
-    if (textInput) {
-        textInput.addEventListener('input', () => {
-            clearImageResult();
-        });
-    }
-
     function detectTextSentiment(text) {
         const lower = text.toLowerCase();
-        if (lower.includes('sad') || lower.includes('cry') || lower.includes('depressed') || lower.includes('bad')) {
+
+        // คำคีย์เวิร์ดภาษาไทย และ ภาษาอังกฤษ
+        const sadWords = ['sad', 'cry', 'depressed', 'bad', 'เศร้า', 'เสียใจ', 'ร้องไห้', 'ท้อ', 'ดิ่ง', 'แย่', 'ซึม', 'เหนื่อย'];
+        const angryWords = ['angry', 'hate', 'mad', 'โกรธ', 'เกลียด', 'โมโห', 'แค้น', 'หงุดหงิด', 'ฉุน', 'เดือด'];
+        const fearWords = ['scared', 'fear', 'afraid', 'กลัว', 'ระแวง', 'ผวา', 'ตกใจ', 'สยอง', 'หวาด'];
+        const calmWords = ['calm', 'peace', 'relax', 'สงบ', 'ผ่อนคลาย', 'ชิล', 'สบาย', 'เงียบ', 'โล่ง'];
+
+        if (sadWords.some(word => lower.includes(word))) {
             return 'SADNESS';
-        } else if (lower.includes('angry') || lower.includes('hate') || lower.includes('mad')) {
+        } else if (angryWords.some(word => lower.includes(word))) {
             return 'ANGER';
-        } else if (lower.includes('scared') || lower.includes('fear') || lower.includes('afraid')) {
+        } else if (fearWords.some(word => lower.includes(word))) {
             return 'FEAR';
+        } else if (calmWords.some(word => lower.includes(word))) {
+            return 'CALM';
         } else {
             return 'JOY';
         }
     }
 
+    // ----------------------------------------------------
+    // 4. ฟังก์ชันประมวลผลอารมณ์จากค่าสีของรูปภาพ
+    // ----------------------------------------------------
     function analyzeColorSentiment(rgbColors) {
         let totalR = 0, totalG = 0, totalB = 0;
         
@@ -114,7 +195,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // กดปุ่มวิเคราะห์ข้อความ (Analyze)
+    // 5. ฟังก์ชันเคลียร์ค่าและซ่อนส่วนของรูปภาพ
+    // ----------------------------------------------------
+    function clearImageResult() {
+        if (extractedPaletteSection) {
+            extractedPaletteSection.style.display = 'none';
+        }
+        if (extractedPalette) {
+            extractedPalette.innerHTML = '';
+        }
+        if (imagePreview) {
+            imagePreview.src = '';
+        }
+        if (imageInput) {
+            imageInput.value = '';
+        }
+    }
+
+    // เมื่อเริ่มพิมพ์ข้อความใหม่ ให้ซ่อนผลลัพธ์จากรูปภาพทันที
+    if (textInput) {
+        textInput.addEventListener('input', () => {
+            clearImageResult();
+        });
+    }
+
+    // ----------------------------------------------------
+    // 6. เหตุการณ์ปุ่มวิเคราะห์ข้อความ (Analyze)
     // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', (e) => {
@@ -123,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!text) {
                 if (alertBox) {
-                    alertBox.innerText = 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
+                    alertBox.innerText = translations[currentLang].alertEmpty;
                     alertBox.style.display = 'block';
                 }
                 return;
@@ -131,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (alertBox) alertBox.style.display = 'none';
 
-            // ซ่อน/ล้างผลลัพธ์ของรูปภาพเมื่อวิเคราะห์ด้วยข้อความ
             clearImageResult();
 
             const detectedEmotion = detectTextSentiment(text);
@@ -140,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // กดอัปโหลดรูปภาพ
+    // 7. เหตุการณ์ปุ่มอัปโหลดรูปภาพ
     // ----------------------------------------------------
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', () => imageInput.click());
@@ -151,11 +256,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // เมื่อเริ่มวิเคราะห์รูปภาพ ล้างข้อความใน Textarea ออก
             if (textInput) textInput.value = '';
 
             const reader = new FileReader();
             reader.onload = (event) => {
+                if (imagePreview) {
+                    imagePreview.src = event.target.result;
+                }
+
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
@@ -176,6 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ----------------------------------------------------
+    // 8. ฟังก์ชันช่วยประมวลผล Canvas & แสดงผล UI
+    // ----------------------------------------------------
     function extractRGBColors(ctx, width, height, count) {
         const hexList = [];
         const rgbList = [];
