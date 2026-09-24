@@ -152,5 +152,37 @@ Final-Project/
 ├── main.py                     # Main Entry Point (--cli, --batch)
 ├── requirements.txt            # Project Dependencies
 ├── README.md                   # Project Documentation
+
+## 🛠️ วิธีใช้งานและการติดตั้งระบบ (Installation & Live Deployment)
+
+### 1. ความต้องการของระบบ (Prerequisites)
+* **สำหรับฝั่ง Web Dashboard (Online):** สามารถใช้งานผ่านเว็บเบราว์เซอร์ยุคใหม่ (Chrome, Edge, Safari, Firefox) ได้ทันทีโดยไม่ต้องติดตั้งโปรแกรมใดๆ
+* **สำหรับฝั่ง Python CLI / Local Testing:**
+  * Python 3.9 ขึ้นไป
+  * Git
+
+```
+---
+
+## 🌐 การเข้าใช้งานผ่านระบบออนไลน์ (Live Web Dashboard)
+
+คุณสามารถทดลองใช้งานเว็บแอปพลิเคชันรูปแบบออนไลน์ (Client-Side AI Processing 100%) ได้ทันทีผ่าน **GitHub Pages** โดยไม่ต้องติดตั้งระบบภายในเครื่อง:
+
+👉 **[เข้าใช้งาน Smart Art & Palette Web Dashboard](https://peeraphatda.github.io/Final-Project/)**
+
+> **Note:** ระบบวิเคราะห์อารมณ์และสกัดสีจากรูปภาพบนหน้าเว็บ ประมวลผลผ่าน WebAssembly / ONNX Runtime บนเบราว์เซอร์ของผู้ใช้โดยตรง จึงรับประกันความเร็ว ความเป็นส่วนตัว และไม่ต้องพึ่งพา Backend API ภายนอก
+
+---
+
+## 💻 การติดตั้งและใช้งานบนเครื่องคอมพิวเตอร์ (Local Machine Execution)
+
+หากต้องการรันระบบวิเคราะห์ผ่าน Command Line Interface (CLI) หรือทดสอบประมวลผลไฟล์ Batch Processing ให้ปฏิบัติตามขั้นตอนดังนี้:
+
+### 1. การดาวน์โหลดและติดตั้ง Dependencies
+
+1. **Cloning Repository:**
+   ```bash
+   git clone [https://github.com/peeraphatda/Final-Project.git](https://github.com/peeraphatda/Final-Project.git)
+   cd Final-Project
 ├── CHANGELOG.md                # Version History
 └── LEARNINGLOG.md              # Development Reflection Log
