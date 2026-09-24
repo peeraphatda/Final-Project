@@ -122,52 +122,35 @@
 ```text
 Final-Project/
 ├── .github/
-│   └── workflows/             # GitHub Actions CI/CD Deployment Scripts
+│   └── workflows/              # GitHub Actions CI/CD Deployment Scripts
 │       └── deploy-web.yml
-├── src/                       # Core Python Application Modules
+├── src/                        # Core Python Application Modules
 │   ├── __init__.py
-│   ├── emotion_client.py      # Hugging Face DistilBERT Classifier
-│   ├── palette_engine.py      # Color Psychology & WCAG Calculator
-│   ├── visualizer.py          # Matplotlib Swatch Renderer
-│   ├── cli_app.py             # CLI Interactive Interface
-│   ├── data_store.py          # SQLite Local & Cloud Migration Support
-│   ├── report_generator.py    # Batch CSV Processing & Export (.css / .json)
-│   └── ai_advisory.py         # Design Advisory & Font Pairings
-├── web/                       # Frontend Web Application Dashboard
-│   ├── index.html             # Glassmorphic UI Dashboard
-│   ├── style.css              # Responsive Styling
-│   └── app.js                 # UI Interaction & Image Mood Extractor
-├── tests/                     # Automated Unit Testing Suites
+│   ├── emotion_client.py       # Hugging Face DistilBERT Classifier
+│   ├── palette_engine.py       # Color Psychology & WCAG Calculator
+│   ├── visualizer.py           # Matplotlib Swatch Renderer
+│   ├── cli_app.py              # CLI Interactive Interface
+│   ├── data_store.py           # SQLite Local & Cloud Migration Support
+│   ├── report_generator.py     # Batch CSV Processing & Export (.css / .json)
+│   └── ai_advisory.py          # Design Advisory & Font Pairings
+├── web/                        # Frontend Web Application Dashboard
+│   ├── index.html              # Glassmorphic UI Dashboard
+│   ├── style.css               # Responsive Styling
+│   └── app.js                  # UI Interaction & Image Mood Extractor
+├── tests/                      # Automated Unit Testing Suites
 │   ├── test_emotion_client.py
 │   ├── test_palette_engine.py
 │   ├── test_data_store.py
 │   └── test_report.py
-├── reports/                   # Sprint Progress Reports
+├── reports/                    # Sprint Progress Reports
 │   ├── SPRINT1.md
 │   ├── SPRINT2.md
 │   └── SPRINT3.md
-├── data/                      # Data Storage & Batch Processing
-│   ├── palette_history.db     # SQLite Local Database (Auto-generated)
-│   └── sample_batch.csv       # Sample File for Batch Mode Testing
-├── main.py                    # Main Entry Point (--cli, --batch)
-├── requirements.txt           # Project Dependencies
-├── README.md                  # Project Documentation
-├── CHANGELOG.md               # Version History
-└── LEARNINGLOG.md             # Development Reflection Log
-
-```
-
-## 🛠️ วิธีติดตั้งและใช้งาน (Installation & Usage Guide)
-
-### 1. ความต้องการของระบบ (Prerequisites)
-* Python 3.9 ขึ้นไป
-* Git
-
----
-
-### 2. ขั้นตอนการติดตั้ง (Installation)
-
-1. **Cloning Repository:**
-   ```bash
-   git clone [https://github.com/peeraphatda/Final-Project.git](https://github.com/peeraphatda/Final-Project.git)
-   cd Final-Project
+├── data/                       # Data Storage & Batch Processing
+│   ├── palette_history.db      # SQLite Local Database (Auto-generated)
+│   └── sample_batch.csv        # Sample File for Batch Mode Testing
+├── main.py                     # Main Entry Point (--cli, --batch)
+├── requirements.txt            # Project Dependencies
+├── README.md                   # Project Documentation
+├── CHANGELOG.md                # Version History
+└── LEARNINGLOG.md              # Development Reflection Log
