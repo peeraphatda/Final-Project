@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Art & Palette Sentiment Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-container">
+        <!-- Header & Language Toggle -->
+        <header>
+            <div class="logo">
+                <h1>🎨 Smart Art & Palette</h1>
+                <p id="sub-title">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
+            </div>
+            <button id="lang-toggle-btn" class="glass-btn">EN / TH</button>
+        </header>
+
+        <!-- Main Input Section -->
+        <main>
+            <section class="input-card glass-card">
+                <h2 id="input-heading">กรอกข้อความภาษาอังกฤษเพื่อวิเคราะห์อารมณ์</h2>
+                <textarea id="text-input" placeholder="e.g., I feel deeply happy and full of excitement today..."></textarea>
+                
+                <div class="button-group">
+                    <button id="analyze-btn" class="primary-btn">วิเคราะห์อารมณ์ (Analyze)</button>
+                    <label for="image-upload" class="glass-btn upload-label">
+                        📁 <span id="upload-text">อัปโหลดรูปภาพ (Extract Image)</span>
+                    </label>
+                    <input type="file" id="image-upload" accept="image/*" hidden>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="result-section" class="result-card glass-card hidden">
+                <div class="result-header">
+                    <h2>Emotion Result: <span id="emotion-label">-</span></h2>
+                    <p>Confidence Score: <span id="confidence-score">0%</span></p>
+                </div>
+
+                <!-- Palette Display -->
+                <div class="palette-container">
+                    <h3>Color Palette (WCAG Compliant)</h3>
+                    <div id="palette-swatches" class="swatches"></div>
+                </div>
+
+                <!-- AI Design Advisory -->
+                <div class="advisory-container glass-card">
+                    <h3 id="advisory-heading">💡 AI Design Advisory</h3>
+                    <p><strong>Recommended Theme:</strong> <span id="adv-theme">-</span></p>
+                    <p><strong>Typography:</strong> <span id="adv-font">-</span></p>
+                    <p><strong>Usage Context:</strong> <span id="adv-usage">-</span></p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
