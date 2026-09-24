@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const subTitle = document.getElementById('subTitle');
     const inputLabel = document.getElementById('inputLabel');
     const langToggleBtn = document.getElementById('langToggleBtn');
+    const logoElement = document.querySelector('.logo'); // สำหรับอัปเดตชื่อแบรนด์ส่วนหัว
     
     const uploadTriggerBtn = document.getElementById('uploadTriggerBtn');
     const imageInput = document.getElementById('imageInput');
@@ -30,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeName = document.getElementById('themeName');
     const fontPairing = document.getElementById('fontPairing');
     const usageContext = document.getElementById('usageContext');
+
+    // อัปเดตชื่อหลักเป็น Smart Art & Palette Sentiment Analyzer
+    if (logoElement) {
+        logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
+    }
 
     // ----------------------------------------------------
     // 1. ระบบสลับภาษา UI (TH / EN)
