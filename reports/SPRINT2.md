@@ -8,7 +8,6 @@
   - **นายกฤษฎา สายวัน** (กาย) — **Coder** (พัฒนา DataStore, SQLite Persistence & Supabase Integration)
   - **นายภีรภัทร ด่านภูมิพัฒนา** (ภีม) — **Coder** (พัฒนา Report Generator & AI Advisory Engine)
   - **นายปฏิพัฒน์ หอทอง** (ปลั๊ก) — **Debugger / QA** (ทดสอบ Batch File Processing & WCAG Calculation Validation)
-**นายปฏิภาณ นามสีลี** (ท็อป)
 ---
 
 ## 1. สรุปความก้าวหน้าของงาน (Sprint Progress Summary)
