@@ -9,10 +9,10 @@
 
 | สมาชิก | ชื่อเล่น | บทบาทหน้าที่ใน Sprint 1 |
 | :--- | :---: | :--- |
-| **นายกฤษฎา สายวัน** | กาย | **Planner ** (วางโครงสร้าง Class, OOP Design & Modular Pipeline) |
-| **นายปฏิภาณ นามสีลี** | ท็อป | **Coder ** (NLP Pipeline)** (เชื่อมต่อ DistilBERT NLP & Defensive Fallback)[cite: 1] |
-| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder ** (Visualization)** (พัฒนา Matplotlib Swatch Renderer & CLI Layout)[cite: 1] |
-| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger ** (เขียน Unit Test & ตรวจสอบ Exception Handling) |
+| **นายกฤษฎา สายวัน** | กาย | **Planner** (วางโครงสร้าง Class, OOP Design & Modular Pipeline) |
+| **นายปฏิภาณ นามสีลี** | ท็อป | **Coder** (NLP Pipeline)** (เชื่อมต่อ DistilBERT NLP & Defensive Fallback)[cite: 1] |
+| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder** (Visualization)** (พัฒนา Matplotlib Swatch Renderer & CLI Layout)[cite: 1] |
+| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger** (เขียน Unit Test & ตรวจสอบ Exception Handling) |
 
 ---
 
