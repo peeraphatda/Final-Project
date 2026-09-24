@@ -8,9 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const extractedPalette = document.getElementById('extractedPalette');
     const extractedPaletteSection = document.getElementById('extractedPaletteSection');
 
-    // ----------------------------------------------------
     // 1. ระบบตรวจเช็กข้อความว่าง (Validation)
-    // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -28,16 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (alertBox) alertBox.style.display = 'none';
             console.log('Analyzing:', text);
-            // สั่งประมวลผลต่อตาม Logic ของคุณ...
         });
     }
 
-    // ----------------------------------------------------
-    // 2. ระบบผูกปุ่มอัปโหลดรูปภาพ (Trigger File Input)
-    // ----------------------------------------------------
+    // 2. ระบบผูกปุ่มอัปโหลดรูปภาพ
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', () => {
-            imageInput.click(); // สั่งเปิดหน้าต่างเลือกไฟล์
+            imageInput.click();
         });
     }
 
@@ -50,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    // สร้าง Canvas สกัดสีจากภาพ
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     canvas.width = img.width;
@@ -66,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ฟังก์ชันดึงสีจาก Canvas
     function extractColors(ctx, width, height, count) {
         const colors = [];
         const stepX = Math.floor(width / (count + 1));
@@ -80,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return colors;
     }
 
-    // ฟังก์ชันวาดจานสีลง UI
     function renderPalette(colors) {
         if (!extractedPalette) return;
         extractedPalette.innerHTML = '';

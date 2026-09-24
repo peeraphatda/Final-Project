@@ -1,112 +1,80 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const textInput = document.getElementById('textInput');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const alertBox = document.getElementById('alertBox');
-    
-    const uploadTriggerBtn = document.getElementById('uploadTriggerBtn');
-    const imageInput = document.getElementById('imageInput');
-    const extractedPalette = document.getElementById('extractedPalette');
-    const extractedPaletteSection = document.getElementById('extractedPaletteSection');
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Art & Palette — Sentiment Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
 
-    // ----------------------------------------------------
-    // 1. ระบบตรวจเช็กข้อความว่าง (Validation)
-    // ----------------------------------------------------
-    if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const text = textInput ? textInput.value.trim() : '';
+    <div class="glass-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo-title">
+                <h2>🎨 Smart Art & Palette</h2>
+                <p id="subTitle">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
+            </div>
+            <button id="langToggleBtn" class="btn-lang">EN / TH</button>
+        </header>
 
-            if (!text) {
-                if (alertBox) {
-                    alertBox.innerText = '⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
-                    alertBox.style.display = 'block';
-                } else {
-                    alert('⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!');
-                }
-                return;
-            }
+        <!-- Main Input Section -->
+        <main class="main-content">
+            <div class="input-card">
+                <label for="textInput" id="inputLabel" class="section-title">กรอกข้อความภาษาอังกฤษเพื่อวิเคราะห์อารมณ์</label>
+                
+                <textarea id="textInput" placeholder="i feel sad..."></textarea>
+                
+                <!-- Alert Box สำหรับแจ้งเตือนเมื่อข้อความว่าง -->
+                <div id="alertBox" class="alert-box" style="display: none; color: #ff4d4f; margin-bottom: 10px; font-weight: bold;"></div>
 
-            if (alertBox) alertBox.style.display = 'none';
-            console.log('Analyzing:', text);
-            // สั่งประมวลผลต่อตาม Logic ของคุณ...
-        });
-    }
+                <div class="button-group">
+                    <button id="analyzeBtn" class="btn btn-primary">วิเคราะห์อารมณ์ (Analyze)</button>
+                    
+                    <!-- ปุ่มอัปโหลดรูปภาพ และ Hidden Input -->
+                    <button id="uploadTriggerBtn" type="button" class="btn btn-secondary">📁 อัปโหลดรูปภาพ (Extract Image)</button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+            </div>
 
-    // ----------------------------------------------------
-    // 2. ระบบผูกปุ่มอัปโหลดรูปภาพ (Trigger File Input)
-    // ----------------------------------------------------
-    if (uploadTriggerBtn && imageInput) {
-        uploadTriggerBtn.addEventListener('click', () => {
-            imageInput.click(); // สั่งเปิดหน้าต่างเลือกไฟล์
-        });
-    }
+            <!-- Extracted Image Palette Result -->
+            <div id="extractedPaletteSection" class="result-card" style="display: none;">
+                <h3 class="result-title">🖼️ Extracted Palette from Image</h3>
+                <div id="extractedPalette" class="palette-grid"></div>
+            </div>
 
-    if (imageInput) {
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            <!-- Emotion Analysis Result Section -->
+            <div id="resultSection" class="result-card">
+                <div class="emotion-header">
+                    <h3 id="resultEmotion">Emotion Result: <span id="emotionLabel">JOY</span></h3>
+                    <p id="resultConfidence">Confidence Score: <span id="confidenceValue">98.5%</span></p>
+                </div>
 
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    // สร้าง Canvas สกัดสีจากภาพ
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
+                <div class="palette-section">
+                    <h4 id="paletteTitle">Color Palette (WCAG Compliant)</h4>
+                    <div id="paletteDisplay" class="palette-grid">
+                        <div class="color-swatch" style="background-color: #FFD700;"><span>#FFD700</span></div>
+                        <div class="color-swatch" style="background-color: #FF8C00;"><span>#FF8C00</span></div>
+                        <div class="color-swatch" style="background-color: #FF69B4;"><span>#FF69B4</span></div>
+                        <div class="color-swatch" style="background-color: #00BFFF;"><span>#00BFFF</span></div>
+                        <div class="color-swatch" style="background-color: #32CD32;"><span>#32CD32</span></div>
+                    </div>
+                </div>
 
-                    const colors = extractColors(ctx, canvas.width, canvas.height, 5);
-                    renderPalette(colors);
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-    }
+                <!-- AI Design Advisory Section -->
+                <div class="advisory-section">
+                    <h4>💡 AI Design Advisory</h4>
+                    <p><strong>Recommended Theme:</strong> <span id="themeName">Vibrant Sunburst</span></p>
+                    <p><strong>Typography:</strong> <span id="fontPairing">Poppins / Montserrat</span></p>
+                    <p><strong>Usage Context:</strong> <span id="usageContext">E-Commerce, Festival Branding, UI Dashboard</span></p>
+                </div>
+            </div>
+        </main>
+    </div>
 
-    // ฟังก์ชันดึงสีจาก Canvas
-    function extractColors(ctx, width, height, count) {
-        const colors = [];
-        const stepX = Math.floor(width / (count + 1));
-        const stepY = Math.floor(height / 2);
-
-        for (let i = 1; i <= count; i++) {
-            const p = ctx.getImageData(i * stepX, stepY, 1, 1).data;
-            const hex = '#' + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
-            colors.push(hex);
-        }
-        return colors;
-    }
-
-    // ฟังก์ชันวาดจานสีลง UI
-    function renderPalette(colors) {
-        if (!extractedPalette) return;
-        extractedPalette.innerHTML = '';
-        if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
-
-        colors.forEach(color => {
-            const box = document.createElement('div');
-            box.style.backgroundColor = color;
-            box.style.width = '55px';
-            box.style.height = '55px';
-            box.style.borderRadius = '8px';
-            box.style.display = 'inline-block';
-            box.style.margin = '5px';
-            box.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-            box.title = color;
-
-            const label = document.createElement('span');
-            label.innerText = color;
-            label.style.display = 'block';
-            label.style.fontSize = '10px';
-            label.style.textAlign = 'center';
-            label.style.marginTop = '60px';
-            label.style.color = '#fff';
-
-            box.appendChild(label);
-            extractedPalette.appendChild(box);
-        });
-    }
-});
+    <script src="app.js"></script>
+</body>
+</html>
