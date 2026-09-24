@@ -4,7 +4,6 @@
 
 อาจารย์ผู้สอน: ผศ. บุญสืบ ไวคำ
 
-**Google Colab Notebook:** [กดที่นี่เพื่อเปิดดู Google Colab](https://colab.research.google.com/drive/10bgPo_R8iiEEitrnFC8ZJkmdZS2GU6Hr?usp=sharing)
 
 ---
 
@@ -33,7 +32,7 @@
 | **นายปฏิภาณ นามสีลี** | ท็อป | **Coder / Dev (NLP Pipeline)** | **Debugger / QA** | **Planner / Architect** |
 | **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder / Dev (Visualization)** | **Planner / Architect** | **Coder & DevOps** |
 | **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger / QA** | **Coder / Dev** | **Debugger / QA & Deployment** |
-#### ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview)
+## ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview)
 
 ##### 🟢 ฟีเจอร์ที่พัฒนาเสร็จแล้ว (Current Implemented Features - Sprint 1)
 * 🎭 **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping ป้องกันข้อผิดพลาด
