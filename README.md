@@ -174,15 +174,103 @@ Final-Project/
 
 ---
 
-## 💻 การติดตั้งและใช้งานบนเครื่องคอมพิวเตอร์ (Local Machine Execution)
+## 📖 คู่มือการใช้งานและพัฒนา Repository (Repository Usage Guide)
 
-หากต้องการรันระบบวิเคราะห์ผ่าน Command Line Interface (CLI) หรือทดสอบประมวลผลไฟล์ Batch Processing ให้ปฏิบัติตามขั้นตอนดังนี้:
+คู่มือนี้อธิบายขั้นตอนตั้งแต่การ Clone โครงการ การตั้งค่าเครื่องมือ การรันโปรแกรมในโหมดต่างๆ การทำงานร่วมกันผ่าน Git ไปจนถึงระบบ Deploy อัตโนมัติ
 
-### 1. การดาวน์โหลดและติดตั้ง Dependencies
+---
 
-1. **Cloning Repository:**
-   ```bash
-   git clone [https://github.com/peeraphatda/Final-Project.git](https://github.com/peeraphatda/Final-Project.git)
-   cd Final-Project
-├── CHANGELOG.md                # Version History
-└── LEARNINGLOG.md              # Development Reflection Log
+### 1. การดึงโครงการลงเครื่อง (Clone & Branching Strategy)
+
+<Image src="image_agent_tag_15613877416992278166" alt="Git Flow Branching Model Diagram" caption="แผนภาพจำลองโครงสร้าง Branching Model ในการพัฒนาระบบ" />
+
+#### 1.1 คัดลอก Repository
+เปิด Terminal บนคอมพิวเตอร์ของคุณ แล้วรันคำสั่ง:
+```bash
+git clone [https://github.com/peeraphatda/Final-Project.git](https://github.com/peeraphatda/Final-Project.git)
+cd Final-Project
+```
+1.2 การจัดการ Branch (ข้อแนะนำสำหรับการพัฒนา)
+ในการพัฒนาฟีเจอร์ใหม่ ควรสร้าง Branch แยกจาก main เสมอ เพื่อป้องกันไม่ให้เกิดความเสียหายกับโค้ดหลัก:
+
+Bash
+# สร้างและสลับไปยัง Branch ใหม่
+git checkout -b feature/your-feature-name
+
+# ตรวจสอบ Branch ปัจจุบัน
+git branch
+2. การเตรียมสภาพแวดล้อม (Local Environment Setup)
+ปฏิบัติตามขั้นตอนเรียงตามลำดับดังต่อไปนี้ เพื่อเตรียมความพร้อมของระบบก่อนเริ่มรันโปรแกรม:
+
+สร้างและเปิดใช้งาน Virtual Environment:
+
+Bash
+# สำหรับ Windows:
+python -m venv venv
+.\venv\Scripts\activate
+
+# สำหรับ macOS / Linux:
+python3 -m venv venv
+source venv/bin/activate
+อัปเกรดเครื่องมือจัดการแพ็กเกจ (pip):
+
+Bash
+python -m pip install --upgrade pip
+ติดตั้ง Dependencies ทั้งหมด:
+
+Bash
+pip install -r requirements.txt
+ตรวจสอบความถูกต้องด้วย Unit Testing:
+
+Bash
+pytest
+3. การเลือกโหมดการใช้งาน (Execution Modes)
+หลังจากติดตั้งเรียบร้อยแล้ว สามารถเลือกสั่งรันระบบได้ 3 รูปแบบ:
+
+โหมดที่ 1: Interactive CLI (ประมวลผลข้อความแบบเรียลไทม์ผ่าน Terminal):
+
+Bash
+python main.py --cli
+โหมดที่ 2: Batch Processing (อ่านไฟล์ข้อความ CSV แล้วส่งออกรายงาน JSON/CSS):
+
+Bash
+python main.py --batch data/sample_batch.csv
+โหมดที่ 3: Local Web Dashboard (รันหน้าเว็บทดสอบภายในเครื่อง):
+
+Bash
+python -m http.server 8000
+(เข้าใช้งานผ่านเบราว์เซอร์ที่ URL: http://localhost:8000/web/)
+
+4. การอัปเดตงานและส่งขึ้น GitHub (Commit & Push Workflow)
+เมื่อพัฒนาหรือแก้ไขโค้ดเรียบร้อยแล้ว ให้ทำการ Commit และ Push โค้ดกลับไปยัง GitHub ตามลำดับดังนี้:
+
+ตรวจสอบสถานะไฟล์ที่มีการเปลี่ยนแปลง:
+
+Bash
+git status
+เพิ่มไฟล์ที่ต้องการเตรียม Commit:
+
+Bash
+git add .
+บันทึก Commit พร้อมระบุความหมาย:
+
+Bash
+git commit -m "feat: add color extractor feature in web dashboard"
+ส่งโค้ดไปยัง GitHub Repository:
+
+Bash
+# หากพัฒนาบน Branch แยก:
+git push origin feature/your-feature-name
+
+# หากทำการ Merge เข้าสู่กิ่งหลักเพื่อเตรียม Deploy:
+git checkout main
+git merge feature/your-feature-name
+git push origin main
+
+5. ระบบจัดส่งแอปพลิเคชันอัตโนมัติ (CI/CD Automated Deployment)
+เมื่อมีการ git push origin main ขึ้นไปยังกิ่งหลัก:
+
+ระบบ GitHub Actions จะตรวจพบไฟล์ .github/workflows/deploy-web.yml และเริ่มกระบวนการอัตโนมัติ
+ระบบจะทำการดึงเฉพาะเนื้อหาในโฟลเดอร์ web/ ขึ้นไปจัดส่งบน GitHub Pages
+สามารถตรวจสอบสถานะการ Deploy ได้ที่แท็บ Actions บน GitHub Repository
+เมื่อกระบวนการเสร็จสมบูรณ์ หน้าเว็บจะอัปเดตอัตโนมัติที่: 👉 https://peeraphatda.github.io/Final-Project/
