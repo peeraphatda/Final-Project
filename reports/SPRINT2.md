@@ -9,10 +9,10 @@
 
 | สมาชิก | ชื่อเล่น | บทบาทหน้าที่ใน Sprint 2 |
 | :--- | :---: | :--- |
-| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Planner / Architect** (วางโครงสร้าง Database Schema & Export Specification) |
-| **นายกฤษฎา สายวัน** | กาย | **Coder / Dev** (พัฒนา DataStore, SQLite Persistence & Supabase Integration) |
-| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Coder / Dev** (พัฒนา Report Generator & AI Advisory Engine) |
-| **นายปฏิภาณ นามสีลี** | ท็อป | **Debugger / QA** (ทดสอบ Batch File Processing & WCAG Calculation Validation) |
+| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Planner** (วางโครงสร้าง Database Schema & Export Specification) |
+| **นายกฤษฎา สายวัน** | กาย | **Coder** (พัฒนา DataStore, SQLite Persistence & Supabase Integration) |
+| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Coder** (พัฒนา Report Generator & AI Advisory Engine) |
+| **นายปฏิภาณ นามสีลี** | ท็อป | **Debugger** (ทดสอบ Batch File Processing & WCAG Calculation Validation) |
 
 ---
 
