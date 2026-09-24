@@ -26,7 +26,16 @@
    * **Role:** Coder 2 — Color Engine & Visualization (ออกแบบฟังก์ชันแปลงค่าอารมณ์เป็น Hex Codes, พัฒนาการเรนเดอร์ภาพแถบสีด้วย `matplotlib` และเขียน CLI Main Loop)
 
 ---
+#### 🔄 สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
 
+เพื่อให้สมาชิกทุกคนในทีมได้ฝึกฝนทั้ง 3 บทบาทหลัก (**Planner / Architect**, **Coder / Dev**, **Debugger / QA & DevOps**) ครบทุกคน 100%:
+
+| สมาชิก | ชื่อเล่น | Sprint 1 : OOP & SQLite | Sprint 2 : AI, Report & Supabase | Sprint 3 : Web & Deployment |
+| :--- | :---: | :---: | :---: | :---: |
+| **นายกฤษฎา สายวัน** | กาย | **Planner / Architect** | **Coder / Dev** | **Debugger / QA** |
+| **นายปฏิภาณ นามสีลี** | ท็อป | **Coder / Dev (NLP Pipeline)** | **Debugger / QA** | **Planner / Architect** |
+| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder / Dev (Visualization)** | **Planner / Architect** | **Coder & DevOps** |
+| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger / QA** | **Coder / Dev** | **Debugger / QA & Deployment** |
 ## 1. Project Overview & Pitch
 
 * **Project Name:** Smart Art & Palette Sentiment Analyzer
