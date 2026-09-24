@@ -15,7 +15,7 @@
         <!-- Header Section -->
         <header class="header">
             <div class="logo-title">
-                <h2>🎨 Smart Art & Palette</h2>
+                <h2>Smart Art & Palette</h2>
                 <p id="subTitle">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
             </div>
             <button id="langToggleBtn" class="btn-lang">EN / TH</button>
@@ -29,20 +29,20 @@
                 <textarea id="textInput" placeholder="i feel sad..."></textarea>
                 
                 <!-- Alert Box สำหรับแจ้งเตือนเมื่อข้อความว่าง -->
-                <div id="alertBox" class="alert-box" style="display: none; color: #ff4d4f; margin-bottom: 10px; font-weight: bold;"></div>
+                <div id="alertBox" class="alert-box" style="display: none; color: #ff4d4f; margin-bottom: 10px; font-weight: 500; font-size: 0.85rem;"></div>
 
                 <div class="button-group">
                     <button id="analyzeBtn" class="btn btn-primary">วิเคราะห์อารมณ์ (Analyze)</button>
                     
-                    <!-- ปุ่มอัปโหลดรูปภาพ และ Hidden Input -->
-                    <button id="uploadTriggerBtn" type="button" class="btn btn-secondary">📁 อัปโหลดรูปภาพ (Extract Image)</button>
+                    <!-- ปุ่มอัปโหลดรูปภาพ -->
+                    <button id="uploadTriggerBtn" type="button" class="btn btn-secondary">อัปโหลดรูปภาพ (Extract Image)</button>
                     <input type="file" id="imageInput" accept="image/*" style="display: none;">
                 </div>
             </div>
 
             <!-- Extracted Image Palette Result -->
             <div id="extractedPaletteSection" class="result-card" style="display: none;">
-                <h3 class="result-title">🖼️ Extracted Palette from Image</h3>
+                <h3 class="result-title">Extracted Palette from Image</h3>
                 <div id="extractedPalette" class="palette-grid"></div>
             </div>
 
@@ -66,7 +66,7 @@
 
                 <!-- AI Design Advisory Section -->
                 <div class="advisory-section">
-                    <h4>💡 AI Design Advisory</h4>
+                    <h4>AI Design Advisory</h4>
                     <p><strong>Recommended Theme:</strong> <span id="themeName">Vibrant Sunburst</span></p>
                     <p><strong>Typography:</strong> <span id="fontPairing">Poppins / Montserrat</span></p>
                     <p><strong>Usage Context:</strong> <span id="usageContext">E-Commerce, Festival Branding, UI Dashboard</span></p>

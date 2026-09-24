@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontPairing = document.getElementById('fontPairing');
     const usageContext = document.getElementById('usageContext');
 
-    // ฐานข้อมูลวิเคราะห์อารมณ์ตามทฤษฎีจิตวิทยาของสี (Color Psychology Rules)
     const emotionRules = {
         JOY: {
             palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'],
@@ -50,9 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ----------------------------------------------------
-    // 1. ฟังก์ชันวิเคราะห์อารมณ์จากข้อความ (Text Sentiment)
-    // ----------------------------------------------------
     function detectTextSentiment(text) {
         const lower = text.toLowerCase();
         if (lower.includes('sad') || lower.includes('cry') || lower.includes('depressed') || lower.includes('bad')) {
@@ -66,9 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ----------------------------------------------------
-    // 2. ฟังก์ชันประมวลผลอารมณ์จากพิกเซลสีภาพ (Image Color Psychology)
-    // ----------------------------------------------------
     function analyzeColorSentiment(rgbColors) {
         let totalR = 0, totalG = 0, totalB = 0;
         
@@ -83,26 +76,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const avgG = totalG / count;
         const avgB = totalB / count;
 
-        // คำนวณค่าความสว่าง (Brightness)
         const brightness = (avgR * 299 + avgG * 587 + avgB * 114) / 1000;
 
-        // แยกอารมณ์ตามเฉดสีหลักและความสว่าง
         if (brightness < 80) {
-            return 'FEAR'; // โทนสลัว/มืด
+            return 'FEAR';
         } else if (avgR > avgG * 1.3 && avgR > avgB * 1.3) {
-            return 'ANGER'; // โทนสีแดง/ส้มเข้ม
+            return 'ANGER';
         } else if (avgB > avgR * 1.1 && brightness < 150) {
-            return 'SADNESS'; // โทนน้ำเงิน/หม่น
+            return 'SADNESS';
         } else if (avgG > avgR && avgB > avgR) {
-            return 'CALM'; // โทนเขียว/ฟ้าเย็น
+            return 'CALM';
         } else {
-            return 'JOY'; // โทนสว่างสดใส
+            return 'JOY';
         }
     }
 
-    // ----------------------------------------------------
-    // 3. ระบบอัปเดต UI เมื่อกดวิเคราะห์ข้อความ
-    // ----------------------------------------------------
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -110,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!text) {
                 if (alertBox) {
-                    alertBox.innerText = '⚠️ กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
+                    alertBox.innerText = 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
                     alertBox.style.display = 'block';
                 }
                 return;
@@ -123,9 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ----------------------------------------------------
-    // 4. ระบบอัปโหลดและวิเคราะห์อารมณ์จากรูปภาพ
-    // ----------------------------------------------------
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', () => imageInput.click());
     }
@@ -145,13 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
 
-                    // สกัดข้อมูลสี RGB
                     const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 5);
-                    
-                    // แสดงจานสีที่ดึงได้จากรูปภาพ
                     renderExtractedPalette(rgbData.hexList);
 
-                    // วิเคราะห์อารมณ์จากสีของรูปภาพ แล้วอัปเดตหน้า UI ทันที!
                     const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
                     updateUIResult(imageEmotion, (90 + Math.floor(Math.random() * 9)) + '.0%');
                 };
@@ -161,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // สกัดสีจาก Canvas เป็นทั้ง HEX และ RGB
     function extractRGBColors(ctx, width, height, count) {
         const hexList = [];
         const rgbList = [];
@@ -177,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return { hexList, rgbList };
     }
 
-    // อัปเดตผลลัพธ์บน UI ทั้งหมด
     function updateUIResult(emotionKey, confidence) {
         const resultData = emotionRules[emotionKey] || emotionRules['JOY'];
 
