@@ -1,0 +1,13 @@
+# Machine Learning & NLP Engine
+transformers>=4.30.0
+torch>=2.0.0
+
+# Visualization & Color Palette Engine
+matplotlib>=3.7.0
+
+# Data Processing & Utilities
+pandas>=2.0.0
+requests>=2.31.0
+
+# Testing Framework
+pytest>=7.3.0
