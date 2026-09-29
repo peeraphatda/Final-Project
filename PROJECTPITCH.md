@@ -1,81 +1,82 @@
-# 📢 Final Term Project Pitch
+# Final Term Project Pitch
 
-## 1. Project Title
-**Smart Art & Palette** — Dynamic Emotion-Based Palette Generator & AI Design Advisory
-
----
-
-## 2. Problem Statement
-Designers and developers often struggle to find color palettes that accurately convey specific emotional tones for UI/UX and visual media. Manual color selection is time-consuming, lacks standardized contrast validation, and does not offer automated design advice (such as font pairings and layout themes) based on textual context.
+## 1. ชื่อโครงการ (Project Title)
+**Smart Art & Palette** — Dynamic Emotion-Based Palette Generator & AI Design Advisory  
+*(ระบบเจเนอเรตจานสีอัจฉริยะตามอารมณ์พร้อม AI แนะนำการออกแบบ)*
 
 ---
 
-## 3. Proposed Solution
-An intelligent NLP-driven application that extracts emotions from user input text and generates a matching 5-color smart palette. It validates WCAG 2.1 accessibility contrast ratios, provides AI design recommendations (font pairings and themes), logs history in SQLite, enables CSV batch processing, and offers an interactive Web Dashboard with image color extraction capabilities.
+## 2. ที่มาและความสำคัญของปัญหา (Problem Statement)
+นักออกแบบและนักพัฒนาระบบมักประสบปัญหาในการเลือกชุดสีที่สามารถถ่ายทอด "อารมณ์" หรือ "มู้ดแอนด์โทน" ของงาน UI/UX และสื่อทัศนศิลป์ได้อย่างถูกต้อง การเลือกสีด้วยตนเองใช้เวลานาน ขาดการตรวจสอบมาตรฐานความต่างสี (Contrast) ที่เป็นระบบ และไม่มีเครื่องมือช่วยแนะนำการจับคู่ฟอนต์หรือธีมการออกแบบที่สอดคล้องกับเนื้อหาข้อความโดยอัตโนมัติ
 
 ---
 
-## 4. Domain
-✅ NLP / AI & Data Analysis / Design & Developer Tools / Web Application
+## 3. ทางออกของปัญหา (Proposed Solution)
+แอปพลิเคชันประมวลผลภาษาธรรมชาติ (NLP) อัจฉริยะที่สกัดอารมณ์จากข้อความของผู้ใช้ แล้วสร้างเป็นจานสีอัจฉริยะ 5 สีที่เข้ากันอย่างสมบูรณ์ ระบบสามารถตรวจสอบอัตราส่วนความต่างสีตามมาตรฐาน WCAG 2.1, ให้คำแนะนำด้านการออกแบบด้วย AI (แนะนำฟอนต์และธีม), บันทึกประวัติลง SQLite, รองรับการประมวลผลไฟล์ CSV ปริมาณมาก (Batch Processing) และมาพร้อมแดชบอร์ดบนเว็บแบบโต้ตอบที่มีฟังก์ชันสกัดสีจากรูปภาพ
 
 ---
 
-## 5. API(s) / ML Models to Use
-* **Model Name:** Hugging Face Transformers (`bhadresh-savani/distilbert-base-uncased-emotion`)[cite: 1]
-  * **Documentation Link:** https://huggingface.co/bhadresh-savani/distilbert-base-uncased-emotion
-  * **Type of Data:** Text-based emotion analysis (Joy, Sadness, Anger, Fear, Love, Neutral)
-* **Client-Side Runtime:** ONNX Runtime / WebAssembly (Client-side AI execution on Web Dashboard)
-  * **Documentation Link:** https://onnxruntime.ai/docs/
+## 4. ขอบเขตเทคโนโลยี (Domain)
+ประมวลผลภาษาธรรมชาติ (NLP) / ปัญญาประดิษฐ์และการวิเคราะห์ข้อมูล / เครื่องมือสำหรับนักออกแบบและนักพัฒนา / เว็บแอปพลิเคชัน
 
 ---
 
-## 6. Data Persistence Plan
-* **Local Database:** SQLite (`data/palette_history.db`)
-* **Stores:** Input text, predicted emotion, confidence score, 5-color HEX palette, and execution timestamps.
-* **Cloud Readiness:** Schema structured for future PostgreSQL / Supabase migration.
+## 5. API และโมเดล ML ที่ใช้ (API(s) / ML Models to Use)
+* **ชื่อโมเดล:** Hugging Face Transformers (`bhadresh-savani/distilbert-base-uncased-emotion`)
+  * **ลิงก์เอกสาร:** https://huggingface.co/bhadresh-savani/distilbert-base-uncased-emotion
+  * **ประเภทข้อมูล:** การวิเคราะห์อารมณ์จากข้อความ (Joy, Sadness, Anger, Fear, Love, Neutral)
+* **ระบบประมวลผลฝั่งไคลเอนต์:** ONNX Runtime / WebAssembly (ประมวลผล AI บนเบราว์เซอร์ผ่าน Web Dashboard)
+  * **ลิงก์เอกสาร:** https://onnxruntime.ai/docs/
 
 ---
 
-## 7. Framework Style
-* **OOP & Modular Architecture:**
-  * `EmotionClient` (NLP Inference Engine & Defensive Fallback)[cite: 1]
-  * `PaletteEngine` (Color mapping & WCAG 2.1 contrast calculation)
-  * `DataStore` (SQLite persistence manager)
-  * `ReportGenerator` (CSV batch processor & JSON/CSS exporter)
-  * `AIAdvisory` (Font pairings & design theme advice)
+## 6. แผนการจัดเก็บข้อมูล (Data Persistence Plan)
+* **ฐานข้อมูลในเครื่อง:** SQLite (`data/palette_history.db`)
+* **ข้อมูลที่จัดเก็บ:** ข้อความอินพุต, อารมณ์ที่วิเคราะห์ได้, ค่าความเชื่อมั่น (Confidence Score), ชุดสี HEX 5 สี และเวลาที่ประมวลผล
+* **การรองรับระบบคลาวด์:** โครงสร้าง Schema รองรับการย้ายขึ้น PostgreSQL / Supabase ในอนาคต
 
 ---
 
-## 8. Roles & Responsibilities
-* **Planner / System Architect:** Top / Plug / Guy / Peem (Rotated across Sprints 1–3) — Manages repo setup, DB schema design, i18n specification, and GitHub Actions CI/CD setup.
-* **Core Developers:** Top / Plug / Guy / Peem (Rotated across Sprints 1–3) — Implements DistilBERT NLP integration, Matplotlib renderer, SQLite store, batch exporter, and Glassmorphism Web UI.
-* **Automated Tester & QA Debugger:** Top / Plug / Guy / Peem (Rotated across Sprints 1–3) — Writes unit tests (`pytest`), handles defensive unwrapping exceptions, validates WCAG calculations, and tests cross-browser compatibility.
+## 7. สถาปัตยกรรมเชิงวัตถุ (Framework Style)
+* **สถาปัตยกรรม OOP และการแบ่งมอดูล:**
+  * `EmotionClient` (ตัวประมวลผล NLP พร้อมระบบป้องกันข้อผิดพลาด Fallback)
+  * `PaletteEngine` (การแมปปิ้งสีและการคำนวณความต่างสี WCAG 2.1)
+  * `DataStore` (ตัวจัดการฐานข้อมูล SQLite Persistence)
+  * `ReportGenerator` (ตัวประมวลผลไฟล์ CSV และส่งออกเป็น JSON/CSS)
+  * `AIAdvisory` (ตัวแนะนำการจับคู่ฟอนต์และธีมการออกแบบ)
 
 ---
 
-## 9. Features (MVP)
-* Analyze text emotion using DistilBERT NLP model[cite: 1].
-* Generate a 5-color palette (HEX/RGB) based on emotion.
-* Render color swatches in Terminal using Matplotlib[cite: 1].
-* Interactive CLI interface with text cleaning and basic exception handling.
+## 8. บทบาทและความรับผิดชอบ (Roles & Responsibilities)
+* **ผู้ดูแลระบบและสถาปนิก (Planner / System Architect):** ท็อป / ปลั๊ก / กาย / ภีม (หมุนเวียนบทบาทใน Sprint 1–3) — ดูแลการตั้งค่า Repo, ออกแบบ Schema ฐานข้อมูล, กำหนดสเปก i18n และตั้งค่า GitHub Actions CI/CD
+* **นักพัฒนาหลัก (Core Developers):** ท็อป / ปลั๊ก / กาย / ภีม (หมุนเวียนบทบาทใน Sprint 1–3) — พัฒนาระบบเชื่อมต่อ NLP DistilBERT, ตัวแสดงผล Matplotlib, ระบบ SQLite, ตัวส่งออก Batch และ Web UI สไตล์ Glassmorphism
+* **ผู้ทดสอบและควบคุมคุณภาพ (Automated Tester & QA Debugger):** ท็อป / ปลั๊ก / กาย / ภีม (หมุนเวียนบทบาทใน Sprint 1–3) — เขียน Unit Test (`pytest`), จัดการดักจับ Exception ป้องกันแอป Crash, ตรวจสอบการคำนวณ WCAG และทดสอบการทำงานข้ามเบราว์เซอร์
 
 ---
 
-## 10. Stretch Features (Completed)
-* **WCAG 2.1 Contrast Checker:** Computes text/background contrast with PASS (AAA/AA) or FAIL status.
-* **AI Design Advisory:** Suggests theme names, font pairings, and UI/UX usage tips based on emotion.
-* **Batch Processing & Export:** Reads multi-line text from CSV and exports to `.json` and `.css` (CSS Variables).
-* **SQLite Persistence:** Stores execution logs and historical queries in Local SQLite DB.
-* **Glassmorphism Web Dashboard & Image Extractor:** Interactive web app hosted on GitHub Pages with image palette extraction and bilingual (TH/EN) support.
-* **Automated CI/CD:** Continuous Deployment via GitHub Actions workflow (`deploy-web.yml`).
+## 9. ฟีเจอร์หลักขั้นต้น (Features - MVP)
+* วิเคราะห์อารมณ์จากข้อความด้วยโมเดล NLP DistilBERT
+* เจเนอเรตจานสี 5 สี (HEX/RGB) ตามอารมณ์ที่วิเคราะห์ได้
+* แสดงผลแถบสี Swatches บน Terminal ด้วย Matplotlib
+* อินเทอร์เฟซ CLI แบบโต้ตอบ พร้อมระบบทำความสะอาดข้อความและการจัดการ Exception เบื้องต้น
 
 ---
 
-## 11. Evaluation Checklist
-* ✅ NLP Model & Emotion Classifier functional with fallback handling.
-* ✅ Data persisted in Local SQLite DB (`data/palette_history.db`).
-* ✅ Code follows PEP 8 standards and OOP principles.
-* ✅ Unit tests pass (`pytest` for core engine, SQLite, and export logic).
-* ✅ CI/CD pipeline runs automatically via GitHub Actions and deploys to GitHub Pages.
-* ✅ Complete documentation (`README.md`, `CHANGELOG.md`, `LEARNINGLOG.md`, Sprint 1–3 Reports).
-* ✅ Roles and rotation logic clearly documented.
+## 10. ฟีเจอร์เพิ่มเติมที่ทำสำเร็จ (Stretch Features - Completed)
+* **ระบบตรวจความต่างสี WCAG 2.1:** คำนวณความต่างของสีข้อความและพื้นหลังพร้อมแสดงสถานะ PASS (AAA/AA) หรือ FAIL
+* **AI ให้คำแนะนำการออกแบบ:** แนะนำชื่อธีม การจับคู่ฟอนต์ (Font Pairings) และเทคนิคการนำไปใช้ในงาน UI/UX
+* **การประมวลผล Batch & ส่งออกไฟล์:** อ่านไฟล์ CSV หลายบรรทัดและส่งออกเป็นไฟล์ `.json` และ `.css` (CSS Variables)
+* **การบันทึกข้อมูลด้วย SQLite:** จัดเก็บประวัติการใช้งานลงในฐานข้อมูล SQLite Local DB
+* **Web Dashboard & สกัดสีจากรูป:** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism รันบน GitHub Pages สกัดสีจากรูปภาพได้ และรองรับ 2 ภาษา (ไทย/อังกฤษ)
+* **ระบบ CI/CD อัตโนมัติ:** บิลด์และอัปเดตหน้าเว็บอัตโนมัติผ่าน GitHub Actions Workflow (`deploy-web.yml`)
+
+---
+
+## 11. รายการตรวจสอบการประเมิน (Evaluation Checklist)
+* โมเดล NLP และตัววิเคราะห์อารมณ์ทำงานได้ถูกต้อง พร้อมระบบ Fallback สำรอง
+* ข้อมูลถูกบันทึกลงฐานข้อมูล SQLite Local DB (`data/palette_history.db`)
+* โค้ดเป็นไปตามมาตรฐาน PEP 8 และหลักการเขียนโปรแกรมเชิงวัตถุ (OOP)
+* ผ่านการทดสอบ Unit Tests (`pytest` สำหรับระบบ NLP, ฐานข้อมูล SQLite และการส่งออกไฟล์)
+* ท่อส่ง CI/CD รันอัตโนมัติผ่าน GitHub Actions และ Deploy ลง GitHub Pages สำเร็จ
+* เอกสารครบถ้วน (`README.md`, `CHANGELOG.md`, `LEARNINGLOG.md`, รายงาน Sprint 1–3)
+* บันทึกบทบาทและการหมุนเวียนงานของสมาชิกชัดเจน
