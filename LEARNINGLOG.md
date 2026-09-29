@@ -1,4 +1,4 @@
-# 🧠 LEARNINGLOG — Smart Art & Palette
+# 🧠 LEARNINGLOG — Smart Art & Palette Sentiment Analyzer
 
 เอกสารสรุปองค์ความรู้ ทักษะทางเทคนิค (Technical Skills) และบทเรียนการแก้ปัญหาที่สมาชิกในทีมได้รับจากการพัฒนาโครงการ **Smart Art & Palette** ตลอด 3 Sprints
 
