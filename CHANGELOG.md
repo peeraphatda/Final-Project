@@ -1,4 +1,4 @@
-# 📋 CHANGELOG — Smart Art & Palette
+# 📋 CHANGELOG — Smart Art & Palette Sentiment Analyzer
 
 รายการบันทึกการเปลี่ยนแปลงและการอัปเดตเวอร์ชันของโครงการ **Smart Art & Palette** ตามวงจรการพัฒนาแบบ Agile / Scrum (Sprint 1 ถึง Sprint 3)
 
