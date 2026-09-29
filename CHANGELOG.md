@@ -4,7 +4,7 @@
 
 ---
 
-## [v1.0.0] - 2026-09-25 (Sprint 3 Release — Final Submission) 🚀
+## [v1.0.0] - 2026-09-25 (Sprint 3 Release — Final Submission)
 
 ### Added (ฟีเจอร์ใหม่)
 * **Web Application Dashboard:** หน้าเว็บแดชบอร์ดประมวลผลเรียลไทม์ ตกแต่งในสไตล์ Modern Glassmorphism Responsive UI (`web/index.html`, `style.css`, `app.js`)
@@ -20,7 +20,7 @@
 
 ---
 
-## [v0.2.0] - 2026-09-18 (Sprint 2 Release — Persistence & Advisory) 📦
+## [v0.2.0] - 2026-09-18 (Sprint 2 Release — Persistence & Advisory)
 
 ### Added (ฟีเจอร์ใหม่)
 * **Local SQLite DataStore:** บันทึกประวัติข้อความ, อารมณ์, ค่า confidence และจานสี Hex Code ลงใน `data/palette_history.db`
@@ -35,7 +35,7 @@
 
 ---
 
-## [v0.1.0] - 2026-09-11 (Sprint 1 Release — Core OOP CLI Foundation) 🛠️
+## [v0.1.0] - 2026-09-11 (Sprint 1 Release — Core OOP CLI Foundation)
 
 ### Added (ฟีเจอร์ใหม่)
 * **NLP Emotion Analysis Engine:** เชื่อมต่อ Hugging Face Transformers ใช้โมเดล `bhadresh-savani/distilbert-base-uncased-emotion` ในการวิเคราะห์ข้อความภาษาอังกฤษและไทย
