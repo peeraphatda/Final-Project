@@ -168,7 +168,7 @@ Final-Project/
 
 คุณสามารถทดลองใช้งานเว็บแอปพลิเคชันรูปแบบออนไลน์ (Client-Side AI Processing 100%) ได้ทันทีผ่าน **GitHub Pages** โดยไม่ต้องติดตั้งระบบภายในเครื่อง:
 
-👉 **[เข้าใช้งาน Smart Art & Palette Web Dashboard](https://peeraphatda.github.io/Final-Project/)**
+👉 **[เข้าใช้งาน Smart Art & Palette Sentiment Analyzer Web Dashboard](https://peeraphatda.github.io/Final-Project/)**
 
 > **Note:** ระบบวิเคราะห์อารมณ์และสกัดสีจากรูปภาพบนหน้าเว็บ ประมวลผลผ่าน WebAssembly / ONNX Runtime บนเบราว์เซอร์ของผู้ใช้โดยตรง จึงรับประกันความเร็ว ความเป็นส่วนตัว และไม่ต้องพึ่งพา Backend API ภายนอก
 
