@@ -34,11 +34,11 @@ const clearHistoryBtn = $('clearHistoryBtn');
 const API_BASE_URL = 'http://localhost:3000/api/history';
 
 let currentLang = 'TH';
-let paletteAnimationTimer = null; // ตัวแปรสำหรับเก็บ Timer วนลูปเปลี่ยนสีพื้นหลัง
+let paletteAnimationTimer = null;
 
 const translations = {
     TH: {
-        subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี',
+        subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ UI/UX',
         inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
         placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
         analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
@@ -46,7 +46,7 @@ const translations = {
         extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
         resultEmotionLabel: 'ผลลัพธ์อารมณ์: ',
         resultConfidenceLabel: 'ค่าความเชื่อมั่น: ',
-        paletteTitle: 'ชุดจานสีแนะนำ (WCAG Compliant)',
+        paletteTitle: 'ชุดจานสีแนะนำขยายพิเศษ (Expanded Palette)',
         alertEmpty: 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!',
         advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
         recTheme: 'ธีมที่แนะนำ: ',
@@ -59,7 +59,7 @@ const translations = {
         emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์'
     },
     EN: {
-        subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
+        subTitle: 'Text Sentiment Analysis & Expanded Color Palette Recommendation',
         inputLabel: 'Enter text to analyze sentiment via AI Model',
         placeholder: 'i feel happy or feel sad...',
         analyzeBtn: 'Analyze Sentiment',
@@ -67,7 +67,7 @@ const translations = {
         extractedTitle: 'Uploaded Image & Extracted Palette',
         resultEmotionLabel: 'Emotion Result: ',
         resultConfidenceLabel: 'Confidence Score: ',
-        paletteTitle: 'Recommended Color Palette (WCAG Compliant)',
+        paletteTitle: 'Recommended Expanded Color Palette',
         alertEmpty: 'Please enter text before analyzing!',
         advisoryTitle: 'AI Design Advisory',
         recTheme: 'Recommended Theme: ',
@@ -81,95 +81,122 @@ const translations = {
     }
 };
 
-// 🟢 1. ระบบสลับภาษา (TH / EN)
-if (langToggleBtn) {
-    langToggleBtn.addEventListener('click', () => {
-        currentLang = currentLang === 'TH' ? 'EN' : 'TH';
-        applyLanguage(currentLang);
-    });
-}
-
-function applyLanguage(lang) {
-    const t = translations[lang];
-    if (subTitle) subTitle.innerText = t.subTitle;
-    if (inputLabel) inputLabel.innerText = t.inputLabel;
-    if (textInput) textInput.placeholder = t.placeholder;
-    if (analyzeBtn && !analyzeBtn.disabled) analyzeBtn.innerText = t.analyzeBtn;
-    if (uploadTriggerBtn) uploadTriggerBtn.innerText = t.uploadBtn;
-    
-    const extractedTitle = document.querySelector('#extractedPaletteSection .result-title');
-    if (extractedTitle) extractedTitle.innerText = t.extractedTitle;
-    if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
-    if (historyTitle) historyTitle.innerText = t.historyTitle;
-    if (clearHistoryBtn) clearHistoryBtn.innerText = t.clearHistory;
-
-    if (resultEmotionText && emotionLabel) resultEmotionText.childNodes[0].nodeValue = t.resultEmotionLabel;
-    if (resultConfidenceText && confidenceValue) resultConfidenceText.childNodes[0].nodeValue = t.resultConfidenceLabel;
-
-    const advisoryHeader = document.querySelector('.advisory-section h4');
-    if (advisoryHeader) advisoryHeader.innerText = t.advisoryTitle;
-
-    const advisoryParagraphs = document.querySelectorAll('.advisory-section p strong');
-    if (advisoryParagraphs.length >= 3) {
-        advisoryParagraphs[0].innerText = t.recTheme;
-        advisoryParagraphs[1].innerText = t.typography;
-        advisoryParagraphs[2].innerText = t.usageContext;
-    }
-
-    renderHistoryList();
-}
-
-// 🟢 โครงสร้างข้อมูลจานสี + ฟอนต์
+// 🟢 โครงสร้างชุดจานสีแบบจุใจ (8 สีต่ออารมณ์ พร้อมระบุประเภทการใช้งาน)
 const emotionRules = {
     JOY: { 
-        palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], 
+        palette: [
+            { hex: '#FFD700', role: 'Main' },
+            { hex: '#FF8C00', role: 'Primary' },
+            { hex: '#FF69B4', role: 'Accent 1' },
+            { hex: '#00BFFF', role: 'Accent 2' },
+            { hex: '#32CD32', role: 'Success' },
+            { hex: '#FFE4B5', role: 'Soft Bg' },
+            { hex: '#FFF8DC', role: 'Light Bg' },
+            { hex: '#2C3E50', role: 'Dark Text' }
+        ], 
         theme: 'Vibrant Sunburst', 
         font: 'Poppins / Montserrat', 
         fontFamily: "'Poppins', 'Montserrat', sans-serif",
-        context: 'E-Commerce, Festival Branding, UI Dashboard' 
+        context: 'E-Commerce, Festival Branding, Mobile UI' 
     },
     SADNESS: { 
-        palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], 
+        palette: [
+            { hex: '#1C2541', role: 'Primary' },
+            { hex: '#3A506B', role: 'Secondary' },
+            { hex: '#5BC0BE', role: 'Accent' },
+            { hex: '#6C757D', role: 'Muted Text' },
+            { hex: '#ADB5BD', role: 'Border' },
+            { hex: '#D9E2EC', role: 'Soft Surface' },
+            { hex: '#F0F4F8', role: 'Light Bg' },
+            { hex: '#0F172A', role: 'Dark Text' }
+        ], 
         theme: 'Melancholic Mist', 
         font: 'Lora / Merriweather', 
         fontFamily: "'Lora', 'Merriweather', serif",
         context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps' 
     },
     ANGER: { 
-        palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], 
+        palette: [
+            { hex: '#D00000', role: 'Primary' },
+            { hex: '#9D0208', role: 'Dark Primary' },
+            { hex: '#E85D04', role: 'Accent 1' },
+            { hex: '#FAA307', role: 'Accent 2' },
+            { hex: '#370617', role: 'Dark Surface' },
+            { hex: '#FFCCD5', role: 'Soft Red' },
+            { hex: '#FFF0F3', role: 'Light Bg' },
+            { hex: '#2B2D42', role: 'Dark Text' }
+        ], 
         theme: 'Fiery Passion', 
         font: 'Oswald / Roboto', 
         fontFamily: "'Oswald', 'Roboto', sans-serif",
         context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign' 
     },
     FEAR: { 
-        palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], 
+        palette: [
+            { hex: '#2B1E3A', role: 'Dark Bg' },
+            { hex: '#4A3E3D', role: 'Primary' },
+            { hex: '#2C3539', role: 'Surface' },
+            { hex: '#5C5470', role: 'Secondary' },
+            { hex: '#B8C0C2', role: 'Muted Text' },
+            { hex: '#8D99AE', role: 'Accent' },
+            { hex: '#EDF2F4', role: 'Light Text' },
+            { hex: '#111827', role: 'Deep Base' }
+        ], 
         theme: 'Mystic Shadow', 
         font: 'Cinzel / Inter', 
         fontFamily: "'Cinzel', 'Inter', serif",
-        context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools' 
+        context: 'Cybersecurity Platforms, Horror Content, Security Tools' 
     },
     LOVE: { 
-        palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], 
+        palette: [
+            { hex: '#FF758F', role: 'Primary' },
+            { hex: '#FF4D6D', role: 'Accent' },
+            { hex: '#C9184A', role: 'Deep Red' },
+            { hex: '#FFB3C1', role: 'Soft Pink' },
+            { hex: '#FFF0F3', role: 'Light Bg' },
+            { hex: '#800F2F', role: 'Text Dark' },
+            { hex: '#FFCCD5', role: 'Card Bg' },
+            { hex: '#590D22', role: 'Header' }
+        ], 
         theme: 'Romantic Bloom', 
         font: 'Playfair Display / Great Vibes', 
         fontFamily: "'Playfair Display', serif",
         context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms' 
     },
     SURPRISE: { 
-        palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], 
+        palette: [
+            { hex: '#7209B7', role: 'Primary' },
+            { hex: '#3F37C9', role: 'Secondary' },
+            { hex: '#4CC9F0', role: 'Accent 1' },
+            { hex: '#F72585', role: 'Accent 2' },
+            { hex: '#4895EF', role: 'Info' },
+            { hex: '#E0AAFF', role: 'Soft Purple' },
+            { hex: '#F7F0F5', role: 'Light Bg' },
+            { hex: '#10002B', role: 'Dark Text' }
+        ], 
         theme: 'Electric Wonder', 
         font: 'Plus Jakarta Sans / Space Grotesk', 
         fontFamily: "'Plus Jakarta Sans', 'Space Grotesk', sans-serif",
-        context: 'Entertainment Apps, Promotional Banners, Interactive Art' 
+        context: 'Entertainment Apps, Banners, Interactive Art' 
     }
 };
 
-const renderSwatches = colors => (colors || []).map(c => `
-    <div class="color-swatch" style="background-color: ${c}">
-        <span>${c}</span>
-    </div>
-`).join('');
+// 🟢 วาดการ์ดแสดงสีสวยงามแยกตามประเภท
+const renderSwatches = colors => {
+    return `<div class="palette-grid">` + (colors || []).map(c => {
+        const hex = typeof c === 'string' ? c : c.hex;
+        const role = typeof c === 'object' && c.role ? c.role : 'Color';
+        return `
+            <div class="color-card">
+                <div class="color-swatch-box" style="background-color: ${hex}"></div>
+                <div class="color-info">
+                    <span class="color-hex">${hex}</span>
+                    <span class="color-role">${role}</span>
+                </div>
+            </div>
+        `;
+    }).join('') + `</div>`;
+};
 
 let sentimentPipeline = null;
 
@@ -181,8 +208,7 @@ async function getAIPipeline() {
     return sentimentPipeline;
 }
 
-// 🟢 Helper แปลง Hex เป็น RGBA แบบเจือจางเพื่อให้พื้นหลังสบายตา
-function hexToSoftRgba(hex, opacity = 0.25) {
+function hexToSoftRgba(hex, opacity = 0.2) {
     let c = hex.replace('#', '');
     if (c.length === 3) c = c.split('').map(x => x + x).join('');
     const num = parseInt(c, 16);
@@ -192,24 +218,24 @@ function hexToSoftRgba(hex, opacity = 0.25) {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
-// 🟢 ฟังก์ชันวนลูปเปลี่ยนสีพื้นหลังตามจานสีในรอบนั้นๆ
+// 🟢 วนลูปสลับสีพื้นหลังเรียบหรูตามรายการสี Hex
 function startPaletteBackgroundAnimation(colorList) {
     if (paletteAnimationTimer) clearInterval(paletteAnimationTimer);
     if (!colorList || colorList.length === 0) return;
 
     let currentIndex = 0;
+    const hexList = colorList.map(c => typeof c === 'string' ? c : c.hex);
 
     const changeBg = () => {
-        const hexColor = colorList[currentIndex];
-        document.body.style.backgroundColor = hexToSoftRgba(hexColor, 0.25);
-        currentIndex = (currentIndex + 1) % colorList.length;
+        const hexColor = hexList[currentIndex];
+        document.body.style.backgroundColor = hexToSoftRgba(hexColor, 0.22);
+        currentIndex = (currentIndex + 1) % hexList.length;
     };
 
-    changeBg(); // เปลี่ยนสีแรกทันที
-    paletteAnimationTimer = setInterval(changeBg, 3000); // สลับสีทุกๆ 3 วินาที
+    changeBg();
+    paletteAnimationTimer = setInterval(changeBg, 3500);
 }
 
-// 🟢 2. ระบบบันทึกประวัติ
 function saveToHistory(type, inputContent, emotion, confidence, palette) {
     const newItem = {
         type,
@@ -238,7 +264,6 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
-// 🟢 3. ระบบวาดแถบประวัติ
 async function renderHistoryList() {
     const historyContainer = document.getElementById('historyList');
     if (!historyContainer) return;
@@ -254,9 +279,7 @@ async function renderHistoryList() {
     if (!historyData || historyData.length === 0) {
         try {
             const response = await fetch(API_BASE_URL);
-            if (response.ok) {
-                historyData = await response.json();
-            }
+            if (response.ok) historyData = await response.json();
         } catch (err) {
             console.warn("API Offline");
         }
@@ -281,17 +304,19 @@ async function renderHistoryList() {
             try { paletteArray = JSON.parse(item.palette); } catch (e) { paletteArray = []; }
         }
 
+        const hexList = paletteArray.map(c => typeof c === 'string' ? c : c.hex);
+
         const isImage = item.type === 'image';
         const isBase64 = isImage && item.content && item.content.startsWith('data:image');
 
         const contentDisplay = isBase64
-            ? `<img src="${item.content}" style="width:36px; height:36px; object-fit:cover; border-radius:4px; border:1px solid #ddd;" alt="thumb" />`
+            ? `<img src="${item.content}" style="width:36px; height:36px; object-fit:cover; border-radius:6px;" alt="thumb" />`
             : `<span class="history-text" title="${item.content}">${isImage ? '🖼️ ' : ''}${item.content}</span>`;
 
         return `
-            <div class="history-item" data-index="${index}" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid #e2e8f0; cursor:pointer; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+            <div class="history-item" data-index="${index}" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; cursor:pointer; transition: all 0.2s;">
                 <div class="history-info" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
-                    <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; background:${isImage ? '#fce7f3' : '#dbeafe'}; color:${isImage ? '#9d174d' : '#1e40af'};">
+                    <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:3px 8px; border-radius:6px; font-weight:bold; background:${isImage ? '#fce7f3' : '#dbeafe'}; color:${isImage ? '#9d174d' : '#1e40af'};">
                         ${(item.type || 'TEXT').toUpperCase()}
                     </span>
                     ${contentDisplay}
@@ -300,7 +325,7 @@ async function renderHistoryList() {
                 <div class="history-result" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
                     <strong class="history-emotion">${item.emotion || '-'}</strong>
                     <div class="history-mini-palette" style="display:flex; gap:3px;">
-                        ${paletteArray.map(c => `<div class="mini-swatch" style="width:12px; height:12px; border-radius:2px; background:${c}"></div>`).join('')}
+                        ${hexList.slice(0, 5).map(c => `<div class="mini-swatch" style="width:12px; height:12px; border-radius:3px; background:${c}"></div>`).join('')}
                     </div>
                 </div>
             </div>
@@ -317,7 +342,6 @@ async function renderHistoryList() {
     });
 }
 
-// 🟢 4. ฟังก์ชันดึงประวัติมาแสดงผล
 function loadHistoryItem(item) {
     if (alertBox) alertBox.style.display = 'none';
 
@@ -343,7 +367,6 @@ function loadHistoryItem(item) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 🟢 5. ปุ่มวิเคราะห์ข้อความ
 if (analyzeBtn) {
     analyzeBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -396,7 +419,6 @@ if (analyzeBtn) {
     });
 }
 
-// 🟢 6. ปุ่มอัปโหลดรูปภาพ
 function clearImageResult() {
     if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
     if (extractedPalette) extractedPalette.innerHTML = '';
@@ -433,15 +455,13 @@ if (imageInput) {
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
 
-                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 5);
+                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 6);
                 renderExtractedPalette(rgbData.hexList);
 
                 const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
                 const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                 
-                // สำหรับรูปภาพ ใช้อาร์เรย์สีที่สกัดได้จากรูปภาพหมุนวนพื้นหลัง
                 updateUIResult(imageEmotion, confidence, rgbData.hexList);
-
                 saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
             };
             img.src = imageDataUrl;
@@ -483,7 +503,6 @@ function extractRGBColors(ctx, width, height, count) {
     return { hexList, rgbList };
 }
 
-// 🟢 7. ฟังก์ชันอัปเดต UI + วนลูปเปลี่ยนสีพื้นหลังตามจานสีในรอบนั้นๆ
 function updateUIResult(emotionKey, confidence, customPalette = null) {
     const resultData = emotionRules[emotionKey] || emotionRules['JOY'];
 
@@ -494,19 +513,16 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
     if (fontPairing) fontPairing.innerText = resultData.font;
     if (usageContext) usageContext.innerText = resultData.context;
 
+    const activePalette = customPalette || resultData.palette;
+
     if (paletteDisplay) {
-        paletteDisplay.innerHTML = renderSwatches(resultData.palette);
+        paletteDisplay.innerHTML = renderSwatches(activePalette);
     }
 
-    // สลับเปลี่ยนฟอนต์ตามธีมที่ AI แนะนำ
     if (resultData.fontFamily) {
         document.body.style.fontFamily = resultData.fontFamily;
     }
 
-    // เลือกใช้ Custom Palette (ถ้าเป็นรูปภาพ) หรือ Palette ของธีม (ถ้าเป็นข้อความ)
-    const activePalette = customPalette || resultData.palette;
-    
-    // เรียกใช้อิเมเตอร์วนลูปเปลี่ยนสีพื้นหลัง
     startPaletteBackgroundAnimation(activePalette);
 }
 
@@ -516,7 +532,6 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-// 🟢 8. ปุ่มล้างประวัติ
 if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', () => {
         fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
@@ -527,5 +542,4 @@ if (clearHistoryBtn) {
     });
 }
 
-// เริ่มต้นวาดรายการประวัติ
 renderHistoryList();

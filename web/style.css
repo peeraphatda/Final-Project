@@ -1,241 +1,428 @@
+/* ==========================================================================
+   1. CORE VARIABLES & RESET
+   ========================================================================== */
 :root {
-    --primary-color: #3b82f6;
-    --primary-hover: #2563eb;
-    --bg-color: #f0f4f8;
-    --card-bg: #ffffff;
-    --text-color: #1e293b;
-    --border-color: #e2e8f0;
+    --primary-radius: 20px;
+    --secondary-radius: 12px;
+    --transition-speed: 1.2s;
+    --font-primary: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Text Colors */
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+
+    /* Glass Effect UI */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 40px 20px;
-    display: flex;
-    justify-content: center;
-    transition: background-color 1.5s ease-in-out, font-family 0.5s ease-in-out;
+    font-family: var(--font-primary);
     background-color: #f8fafc;
-    font-family: 'Inter', sans-serif; /* ฟอนต์เริ่มต้น */
+    color: var(--text-main);
+    min-height: 100vh;
+    padding: 40px 20px;
+    line-height: 1.6;
+    transition: background-color var(--transition-speed) ease-in-out, font-family 0.5s ease-in-out;
 }
 
+/* ==========================================================================
+   2. MAIN CONTAINER (GLASSMORPHISM)
+   ========================================================================== */
 .container {
-    width: 100%;
-    max-width: 700px;
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--primary-radius);
+    padding: 40px;
+    box-shadow: var(--glass-shadow);
 }
 
+/* Header & Typography */
 header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
     position: relative;
 }
 
-.logo {
-    font-size: 1.8rem;
+h1 {
+    font-size: 2.2rem;
     font-weight: 700;
+    letter-spacing: -0.5px;
     margin-bottom: 8px;
+    background: linear-gradient(135deg, #1e293b, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.sub-title {
-    font-size: 0.95rem;
-    color: #64748b;
+#subTitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 400;
 }
 
-.lang-btn {
+/* Language Toggle Button */
+#langToggleBtn {
     position: absolute;
-    right: 0;
     top: 0;
-    padding: 6px 12px;
-    border: 1px solid var(--border-color);
-    background: #fff;
+    right: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
     border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
     cursor: pointer;
-    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-.card {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+#langToggleBtn:hover {
+    background: #ffffff;
+    color: var(--text-main);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-.input-group {
-    margin-bottom: 20px;
+/* ==========================================================================
+   3. INPUT SECTION & BUTTONS
+   ========================================================================== */
+.input-section {
+    margin-bottom: 30px;
 }
 
-label {
+.input-label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
     font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #334155;
 }
 
 textarea {
     width: 100%;
-    height: 100px;
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    resize: none;
-    box-sizing: border-box;
+    min-height: 110px;
+    padding: 16px;
+    border-radius: var(--secondary-radius);
+    border: 1px solid #cbd5e1;
+    background: rgba(255, 255, 255, 0.9);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-main);
+    resize: vertical;
+    transition: all 0.3s ease;
 }
 
-.button-group {
+textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+.action-buttons {
     display: flex;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-top: 15px;
 }
 
-.btn {
-    flex: 1;
-    padding: 10px;
+button {
     border: none;
-    border-radius: 8px;
+    border-radius: var(--secondary-radius);
+    padding: 12px 24px;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-primary {
-    background: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #ffffff;
+    flex: 2;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
 .btn-primary:hover {
-    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
 }
 
 .btn-secondary {
-    background: #e2e8f0;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #cbd5e1;
     color: #475569;
+    flex: 1;
+}
+
+.btn-secondary:hover {
+    background: #ffffff;
+    border-color: #94a3b8;
+    color: var(--text-main);
 }
 
 .alert-box {
-    color: #ef4444;
-    background: #fee2e2;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 15px;
+    padding: 12px 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    border-radius: var(--secondary-radius);
+    font-size: 0.9rem;
+    margin-top: 15px;
     display: none;
 }
 
-.result-section {
-    background: #f8fafc;
-    padding: 16px;
-    border-radius: 8px;
+/* ==========================================================================
+   4. PALETTE & DISPLAY CARDS
+   ========================================================================== */
+.result-section, .extracted-section, .history-section {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--secondary-radius);
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.palette-container {
+.emotion-badge {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4338ca;
+    background: #e0e7ff;
+    padding: 4px 16px;
+    border-radius: 20px;
+}
+
+/* Color Palette Grid System */
+.palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.color-card {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.color-swatch {
-    flex: 1;
-    height: 60px;
-    border-radius: 6px;
+.color-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.color-swatch-box {
+    width: 100%;
+    height: 65px;
+    transition: opacity 0.2s;
+}
+
+.color-info {
+    padding: 8px 4px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.color-hex {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    display: block;
+    font-family: monospace;
+}
+
+.color-role {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* AI Design Advisory Section */
+.advisory-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.advisory-section h4 {
+    font-size: 0.95rem;
+    color: #475569;
+    margin-bottom: 10px;
+}
+
+.advisory-section p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+/* Image Preview Block */
+.image-preview-container {
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 4px;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
-.color-swatch span {
-    font-size: 0.75rem;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 2px 4px;
-    border-radius: 4px;
+.image-preview-container img {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: var(--secondary-radius);
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* 🟢 ตกแต่งส่วน History & รูปตัวอย่าง Thumbnail */
+/* ==========================================================================
+   5. HISTORY LIST & ITEMS
+   ========================================================================== */
 .history-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 24px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .btn-clear {
     background: transparent;
     color: #ef4444;
-    border: 1px solid #fee2e2;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.btn-clear:hover {
+    background: #fef2f2;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
 .history-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.history-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.history-item:hover {
+    background: #ffffff;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
 }
-
-.history-tag {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: bold;
-}
-
-.history-tag.text { background: #dbeafe; color: #1e40af; }
-.history-tag.image { background: #fce7f3; color: #9d174d; }
 
 .history-text {
-    max-width: 200px;
+    max-width: 260px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 0.9rem;
-}
-
-/* 🟢 สไตล์รูปภาพตัวอย่างในประวัติ */
-.history-thumb {
-    width: 42px;
-    height: 42px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-}
-
-.history-time {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-.history-result {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    color: #334155;
+    font-weight: 500;
 }
 
 .history-mini-palette {
     display: flex;
-    gap: 3px;
+    gap: 4px;
 }
 
 .mini-swatch {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.history-empty {
-    text-align: center;
-    color: #94a3b8;
-    font-size: 0.9rem;
-    padding: 10px 0;
+/* Scrollbar Customization */
+.history-list::-webkit-scrollbar {
+    width: 5px;
+}
+.history-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 10px;
+}
+.history-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE DESIGN (MOBILE ADAPTATION)
+   ========================================================================== */
+@media (max-width: 640px) {
+    body {
+        padding: 15px 10px;
+    }
+
+    .container {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    #langToggleBtn {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .palette-grid {
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+        gap: 8px;
+    }
+
+    .color-swatch-box {
+        height: 50px;
+    }
+
+    .history-text {
+        max-width: 140px;
+    }
 }
