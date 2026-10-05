@@ -69,5 +69,34 @@
 
     <!-- 🟢 ใส่ type="module" ในการเรียกใช้ script -->
     <script type="module" src="app.js"></script>
+
+        <!-- ค้นหาโซนแสดงผลจานสีเดิม -->
+    <div id="paletteDisplay"></div>
+
+    <div class="advisory-section">
+        <p><strong>ธีมที่แนะนำ:</strong> <span id="themeName"></span></p>
+        <p><strong>ชุดฟอนต์:</strong> <span id="fontPairing"></span></p>
+        <p><strong>การนำไปใช้งาน:</strong> <span id="usageContext"></span></p>
+    </div>
+
+    <!-- 🟢 นำโค้ดปุ่ม Export ชุดนี้ไปวางต่อตรงนี้ได้เลยครับ -->
+    <div class="export-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #e2e8f0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <span style="font-weight: bold; font-size: 0.9rem; color: #475569;">Export จานสี:</span>
+    
+     <!-- ปุ่มดาวน์โหลด ASE -->
+     <button type="button" id="exportAseBtn" class="btn-export" style="background-color: #3182ce; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+        🎨 Adobe ASE (.ase)
+     </button>
+    
+     <!-- ปุ่มดาวน์โหลด JSON -->
+     <button type="button" id="exportJsonBtn" class="btn-export" style="background-color: #475569; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+            📄 JSON File (.json)
+      </button>
+
+     <!-- ปุ่ม Copy Figma Tokens -->
+      <button type="button" id="exportFigmaBtn" class="btn-export" style="background-color: #059669; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          ❖ Copy Figma Tokens
+        </button>
+    </div>
 </body>
 </html>
