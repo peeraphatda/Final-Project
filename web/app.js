@@ -57,29 +57,32 @@ async function getAIPipeline() {
     return sentimentPipeline;
 }
 
-// 🟢 บันทึกลง Database
+// บันทึกลง Database
 async function saveToHistory(type, inputContent, emotion, confidence, palette) {
     try {
-        const response = await fetch(API_BASE_URL, {
+        const response = await fetch('http://localhost:3000/api/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, content: inputContent, emotion, confidence, palette })
         });
-        if (response.ok) {
-            await renderHistoryList();
+        
+        if (!response.ok) {
+            console.error("Server error response:", await response.text());
         }
+        await renderHistoryList();
     } catch (error) {
         console.error("Database Save Error:", error);
+        alert("ไม่สามารถบันทึกประวัติลงฐานข้อมูลได้: " + error.message);
     }
 }
 
-// 🟢 ดึงและแสดงรายการประวัติ (History)
+// ดึงและแสดงรายการประวัติ (History)
 async function renderHistoryList() {
     if (!historyList) return;
     
     try {
-        const response = await fetch(API_BASE_URL);
-        if (!response.ok) throw new Error("Network response was not ok");
+        const response = await fetch('http://localhost:3000/api/history');
+        if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
 
         const history = await response.json();
 
@@ -93,7 +96,6 @@ async function renderHistoryList() {
                 ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
                 : '';
 
-            // ตรวจสอบและจัดการจานสี mini-palette
             let paletteArray = [];
             if (Array.isArray(item.palette)) {
                 paletteArray = item.palette;
@@ -123,7 +125,7 @@ async function renderHistoryList() {
         }).join('');
     } catch (error) {
         console.error("Fetch History Error:", error);
-        historyList.innerHTML = `<p class="history-empty">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (โปรดตรวจสอบว่ารัน node server.js อยู่หรือไม่)</p>`;
+        historyList.innerHTML = `<p class="history-empty" style="color:red;">ไม่สามารถดึงประวัติได้ (ตรวจสอบว่ารัน node server.js แล้วหรือยัง)</p>`;
     }
 }
 
