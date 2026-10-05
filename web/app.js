@@ -118,14 +118,56 @@ function applyLanguage(lang) {
     renderHistoryList();
 }
 
-// โครงสร้างข้อมูลจานสี + กำหนดโทนสีพื้นหลัง (bgRgb) แบบซอฟต์นุ่มนวล
+// 🟢 โครงสร้างข้อมูลจานสี + กำหนดสีพื้นหลัง (bgRgb) + กำหนดฟอนต์ (fontFamily) ตามคำแนะนำ AI
 const emotionRules = {
-    JOY: { palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], bgRgb: 'rgb(255, 248, 220)', theme: 'Vibrant Sunburst', font: 'Poppins / Montserrat', context: 'E-Commerce, Festival Branding, UI Dashboard' },
-    SADNESS: { palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], bgRgb: 'rgb(224, 231, 239)', theme: 'Melancholic Mist', font: 'Lora / Merriweather', context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps' },
-    ANGER: { palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], bgRgb: 'rgb(255, 230, 230)', theme: 'Fiery Passion', font: 'Oswald / Roboto', context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign' },
-    FEAR: { palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], bgRgb: 'rgb(230, 226, 236)', theme: 'Mystic Shadow', font: 'Cinzel / Inter', context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools' },
-    LOVE: { palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], bgRgb: 'rgb(255, 235, 240)', theme: 'Romantic Bloom', font: 'Playfair Display / Great Vibes', context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms' },
-    SURPRISE: { palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], bgRgb: 'rgb(235, 230, 255)', theme: 'Electric Wonder', font: 'Plus Jakarta Sans / Space Grotesk', context: 'Entertainment Apps, Promotional Banners, Interactive Art' }
+    JOY: { 
+        palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], 
+        bgRgb: 'rgb(255, 248, 220)', 
+        theme: 'Vibrant Sunburst', 
+        font: 'Poppins / Montserrat', 
+        fontFamily: "'Poppins', 'Montserrat', sans-serif",
+        context: 'E-Commerce, Festival Branding, UI Dashboard' 
+    },
+    SADNESS: { 
+        palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], 
+        bgRgb: 'rgb(224, 231, 239)', 
+        theme: 'Melancholic Mist', 
+        font: 'Lora / Merriweather', 
+        fontFamily: "'Lora', 'Merriweather', serif",
+        context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps' 
+    },
+    ANGER: { 
+        palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], 
+        bgRgb: 'rgb(255, 230, 230)', 
+        theme: 'Fiery Passion', 
+        font: 'Oswald / Roboto', 
+        fontFamily: "'Oswald', 'Roboto', sans-serif",
+        context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign' 
+    },
+    FEAR: { 
+        palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], 
+        bgRgb: 'rgb(230, 226, 236)', 
+        theme: 'Mystic Shadow', 
+        font: 'Cinzel / Inter', 
+        fontFamily: "'Cinzel', 'Inter', serif",
+        context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools' 
+    },
+    LOVE: { 
+        palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], 
+        bgRgb: 'rgb(255, 235, 240)', 
+        theme: 'Romantic Bloom', 
+        font: 'Playfair Display / Great Vibes', 
+        fontFamily: "'Playfair Display', serif",
+        context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms' 
+    },
+    SURPRISE: { 
+        palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], 
+        bgRgb: 'rgb(235, 230, 255)', 
+        theme: 'Electric Wonder', 
+        font: 'Plus Jakarta Sans / Space Grotesk', 
+        fontFamily: "'Plus Jakarta Sans', 'Space Grotesk', sans-serif",
+        context: 'Entertainment Apps, Promotional Banners, Interactive Art' 
+    }
 };
 
 const renderSwatches = colors => (colors || []).map(c => `
@@ -252,7 +294,7 @@ async function renderHistoryList() {
     });
 }
 
-// 🟢 4. ฟังก์ชันดึงประวัติมาแสดงผล + เปลี่ยนสีพื้นหลังตามธีมอารมณ์
+// 🟢 4. ฟังก์ชันดึงประวัติมาแสดงผล
 function loadHistoryItem(item) {
     if (alertBox) alertBox.style.display = 'none';
 
@@ -414,7 +456,7 @@ function extractRGBColors(ctx, width, height, count) {
     return { hexList, rgbList };
 }
 
-// 🟢 7. ฟังก์ชันอัปเดต UI ผลลัพธ์ + สลับสีพื้นหลังเว็บตามธีมอารมณ์
+// 🟢 7. ฟังก์ชันอัปเดต UI + สลับสีพื้นหลัง + สลับฟอนต์ตามธีมอารมณ์ที่ AI แนะนำ
 function updateUIResult(emotionKey, confidence) {
     const resultData = emotionRules[emotionKey] || emotionRules['JOY'];
 
@@ -429,9 +471,14 @@ function updateUIResult(emotionKey, confidence) {
         paletteDisplay.innerHTML = renderSwatches(resultData.palette);
     }
 
-    // 🔴 เปลี่ยนสีพื้นหลังหน้าเว็บ (body background-color) ตามสี RGB ของธีมอารมณ์
+    // 🔴 เปลี่ยนสีพื้นหลังเว็บ
     if (resultData.bgRgb) {
         document.body.style.backgroundColor = resultData.bgRgb;
+    }
+
+    // 🔴 เปลี่ยนชุดฟอนต์ (Font Family) ของหน้าเว็บตามคำแนะนำ
+    if (resultData.fontFamily) {
+        document.body.style.fontFamily = resultData.fontFamily;
     }
 }
 
