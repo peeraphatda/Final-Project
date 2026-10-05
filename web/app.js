@@ -10,6 +10,130 @@ let currentLang = 'TH';
 let paletteAnimationTimer = null;
 let sentimentPipeline = null;
 
+// 🟢 ตัวแปรสำหรับเก็บข้อมูล Palette ปัจจุบันเพื่อใช้ Export
+let activePaletteData = [];
+
+// ==========================================
+// 🛠️️ ASE / EXPORT HELPER FUNCTIONS
+// ==========================================
+
+// ฟังก์ชันแปลง Hex เป็น RGB (0.0 - 1.0)
+function hexToRgbFloat(hex) {
+    let cleanHex = hex.replace('#', '');
+    if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(x => x + x).join('');
+    const num = parseInt(cleanHex, 16);
+    return {
+        r: ((num >> 16) & 255) / 255,
+        g: ((num >> 8) & 255) / 255,
+        b: (num & 255) / 255
+    };
+}
+
+// ฟังก์ชันสร้าง Binary Buffer สำหรับไฟล์ ASE (.ase)
+function createASEBuffer(palette, paletteName = "AI Palette") {
+    const blocks = [];
+
+    function encodeString(str) {
+        const buf = new Uint8Array((str.length + 1) * 2);
+        const view = new DataView(buf.buffer);
+        for (let i = 0; i < str.length; i++) {
+            view.setUint16(i * 2, str.charCodeAt(i), false);
+        }
+        view.setUint16(str.length * 2, 0, false);
+        return buf;
+    }
+
+    palette.forEach((item) => {
+        const hex = typeof item === 'string' ? item : item.hex;
+        const name = (typeof item === 'object' && item.role) ? `${item.role} (${hex})` : hex;
+        const rgb = hexToRgbFloat(hex);
+
+        const nameBuf = encodeString(name);
+        const entryLen = 2 + nameBuf.length + 4 + 12 + 2;
+        const block = new Uint8Array(2 + 4 + entryLen);
+        const view = new DataView(block.buffer);
+
+        let offset = 0;
+        view.setUint16(offset, 0x0001, false); offset += 2;
+        view.setUint32(offset, entryLen, false); offset += 4;
+
+        view.setUint16(offset, name.length + 1, false); offset += 2;
+        block.set(nameBuf, offset); offset += nameBuf.length;
+
+        block.set([82, 71, 66, 32], offset); offset += 4;
+
+        view.setFloat32(offset, rgb.r, false); offset += 4;
+        view.setFloat32(offset, rgb.g, false); offset += 4;
+        view.setFloat32(offset, rgb.b, false); offset += 4;
+
+        view.setUint16(offset, 0, false);
+
+        blocks.push(block);
+    });
+
+    const totalBlockLen = blocks.reduce((sum, b) => sum + b.length, 0);
+    const fullBuffer = new Uint8Array(12 + totalBlockLen);
+    const headerView = new DataView(fullBuffer.buffer);
+
+    fullBuffer.set([65, 83, 69, 70], 0);
+    headerView.setUint16(4, 1, false);
+    headerView.setUint16(6, 0, false);
+    headerView.setUint32(8, blocks.length, false);
+
+    let currentOffset = 12;
+    blocks.forEach(b => {
+        fullBuffer.set(b, currentOffset);
+        currentOffset += b.length;
+    });
+
+    return fullBuffer.buffer;
+}
+
+// ฟังก์ชันดาวน์โหลด ASE
+function downloadASE(palette, filename = "palette.ase") {
+    if (!palette || palette.length === 0) return alert("ไม่มีข้อมูลจานสี!");
+    const buffer = createASEBuffer(palette);
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ฟังก์ชันดาวน์โหลด JSON
+function downloadJSON(palette, filename = "palette.json") {
+    if (!palette || palette.length === 0) return alert("ไม่มีข้อมูลจานสี!");
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(palette, null, 2));
+    const a = document.createElement("a");
+    a.href = dataStr;
+    a.download = filename;
+    a.click();
+}
+
+// ฟังก์ชันคัดลอก Figma Tokens
+function copyFigmaTokens(palette) {
+    if (!palette || palette.length === 0) return alert("ไม่มีข้อมูลจานสี!");
+    
+    const figmaTokens = {};
+    palette.forEach((item, i) => {
+        const hex = typeof item === 'string' ? item : item.hex;
+        const role = (typeof item === 'object' && item.role) ? item.role.toLowerCase().replace(/\s+/g, '-') : `color-${i+1}`;
+        figmaTokens[role] = {
+            value: hex,
+            type: "color"
+        };
+    });
+
+    navigator.clipboard.writeText(JSON.stringify(figmaTokens, null, 2));
+    alert("คัดลอก Figma Color Tokens เรียบร้อยแล้ว!");
+}
+
+// ==========================================
+// 🌐 DICTIONARY & CONFIGS
+// ==========================================
+
 const translations = {
     TH: {
         langBtn: 'EN',
@@ -169,20 +293,20 @@ const emotionRules = {
 function updateLanguageUI() {
     const t = translations[currentLang];
 
-    if ($('langToggleBtn'))$('langToggleBtn').innerText = t.langBtn;
-    if ($('subTitle'))$('subTitle').innerText = t.subTitle;
-    if ($('inputLabel'))$('inputLabel').innerText = t.inputLabel;
-    if ($('textInput'))$('textInput').placeholder = t.placeholder;
-    if ($('analyzeBtn') && !$('analyzeBtn').disabled)$('analyzeBtn').innerText = t.analyzeBtn;
-    if ($('uploadTriggerBtn'))$('uploadTriggerBtn').innerText = t.uploadBtn;
-    if ($('paletteTitle'))$('paletteTitle').innerText = t.paletteTitle;
-    if ($('historyTitle'))$('historyTitle').innerText = t.historyTitle;
-    if ($('clearHistoryBtn'))$('clearHistoryBtn').innerText = t.clearHistory;
+    if ($('langToggleBtn')) $('langToggleBtn').innerText = t.langBtn;
+    if ($('subTitle')) $('subTitle').innerText = t.subTitle;
+    if ($('inputLabel')) $('inputLabel').innerText = t.inputLabel;
+    if ($('textInput')) $('textInput').placeholder = t.placeholder;
+    if ($('analyzeBtn') && !$('analyzeBtn').disabled) $('analyzeBtn').innerText = t.analyzeBtn;
+    if ($('uploadTriggerBtn')) $('uploadTriggerBtn').innerText = t.uploadBtn;
+    if ($('paletteTitle')) $('paletteTitle').innerText = t.paletteTitle;
+    if ($('historyTitle')) $('historyTitle').innerText = t.historyTitle;
+    if ($('clearHistoryBtn')) $('clearHistoryBtn').innerText = t.clearHistory;
 
-    if ($('modalTitle'))$('modalTitle').innerText = t.modalTitle;
-    if ($('modalDesc'))$('modalDesc').innerText = t.modalDesc;
-    if ($('cancelClearBtn'))$('cancelClearBtn').innerText = t.modalCancel;
-    if ($('confirmClearBtn'))$('confirmClearBtn').innerText = t.modalConfirm;
+    if ($('modalTitle')) $('modalTitle').innerText = t.modalTitle;
+    if ($('modalDesc')) $('modalDesc').innerText = t.modalDesc;
+    if ($('cancelClearBtn')) $('cancelClearBtn').innerText = t.modalCancel;
+    if ($('confirmClearBtn')) $('confirmClearBtn').innerText = t.modalConfirm;
 
     renderHistoryList();
 }
@@ -417,16 +541,17 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
     if ($('fontPairing'))$('fontPairing').innerText = resultData.font;
     if ($('usageContext'))$('usageContext').innerText = resultData.context;
 
-    const activePalette = customPalette || resultData.palette;
+    // 🟢 อัปเดตข้อมูล activePaletteData เพื่อใช้ออกไฟล์ Export
+    activePaletteData = customPalette || resultData.palette;
 
-    if ($('paletteDisplay')) {$('paletteDisplay').innerHTML = renderSwatches(activePalette);
+    if ($('paletteDisplay')) {$('paletteDisplay').innerHTML = renderSwatches(activePaletteData);
     }
 
     if (resultData.fontFamily) {
         document.body.style.fontFamily = resultData.fontFamily;
     }
 
-    startPaletteBackgroundAnimation(activePalette);
+    startPaletteBackgroundAnimation(activePaletteData);
 }
 
 function renderExtractedPalette(colors) {
@@ -471,7 +596,10 @@ function createConfirmModal() {
     });
 }
 
-// 🟢 ทำงานเมื่อ DOM โหลดเสร็จเรียบร้อย
+// ==========================================
+// 🚀 DOM LOADED & EVENT LISTENERS
+// ==========================================
+
 document.addEventListener('DOMContentLoaded', () => {
     const langToggleBtn = $('langToggleBtn');
     const analyzeBtn = $('analyzeBtn');
@@ -480,7 +608,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = $('imageInput');
     const clearHistoryBtn = $('clearHistoryBtn');
 
-    // 🟢 ผูก Event ปุ่มสลับภาษา
+    // 🟢 ปุ่ม Export ต่างๆ
+    const exportAseBtn = $('exportAseBtn');
+    const exportJsonBtn = $('exportJsonBtn');
+    const exportFigmaBtn = $('exportFigmaBtn');
+
     if (langToggleBtn) {
         langToggleBtn.style.position = 'relative';
         langToggleBtn.style.zIndex = '999';
@@ -594,6 +726,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const overlay = $('confirmModalOverlay');
             if (overlay) overlay.classList.add('active');
         });
+    }
+
+    // 🟢 ผูก Event ปุ่ม Export ทั้งหมด
+    if (exportAseBtn) {
+        exportAseBtn.addEventListener('click', () => downloadASE(activePaletteData, "ai-palette.ase"));
+    }
+
+    if (exportJsonBtn) {
+        exportJsonBtn.addEventListener('click', () => downloadJSON(activePaletteData, "ai-palette.json"));
+    }
+
+    if (exportFigmaBtn) {
+        exportFigmaBtn.addEventListener('click', () => copyFigmaTokens(activePaletteData));
     }
 
     updateLanguageUI();
