@@ -2,7 +2,7 @@ import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers
 
 env.allowLocalModels = false;
 
-// Helper function เลือก DOM Element
+// Helper เลือก DOM Element
 const $ = id => document.getElementById(id);
 
 const textInput = $('textInput');
@@ -34,7 +34,6 @@ const historyTitle = $('historyTitle');
 const historyList = $('historyList');
 const clearHistoryBtn = $('clearHistoryBtn');
 
-// Endpoint สำหรับเชื่อมต่อกับ Backend Express + SQLite
 const API_BASE_URL = 'http://localhost:3000/api/history';
 
 if (logoElement) logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
@@ -167,59 +166,48 @@ async function getAIPipeline() {
     return sentimentPipeline;
 }
 
-// 🟢 1. บันทึกข้อมูลประวัติลง SQLite Database
+// 🟢 บันทึกข้อมูลประวัติ
 async function saveToHistory(type, inputContent, emotion, confidence, palette) {
-    const newItem = {
-        type,
-        content: inputContent,
-        emotion,
-        confidence,
-        palette
-    };
+    const newItem = { type, content: inputContent, emotion, confidence, palette };
 
     try {
-        const response = await fetch(API_BASE_URL, {
+        await fetch(API_BASE_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newItem)
         });
-        if (!response.ok) console.error("Save to DB failed:", await response.text());
     } catch (err) {
-        console.warn("API Error, fallback saving to LocalStorage:", err);
+        console.warn("Backend Error, saving locally:", err);
     }
 
-    // สำรองข้อมูลลง LocalStorage หาก API มีปัญหา
     try {
         const localData = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
         localData.unshift({ ...newItem, createdAt: new Date().toISOString() });
         if (localData.length > 10) localData.pop();
         localStorage.setItem('sentiment_history', JSON.stringify(localData));
     } catch (e) {
-        console.error("LocalStorage save error:", e);
+        console.error("LocalStorage error:", e);
     }
 
-    // รีเฟรชส่วนการแสดงผลประวัติ
     await renderHistoryList();
 }
 
-// 🟢 2. ดึงและวาดรายการประวัติลงหน้าเว็บ
+// 🟢 ดึงและแสดงรายการประวัติลงหน้าเว็บ
 async function renderHistoryList() {
     const historyContainer = document.getElementById('historyList');
     if (!historyContainer) return;
 
     let historyData = [];
 
-    // ดึงข้อมูลจาก API SQLite
     try {
         const response = await fetch(API_BASE_URL);
         if (response.ok) {
             historyData = await response.json();
         }
     } catch (err) {
-        console.warn("Cannot fetch history from API, fallback to local storage");
+        console.warn("API Offline, loading local history fallback");
     }
 
-    // หาก API ไม่มีข้อมูล ให้ดึงข้อมูลสำรองจาก LocalStorage
     if (!Array.isArray(historyData) || historyData.length === 0) {
         try {
             historyData = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
@@ -228,13 +216,11 @@ async function renderHistoryList() {
         }
     }
 
-    // หากไม่มีประวัติเลย
     if (!historyData || historyData.length === 0) {
-        historyContainer.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
+        historyContainer.innerHTML = `<p class="history-empty" style="text-align:center; color:#94a3b8; padding:15px 0;">${translations[currentLang].emptyHistory}</p>`;
         return;
     }
 
-    // วาด Element แต่ละรายการประวัติ
     historyContainer.innerHTML = historyData.map(item => {
         const timeString = item.createdAt 
             ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
@@ -248,20 +234,22 @@ async function renderHistoryList() {
         }
 
         const contentDisplay = item.type === 'image'
-            ? `<span class="history-text" title="${item.content}">🖼️️ ${item.content}</span>`
+            ? `<span class="history-text" title="${item.content}">🖼️ ${item.content}</span>`
             : `<span class="history-text" title="${item.content}">${item.content}</span>`;
 
         return `
-            <div class="history-item">
-                <div class="history-info">
-                    <span class="history-tag ${item.type || 'text'}">${(item.type || 'TEXT').toUpperCase()}</span>
+            <div class="history-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #e2e8f0;">
+                <div class="history-info" style="display:flex; align-items:center; gap:10px;">
+                    <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; background:${item.type === 'image' ? '#fce7f3' : '#dbeafe'}; color:${item.type === 'image' ? '#9d174d' : '#1e40af'};">
+                        ${(item.type || 'TEXT').toUpperCase()}
+                    </span>
                     ${contentDisplay}
-                    <span class="history-time">${timeString}</span>
+                    <span class="history-time" style="font-size:0.75rem; color:#94a3b8;">${timeString}</span>
                 </div>
-                <div class="history-result">
+                <div class="history-result" style="display:flex; align-items:center; gap:10px;">
                     <strong class="history-emotion">${item.emotion || '-'}</strong>
-                    <div class="history-mini-palette">
-                        ${paletteArray.map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
+                    <div class="history-mini-palette" style="display:flex; gap:3px;">
+                        ${paletteArray.map(c => `<div class="mini-swatch" style="width:12px; height:12px; border-radius:2px; background:${c}"></div>`).join('')}
                     </div>
                 </div>
             </div>
@@ -269,20 +257,18 @@ async function renderHistoryList() {
     }).join('');
 }
 
-// 🟢 3. ปุ่มล้างประวัติ
+// 🟢 ปุ่มล้างประวัติ
 if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', async () => {
         try {
             await fetch(API_BASE_URL, { method: 'DELETE' });
-        } catch (e) {
-            console.error("Clear API error:", e);
-        }
+        } catch (e) {}
         localStorage.removeItem('sentiment_history');
         await renderHistoryList();
     });
 }
 
-// Event: วิเคราะห์ข้อความ
+// 🟢 Event: ปุ่มวิเคราะห์ข้อความ (ปลดล็อกปุ่มทุกครั้งแน่นอน)
 if (analyzeBtn) {
     analyzeBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -299,8 +285,10 @@ if (analyzeBtn) {
         if (alertBox) alertBox.style.display = 'none';
         clearImageResult();
 
+        // ล็อกปุ่มป้องกันการกดซ้ำ
         analyzeBtn.disabled = true;
-        analyzeBtn.style.opacity = '0.7';
+        analyzeBtn.style.opacity = '0.6';
+        analyzeBtn.style.cursor = 'not-allowed';
 
         try {
             const classifier = await getAIPipeline();
@@ -324,13 +312,16 @@ if (analyzeBtn) {
             if (emotionLabel) emotionLabel.innerText = "Error Loading AI Model";
             alert("เกิดข้อผิดพลาดในการรัน AI Model: " + err.message);
         } finally {
+            // 🟢 ปลดล็อกปุ่มคืนทุกครั้ง ไม่ว่าจะสำเร็จหรือเกิด Error
+            stopLoadingAnimation();
             analyzeBtn.disabled = false;
             analyzeBtn.style.opacity = '1';
+            analyzeBtn.style.cursor = 'pointer';
         }
     });
 }
 
-// Event: อัปโหลดรูปภาพ
+// 🟢 Event: ปุ่มอัปโหลดรูปภาพ
 function clearImageResult() {
     if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
     if (extractedPalette) extractedPalette.innerHTML = '';
@@ -436,5 +427,5 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-// สั่งโหลดและวาดรายการประวัติทันทีเมื่อเปิดหน้าเว็บ
+// เรียกโหลดประวัติทันทีเมื่อสคริปต์ทำงาน
 renderHistoryList();
