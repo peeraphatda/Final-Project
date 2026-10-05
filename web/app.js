@@ -172,7 +172,7 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
-// 🟢 3. ระบบวาดแถบประวัติ
+// 🟢 3. ระบบวาดแถบประวัติ (รองรับการคลิกเพื่อโหลดข้อมูล)
 async function renderHistoryList() {
     const historyContainer = document.getElementById('historyList');
     if (!historyContainer) return;
@@ -201,7 +201,10 @@ async function renderHistoryList() {
         return;
     }
 
-    historyContainer.innerHTML = historyData.map(item => {
+    // เก็บข้อมูลไว้ในตัวแประดับ window เพื่อให้กดดึงย้อนหลังได้ง่าย
+    window.currentHistoryData = historyData;
+
+    historyContainer.innerHTML = historyData.map((item, index) => {
         const timeString = item.createdAt 
             ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
             : '';
@@ -221,15 +224,15 @@ async function renderHistoryList() {
             : `<span class="history-text" title="${item.content}">${isImage ? '🖼️ ' : ''}${item.content}</span>`;
 
         return `
-            <div class="history-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #e2e8f0;">
-                <div class="history-info" style="display:flex; align-items:center; gap:10px;">
+            <div class="history-item" data-index="${index}" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid #e2e8f0; cursor:pointer; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                <div class="history-info" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
                     <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; background:${isImage ? '#fce7f3' : '#dbeafe'}; color:${isImage ? '#9d174d' : '#1e40af'};">
                         ${(item.type || 'TEXT').toUpperCase()}
                     </span>
                     ${contentDisplay}
                     <span class="history-time" style="font-size:0.75rem; color:#94a3b8;">${timeString}</span>
                 </div>
-                <div class="history-result" style="display:flex; align-items:center; gap:10px;">
+                <div class="history-result" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
                     <strong class="history-emotion">${item.emotion || '-'}</strong>
                     <div class="history-mini-palette" style="display:flex; gap:3px;">
                         ${paletteArray.map(c => `<div class="mini-swatch" style="width:12px; height:12px; border-radius:2px; background:${c}"></div>`).join('')}
@@ -238,9 +241,45 @@ async function renderHistoryList() {
             </div>
         `;
     }).join('');
+
+    // ผูก Event Listener คลิกรายการประวัติ
+    document.querySelectorAll('.history-item').forEach(itemEl => {
+        itemEl.addEventListener('click', (e) => {
+            const idx = e.currentTarget.getAttribute('data-index');
+            if (window.currentHistoryData && window.currentHistoryData[idx]) {
+                loadHistoryItem(window.currentHistoryData[idx]);
+            }
+        });
+    });
 }
 
-// 🟢 4. ปุ่มวิเคราะห์ข้อความ
+// 🟢 4. ฟังก์ชันดึงประวัติมาแสดงผลหน้าจอหลัก
+function loadHistoryItem(item) {
+    if (alertBox) alertBox.style.display = 'none';
+
+    if (item.type === 'text') {
+        clearImageResult();
+        if (textInput) textInput.value = item.content;
+    } else if (item.type === 'image') {
+        if (textInput) textInput.value = '';
+        if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
+        if (imagePreview) imagePreview.src = item.content;
+        
+        let paletteArray = [];
+        if (Array.isArray(item.palette)) paletteArray = item.palette;
+        else if (typeof item.palette === 'string') {
+            try { paletteArray = JSON.parse(item.palette); } catch (e) { paletteArray = []; }
+        }
+        renderExtractedPalette(paletteArray);
+    }
+
+    updateUIResult(item.emotion, item.confidence || '95.0%');
+
+    // เลื่อนหน้าจอขึ้นไปที่ผลลัพธ์แบบนุ่มนวล
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 🟢 5. ปุ่มวิเคราะห์ข้อความ
 if (analyzeBtn) {
     analyzeBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -293,7 +332,7 @@ if (analyzeBtn) {
     });
 }
 
-// 🟢 5. ปุ่มอัปโหลดรูปภาพ
+// 🟢 6. ปุ่มอัปโหลดรูปภาพ
 function clearImageResult() {
     if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
     if (extractedPalette) extractedPalette.innerHTML = '';
@@ -399,7 +438,7 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-// 🟢 6. ปุ่มล้างประวัติ
+// 🟢 7. ปุ่มล้างประวัติ
 if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', () => {
         fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
