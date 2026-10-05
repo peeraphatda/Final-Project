@@ -34,6 +34,7 @@ const clearHistoryBtn = $('clearHistoryBtn');
 const API_BASE_URL = 'http://localhost:3000/api/history';
 
 let currentLang = 'TH';
+let paletteAnimationTimer = null; // ตัวแปรสำหรับเก็บ Timer วนลูปเปลี่ยนสีพื้นหลัง
 
 const translations = {
     TH: {
@@ -118,11 +119,10 @@ function applyLanguage(lang) {
     renderHistoryList();
 }
 
-// 🟢 โครงสร้างข้อมูลจานสี + กำหนดสีพื้นหลัง (bgRgb) + กำหนดฟอนต์ (fontFamily) ตามคำแนะนำ AI
+// 🟢 โครงสร้างข้อมูลจานสี + ฟอนต์
 const emotionRules = {
     JOY: { 
         palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], 
-        bgRgb: 'rgb(255, 248, 220)', 
         theme: 'Vibrant Sunburst', 
         font: 'Poppins / Montserrat', 
         fontFamily: "'Poppins', 'Montserrat', sans-serif",
@@ -130,7 +130,6 @@ const emotionRules = {
     },
     SADNESS: { 
         palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], 
-        bgRgb: 'rgb(224, 231, 239)', 
         theme: 'Melancholic Mist', 
         font: 'Lora / Merriweather', 
         fontFamily: "'Lora', 'Merriweather', serif",
@@ -138,7 +137,6 @@ const emotionRules = {
     },
     ANGER: { 
         palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], 
-        bgRgb: 'rgb(255, 230, 230)', 
         theme: 'Fiery Passion', 
         font: 'Oswald / Roboto', 
         fontFamily: "'Oswald', 'Roboto', sans-serif",
@@ -146,7 +144,6 @@ const emotionRules = {
     },
     FEAR: { 
         palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], 
-        bgRgb: 'rgb(230, 226, 236)', 
         theme: 'Mystic Shadow', 
         font: 'Cinzel / Inter', 
         fontFamily: "'Cinzel', 'Inter', serif",
@@ -154,7 +151,6 @@ const emotionRules = {
     },
     LOVE: { 
         palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], 
-        bgRgb: 'rgb(255, 235, 240)', 
         theme: 'Romantic Bloom', 
         font: 'Playfair Display / Great Vibes', 
         fontFamily: "'Playfair Display', serif",
@@ -162,7 +158,6 @@ const emotionRules = {
     },
     SURPRISE: { 
         palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], 
-        bgRgb: 'rgb(235, 230, 255)', 
         theme: 'Electric Wonder', 
         font: 'Plus Jakarta Sans / Space Grotesk', 
         fontFamily: "'Plus Jakarta Sans', 'Space Grotesk', sans-serif",
@@ -184,6 +179,34 @@ async function getAIPipeline() {
         sentimentPipeline = await pipeline('zero-shot-classification', 'Xenova/distilbert-base-uncased-mnli');
     }
     return sentimentPipeline;
+}
+
+// 🟢 Helper แปลง Hex เป็น RGBA แบบเจือจางเพื่อให้พื้นหลังสบายตา
+function hexToSoftRgba(hex, opacity = 0.25) {
+    let c = hex.replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+// 🟢 ฟังก์ชันวนลูปเปลี่ยนสีพื้นหลังตามจานสีในรอบนั้นๆ
+function startPaletteBackgroundAnimation(colorList) {
+    if (paletteAnimationTimer) clearInterval(paletteAnimationTimer);
+    if (!colorList || colorList.length === 0) return;
+
+    let currentIndex = 0;
+
+    const changeBg = () => {
+        const hexColor = colorList[currentIndex];
+        document.body.style.backgroundColor = hexToSoftRgba(hexColor, 0.25);
+        currentIndex = (currentIndex + 1) % colorList.length;
+    };
+
+    changeBg(); // เปลี่ยนสีแรกทันที
+    paletteAnimationTimer = setInterval(changeBg, 3000); // สลับสีทุกๆ 3 วินาที
 }
 
 // 🟢 2. ระบบบันทึกประวัติ
@@ -298,23 +321,25 @@ async function renderHistoryList() {
 function loadHistoryItem(item) {
     if (alertBox) alertBox.style.display = 'none';
 
+    let paletteArray = [];
+    if (Array.isArray(item.palette)) paletteArray = item.palette;
+    else if (typeof item.palette === 'string') {
+        try { paletteArray = JSON.parse(item.palette); } catch (e) { paletteArray = []; }
+    }
+
     if (item.type === 'text') {
         clearImageResult();
         if (textInput) textInput.value = item.content;
+        updateUIResult(item.emotion, item.confidence || '95.0%');
     } else if (item.type === 'image') {
         if (textInput) textInput.value = '';
         if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
         if (imagePreview) imagePreview.src = item.content;
         
-        let paletteArray = [];
-        if (Array.isArray(item.palette)) paletteArray = item.palette;
-        else if (typeof item.palette === 'string') {
-            try { paletteArray = JSON.parse(item.palette); } catch (e) { paletteArray = []; }
-        }
         renderExtractedPalette(paletteArray);
+        updateUIResult(item.emotion, item.confidence || '95.0%', paletteArray);
     }
 
-    updateUIResult(item.emotion, item.confidence || '95.0%');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -413,7 +438,9 @@ if (imageInput) {
 
                 const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
                 const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
-                updateUIResult(imageEmotion, confidence);
+                
+                // สำหรับรูปภาพ ใช้อาร์เรย์สีที่สกัดได้จากรูปภาพหมุนวนพื้นหลัง
+                updateUIResult(imageEmotion, confidence, rgbData.hexList);
 
                 saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
             };
@@ -456,8 +483,8 @@ function extractRGBColors(ctx, width, height, count) {
     return { hexList, rgbList };
 }
 
-// 🟢 7. ฟังก์ชันอัปเดต UI + สลับสีพื้นหลัง + สลับฟอนต์ตามธีมอารมณ์ที่ AI แนะนำ
-function updateUIResult(emotionKey, confidence) {
+// 🟢 7. ฟังก์ชันอัปเดต UI + วนลูปเปลี่ยนสีพื้นหลังตามจานสีในรอบนั้นๆ
+function updateUIResult(emotionKey, confidence, customPalette = null) {
     const resultData = emotionRules[emotionKey] || emotionRules['JOY'];
 
     if (emotionLabel) emotionLabel.innerText = emotionKey;
@@ -471,15 +498,16 @@ function updateUIResult(emotionKey, confidence) {
         paletteDisplay.innerHTML = renderSwatches(resultData.palette);
     }
 
-    // 🔴 เปลี่ยนสีพื้นหลังเว็บ
-    if (resultData.bgRgb) {
-        document.body.style.backgroundColor = resultData.bgRgb;
-    }
-
-    // 🔴 เปลี่ยนชุดฟอนต์ (Font Family) ของหน้าเว็บตามคำแนะนำ
+    // สลับเปลี่ยนฟอนต์ตามธีมที่ AI แนะนำ
     if (resultData.fontFamily) {
         document.body.style.fontFamily = resultData.fontFamily;
     }
+
+    // เลือกใช้ Custom Palette (ถ้าเป็นรูปภาพ) หรือ Palette ของธีม (ถ้าเป็นข้อความ)
+    const activePalette = customPalette || resultData.palette;
+    
+    // เรียกใช้อิเมเตอร์วนลูปเปลี่ยนสีพื้นหลัง
+    startPaletteBackgroundAnimation(activePalette);
 }
 
 function renderExtractedPalette(colors) {
@@ -493,6 +521,8 @@ if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', () => {
         fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
         localStorage.removeItem('sentiment_history');
+        if (paletteAnimationTimer) clearInterval(paletteAnimationTimer);
+        document.body.style.backgroundColor = '#f8fafc';
         renderHistoryList();
     });
 }
