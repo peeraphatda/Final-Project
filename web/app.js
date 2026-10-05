@@ -38,6 +38,7 @@ let paletteAnimationTimer = null;
 
 const translations = {
     TH: {
+        langBtn: 'EN',
         subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ UI/UX',
         inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
         placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
@@ -56,9 +57,15 @@ const translations = {
         analyzingText: 'กำลังประมวลผล...',
         historyTitle: 'ประวัติการวิเคราะห์ (History)',
         clearHistory: 'ล้างประวัติ',
-        emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์'
+        emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์',
+        modalTitle: 'ยืนยันการล้างประวัติ',
+        modalDesc: 'คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการวิเคราะห์ทั้งหมด? รายการที่ลบแล้วจะไม่สามารถกู้คืนได้',
+        modalCancel: 'ยกเลิก',
+        modalConfirm: 'ลบประวัติ',
+        copySuccess: 'คัดลอกสี'
     },
     EN: {
+        langBtn: 'TH',
         subTitle: 'Text Sentiment Analysis & Symmetric Color Palette Recommendation',
         inputLabel: 'Enter text to analyze sentiment via AI Model',
         placeholder: 'i feel happy or feel sad...',
@@ -77,9 +84,46 @@ const translations = {
         analyzingText: 'Analyzing...',
         historyTitle: 'Analysis History',
         clearHistory: 'Clear History',
-        emptyHistory: 'No analysis history found'
+        emptyHistory: 'No analysis history found',
+        modalTitle: 'Confirm Clear History',
+        modalDesc: 'Are you sure you want to delete all analysis history? Deleted items cannot be restored.',
+        modalCancel: 'Cancel',
+        modalConfirm: 'Delete All',
+        copySuccess: 'Copied color'
     }
 };
+
+// 🌐 ฟังก์ชันเปลี่ยนภาษา UI
+function updateLanguageUI() {
+    const t = translations[currentLang];
+
+    if (langToggleBtn) langToggleBtn.innerText = t.langBtn;
+    if (subTitle) subTitle.innerText = t.subTitle;
+    if (inputLabel) inputLabel.innerText = t.inputLabel;
+    if (textInput) textInput.placeholder = t.placeholder;
+    if (analyzeBtn && !analyzeBtn.disabled) analyzeBtn.innerText = t.analyzeBtn;
+    if (uploadTriggerBtn) uploadTriggerBtn.innerText = t.uploadBtn;
+    if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
+    if (historyTitle) historyTitle.innerText = t.historyTitle;
+    if (clearHistoryBtn) clearHistoryBtn.innerText = t.clearHistory;
+
+    // อัปเดต Modal Text หากมีใน DOM
+    if ($('modalTitle'))$('modalTitle').innerText = t.modalTitle;
+    if ($('modalDesc'))$('modalDesc').innerText = t.modalDesc;
+    if ($('cancelClearBtn'))$('cancelClearBtn').innerText = t.modalCancel;
+    if ($('confirmClearBtn'))$('confirmClearBtn').innerText = t.modalConfirm;
+
+    renderHistoryList();
+}
+
+// 🟢 สลับภาษาเมื่อกดปุ่ม
+if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentLang = currentLang === 'TH' ? 'EN' : 'TH';
+        updateLanguageUI();
+    });
+}
 
 // 🟢 โครงสร้างชุดจานสี 8 สีแบบสมมาตร
 const emotionRules = {
@@ -181,13 +225,12 @@ const emotionRules = {
     }
 };
 
-// 🟢 วาดการ์ดแสดงสีแบบ Grid สมมาตร + เพิ่มระบบคลิกคัดลอก Hex Code
 const renderSwatches = colors => {
     return `<div class="palette-grid">` + (colors || []).map(c => {
         const hex = typeof c === 'string' ? c : c.hex;
         const role = typeof c === 'object' && c.role ? c.role : 'COLOR';
         return `
-            <div class="color-card" onclick="navigator.clipboard.writeText('${hex}'); alert('คัดลอกสี ${hex} แล้ว!')" title="คลิกเพื่อคัดลอกโค้ดสี">
+            <div class="color-card" onclick="navigator.clipboard.writeText('${hex}'); alert('${translations[currentLang].copySuccess} ${hex}!')" title="Click to copy">
                 <div class="color-swatch-box" style="background-color: ${hex}"></div>
                 <div class="color-info">
                     <span class="color-hex">${hex}</span>
@@ -310,7 +353,7 @@ async function renderHistoryList() {
 
         const contentDisplay = isBase64
             ? `<img src="${item.content}" style="width:36px; height:36px; object-fit:cover; border-radius:6px;" alt="thumb" />`
-            : `<span class="history-text" title="${item.content}">${isImage ? '🖼️️ ' : ''}${item.content}</span>`;
+            : `<span class="history-text" title="${item.content}">${isImage ? '🖼 ' : ''}${item.content}</span>`;
 
         return `
             <div class="history-item" data-index="${index}">
@@ -454,7 +497,7 @@ if (imageInput) {
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
 
-                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8); // ปรับเป็น 8 สีเพื่อให้สมมาตร
+                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8);
                 renderExtractedPalette(rgbData.hexList);
 
                 const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
@@ -531,19 +574,19 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-// 🟢 8. ระบบ Popup Confirmation ล้างประวัติการใช้งาน
 function createConfirmModal() {
     if ($('confirmModalOverlay')) return;
 
+    const t = translations[currentLang];
     const modalHTML = `
         <div id="confirmModalOverlay" class="modal-overlay">
             <div class="modal-card">
                 <div class="modal-icon">🗑️</div>
-                <div class="modal-title">ยืนยันการล้างประวัติ</div>
-                <div class="modal-desc">คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการวิเคราะห์ทั้งหมด? รายการที่ลบแล้วจะไม่สามารถกู้คืนได้</div>
+                <div id="modalTitle" class="modal-title">${t.modalTitle}</div>
+                <div id="modalDesc" class="modal-desc">${t.modalDesc}</div>
                 <div class="modal-actions">
-                    <button id="cancelClearBtn" class="btn-modal-cancel">ยกเลิก</button>
-                    <button id="confirmClearBtn" class="btn-modal-confirm">ลบประวัติ</button>
+                    <button id="cancelClearBtn" class="btn-modal-cancel">${t.modalCancel}</button>
+                    <button id="confirmClearBtn" class="btn-modal-confirm">${t.modalConfirm}</button>
                 </div>
             </div>
         </div>
@@ -576,4 +619,4 @@ if (clearHistoryBtn) {
     });
 }
 
-renderHistoryList();
+updateLanguageUI();
