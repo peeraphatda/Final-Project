@@ -10,27 +10,106 @@ let currentLang = 'TH';
 let paletteAnimationTimer = null;
 let sentimentPipeline = null;
 
-// 🟢 ตัวแปรสำหรับเก็บข้อมูล Palette ปัจจุบันเพื่อใช้ Export
+// 🟢 ตัวแปรสำหรับเก็บข้อมูล Palette ปัจจุบัน
 let activePaletteData = [];
 
 // ==========================================
-// 🛠️️ ASE / EXPORT HELPER FUNCTIONS
+// 🛠 COLOR CONVERSION & EXPORT HELPERS
 // ==========================================
 
-// ฟังก์ชันแปลง Hex เป็น RGB (0.0 - 1.0)
-function hexToRgbFloat(hex) {
+function hexToRgb(hex) {
     let cleanHex = hex.replace('#', '');
     if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(x => x + x).join('');
     const num = parseInt(cleanHex, 16);
     return {
-        r: ((num >> 16) & 255) / 255,
-        g: ((num >> 8) & 255) / 255,
-        b: (num & 255) / 255
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
     };
 }
 
+function hexToHsl(hex) {
+    let { r, g, b } = hexToRgb(hex);
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+        h = s = 0;
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+    return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100)
+    };
+}
+
+function slugifyRole(role, index) {
+    if (!role) return `color-${index + 1}`;
+    return role.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+// 🟢 ฟังก์ชัน Copy โค้ดในรูปแบบต่างๆ
+function copyPaletteCode(format) {
+    if (!activePaletteData || activePaletteData.length === 0) {
+        return alert("ไม่มีข้อมูลจานสี!");
+    }
+
+    let codeResult = '';
+
+    switch (format) {
+        case 'HEX':
+            codeResult = activePaletteData.map(c => typeof c === 'string' ? c : c.hex).join(', ');
+            break;
+
+        case 'RGB':
+            codeResult = activePaletteData.map(c => {
+                const hex = typeof c === 'string' ? c : c.hex;
+                const { r, g, b } = hexToRgb(hex);
+                return `rgb(${r}, ${g}, ${b})`;
+            }).join('\n');
+            break;
+
+        case 'HSL':
+            codeResult = activePaletteData.map(c => {
+                const hex = typeof c === 'string' ? c : c.hex;
+                const { h, s, l } = hexToHsl(hex);
+                return `hsl(${h}, ${s}%, ${l}%)`;
+            }).join('\n');
+            break;
+
+        case 'TAILWIND':
+            codeResult = activePaletteData.map((c, i) => {
+                const hex = typeof c === 'string' ? c : c.hex;
+                const role = slugifyRole(typeof c === 'object' ? c.role : '', i);
+                return `bg-[${hex}] /* ${role} */`;
+            }).join('\n');
+            break;
+
+        case 'CSS_VARS':
+            codeResult = ':root {\n' + activePaletteData.map((c, i) => {
+                const hex = typeof c === 'string' ? c : c.hex;
+                const role = slugifyRole(typeof c === 'object' ? c.role : '', i);
+                return `  --color-${role}: ${hex};`;
+            }).join('\n') + '\n}';
+            break;
+    }
+
+    navigator.clipboard.writeText(codeResult);
+    alert(`คัดลอกโค้ดรูปแบบ ${format} เรียบร้อยแล้ว!`);
+}
+
 // ฟังก์ชันสร้าง Binary Buffer สำหรับไฟล์ ASE (.ase)
-function createASEBuffer(palette, paletteName = "AI Palette") {
+function createASEBuffer(palette) {
     const blocks = [];
 
     function encodeString(str) {
@@ -46,7 +125,7 @@ function createASEBuffer(palette, paletteName = "AI Palette") {
     palette.forEach((item) => {
         const hex = typeof item === 'string' ? item : item.hex;
         const name = (typeof item === 'object' && item.role) ? `${item.role} (${hex})` : hex;
-        const rgb = hexToRgbFloat(hex);
+        const { r, g, b } = hexToRgb(hex);
 
         const nameBuf = encodeString(name);
         const entryLen = 2 + nameBuf.length + 4 + 12 + 2;
@@ -62,12 +141,11 @@ function createASEBuffer(palette, paletteName = "AI Palette") {
 
         block.set([82, 71, 66, 32], offset); offset += 4;
 
-        view.setFloat32(offset, rgb.r, false); offset += 4;
-        view.setFloat32(offset, rgb.g, false); offset += 4;
-        view.setFloat32(offset, rgb.b, false); offset += 4;
+        view.setFloat32(offset, r / 255, false); offset += 4;
+        view.setFloat32(offset, g / 255, false); offset += 4;
+        view.setFloat32(offset, b / 255, false); offset += 4;
 
         view.setUint16(offset, 0, false);
-
         blocks.push(block);
     });
 
@@ -89,7 +167,6 @@ function createASEBuffer(palette, paletteName = "AI Palette") {
     return fullBuffer.buffer;
 }
 
-// ฟังก์ชันดาวน์โหลด ASE
 function downloadASE(palette, filename = "palette.ase") {
     if (!palette || palette.length === 0) return alert("ไม่มีข้อมูลจานสี!");
     const buffer = createASEBuffer(palette);
@@ -102,7 +179,6 @@ function downloadASE(palette, filename = "palette.ase") {
     URL.revokeObjectURL(url);
 }
 
-// ฟังก์ชันดาวน์โหลด JSON
 function downloadJSON(palette, filename = "palette.json") {
     if (!palette || palette.length === 0) return alert("ไม่มีข้อมูลจานสี!");
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(palette, null, 2));
@@ -112,20 +188,14 @@ function downloadJSON(palette, filename = "palette.json") {
     a.click();
 }
 
-// ฟังก์ชันคัดลอก Figma Tokens
 function copyFigmaTokens(palette) {
     if (!palette || palette.length === 0) return alert("ไม่มีข้อมูลจานสี!");
-    
     const figmaTokens = {};
     palette.forEach((item, i) => {
         const hex = typeof item === 'string' ? item : item.hex;
-        const role = (typeof item === 'object' && item.role) ? item.role.toLowerCase().replace(/\s+/g, '-') : `color-${i+1}`;
-        figmaTokens[role] = {
-            value: hex,
-            type: "color"
-        };
+        const role = slugifyRole(typeof item === 'object' ? item.role : '', i);
+        figmaTokens[role] = { value: hex, type: "color" };
     });
-
     navigator.clipboard.writeText(JSON.stringify(figmaTokens, null, 2));
     alert("คัดลอก Figma Color Tokens เรียบร้อยแล้ว!");
 }
@@ -293,20 +363,15 @@ const emotionRules = {
 function updateLanguageUI() {
     const t = translations[currentLang];
 
-    if ($('langToggleBtn')) $('langToggleBtn').innerText = t.langBtn;
-    if ($('subTitle')) $('subTitle').innerText = t.subTitle;
-    if ($('inputLabel')) $('inputLabel').innerText = t.inputLabel;
-    if ($('textInput')) $('textInput').placeholder = t.placeholder;
-    if ($('analyzeBtn') && !$('analyzeBtn').disabled) $('analyzeBtn').innerText = t.analyzeBtn;
-    if ($('uploadTriggerBtn')) $('uploadTriggerBtn').innerText = t.uploadBtn;
-    if ($('paletteTitle')) $('paletteTitle').innerText = t.paletteTitle;
-    if ($('historyTitle')) $('historyTitle').innerText = t.historyTitle;
-    if ($('clearHistoryBtn')) $('clearHistoryBtn').innerText = t.clearHistory;
-
-    if ($('modalTitle')) $('modalTitle').innerText = t.modalTitle;
-    if ($('modalDesc')) $('modalDesc').innerText = t.modalDesc;
-    if ($('cancelClearBtn')) $('cancelClearBtn').innerText = t.modalCancel;
-    if ($('confirmClearBtn')) $('confirmClearBtn').innerText = t.modalConfirm;
+    if ($('langToggleBtn'))$('langToggleBtn').innerText = t.langBtn;
+    if ($('subTitle'))$('subTitle').innerText = t.subTitle;
+    if ($('inputLabel'))$('inputLabel').innerText = t.inputLabel;
+    if ($('textInput'))$('textInput').placeholder = t.placeholder;
+    if ($('analyzeBtn') && !$('analyzeBtn').disabled)$('analyzeBtn').innerText = t.analyzeBtn;
+    if ($('uploadTriggerBtn'))$('uploadTriggerBtn').innerText = t.uploadBtn;
+    if ($('paletteTitle'))$('paletteTitle').innerText = t.paletteTitle;
+    if ($('historyTitle'))$('historyTitle').innerText = t.historyTitle;
+    if ($('clearHistoryBtn'))$('clearHistoryBtn').innerText = t.clearHistory;
 
     renderHistoryList();
 }
@@ -403,15 +468,6 @@ async function renderHistoryList() {
     }
 
     if (!historyData || historyData.length === 0) {
-        try {
-            const response = await fetch(API_BASE_URL);
-            if (response.ok) historyData = await response.json();
-        } catch (err) {
-            console.warn("API Offline");
-        }
-    }
-
-    if (!historyData || historyData.length === 0) {
         historyContainer.innerHTML = `<p class="history-empty" style="text-align:center; color:#94a3b8; padding:15px 0;">${translations[currentLang].emptyHistory}</p>`;
         return;
     }
@@ -432,11 +488,6 @@ async function renderHistoryList() {
 
         const hexList = paletteArray.map(c => typeof c === 'string' ? c : c.hex);
         const isImage = item.type === 'image';
-        const isBase64 = isImage && item.content && item.content.startsWith('data:image');
-
-        const contentDisplay = isBase64
-            ? `<img src="${item.content}" style="width:36px; height:36px; object-fit:cover; border-radius:6px;" alt="thumb" />`
-            : `<span class="history-text" title="${item.content}">${isImage ? '🖼 ' : ''}${item.content}</span>`;
 
         return `
             <div class="history-item" data-index="${index}">
@@ -444,7 +495,7 @@ async function renderHistoryList() {
                     <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:3px 8px; border-radius:6px; font-weight:bold; background:${isImage ? '#fce7f3' : '#dbeafe'}; color:${isImage ? '#9d174d' : '#1e40af'};">
                         ${(item.type || 'TEXT').toUpperCase()}
                     </span>
-                    ${contentDisplay}
+                    <span class="history-text">${isImage ? '🖼 ' : ''}${item.content}</span>
                     <span class="history-time" style="font-size:0.75rem; color:#94a3b8;">${timeString}</span>
                 </div>
                 <div class="history-result" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
@@ -468,8 +519,6 @@ async function renderHistoryList() {
 }
 
 function loadHistoryItem(item) {
-    if ($('alertBox'))$('alertBox').style.display = 'none';
-
     let paletteArray = [];
     if (Array.isArray(item.palette)) paletteArray = item.palette;
     else if (typeof item.palette === 'string') {
@@ -477,59 +526,10 @@ function loadHistoryItem(item) {
     }
 
     if (item.type === 'text') {
-        clearImageResult();
         if ($('textInput'))$('textInput').value = item.content;
         updateUIResult(item.emotion, item.confidence || '95.0%');
-    } else if (item.type === 'image') {
-        if ($('textInput'))$('textInput').value = '';
-        if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'block';
-        if ($('imagePreview'))$('imagePreview').src = item.content;
-        
-        renderExtractedPalette(paletteArray);
-        updateUIResult(item.emotion, item.confidence || '95.0%', paletteArray);
     }
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function clearImageResult() {
-    if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'none';
-    if ($('extractedPalette'))$('extractedPalette').innerHTML = '';
-    if ($('imagePreview'))$('imagePreview').src = '';
-    if ($('imageInput'))$('imageInput').value = '';
-}
-
-function analyzeColorSentiment(rgbColors) {
-    let totalR = 0, totalG = 0, totalB = 0;
-    rgbColors.forEach(color => {
-        totalR += color.r;
-        totalG += color.g;
-        totalB += color.b;
-    });
-
-    const count = rgbColors.length;
-    const brightness = ((totalR / count) * 299 + (totalG / count) * 587 + (totalB / count) * 114) / 1000;
-
-    if (brightness < 80) return 'FEAR';
-    if (totalR > totalG * 1.3 && totalR > totalB * 1.3) return 'ANGER';
-    if (totalB > totalR * 1.1 && brightness < 150) return 'SADNESS';
-    if (totalG > totalR && totalB > totalR) return 'JOY';
-    return 'JOY';
-}
-
-function extractRGBColors(ctx, width, height, count) {
-    const hexList = [];
-    const rgbList = [];
-    const stepX = Math.floor(width / (count + 1));
-    const stepY = Math.floor(height / 2);
-
-    for (let i = 1; i <= count; i++) {
-        const p = ctx.getImageData(i * stepX, stepY, 1, 1).data;
-        const hex = '#' + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
-        hexList.push(hex);
-        rgbList.push({ r: p[0], g: p[1], b: p[2] });
-    }
-    return { hexList, rgbList };
 }
 
 function updateUIResult(emotionKey, confidence, customPalette = null) {
@@ -541,7 +541,7 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
     if ($('fontPairing'))$('fontPairing').innerText = resultData.font;
     if ($('usageContext'))$('usageContext').innerText = resultData.context;
 
-    // 🟢 อัปเดตข้อมูล activePaletteData เพื่อใช้ออกไฟล์ Export
+    // 🟢 อัปเดต Palette ปัจจุบัน
     activePaletteData = customPalette || resultData.palette;
 
     if ($('paletteDisplay')) {$('paletteDisplay').innerHTML = renderSwatches(activePaletteData);
@@ -554,48 +554,6 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
     startPaletteBackgroundAnimation(activePaletteData);
 }
 
-function renderExtractedPalette(colors) {
-    if (!$('extractedPalette')) return;
-    if ($('extractedPaletteSection')) $('extractedPaletteSection').style.display = 'block';$('extractedPalette').innerHTML = renderSwatches(colors);
-}
-
-function createConfirmModal() {
-    if ($('confirmModalOverlay')) return;
-
-    const t = translations[currentLang];
-    const modalHTML = `
-        <div id="confirmModalOverlay" class="modal-overlay">
-            <div class="modal-card">
-                <div class="modal-icon">🗑️</div>
-                <div id="modalTitle" class="modal-title">${t.modalTitle}</div>
-                <div id="modalDesc" class="modal-desc">${t.modalDesc}</div>
-                <div class="modal-actions">
-                    <button id="cancelClearBtn" class="btn-modal-cancel">${t.modalCancel}</button>
-                    <button id="confirmClearBtn" class="btn-modal-confirm">${t.modalConfirm}</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    const overlay = $('confirmModalOverlay');
-    const cancelBtn = $('cancelClearBtn');
-    const confirmBtn = $('confirmClearBtn');
-
-    cancelBtn.addEventListener('click', () => {
-        overlay.classList.remove('active');
-    });
-
-    confirmBtn.addEventListener('click', () => {
-        fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
-        localStorage.removeItem('sentiment_history');
-        if (paletteAnimationTimer) clearInterval(paletteAnimationTimer);
-        document.body.style.backgroundColor = '#f1f5f9';
-        renderHistoryList();
-        overlay.classList.remove('active');
-    });
-}
-
 // ==========================================
 // 🚀 DOM LOADED & EVENT LISTENERS
 // ==========================================
@@ -604,141 +562,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const langToggleBtn = $('langToggleBtn');
     const analyzeBtn = $('analyzeBtn');
     const textInput = $('textInput');
-    const uploadTriggerBtn = $('uploadTriggerBtn');
-    const imageInput = $('imageInput');
-    const clearHistoryBtn = $('clearHistoryBtn');
 
-    // 🟢 ปุ่ม Export ต่างๆ
-    const exportAseBtn = $('exportAseBtn');
-    const exportJsonBtn = $('exportJsonBtn');
-    const exportFigmaBtn = $('exportFigmaBtn');
+    // 🟢 Event Listeners ปุ่ม Export & Copy Code
+    $('exportAseBtn')?.addEventListener('click', () => downloadASE(activePaletteData));
+    $('exportJsonBtn')?.addEventListener('click', () => downloadJSON(activePaletteData));$('exportFigmaBtn')?.addEventListener('click', () => copyFigmaTokens(activePaletteData));
+
+    $('copyHexBtn')?.addEventListener('click', () => copyPaletteCode('HEX'));
+    $('copyRgbBtn')?.addEventListener('click', () => copyPaletteCode('RGB'));$('copyHslBtn')?.addEventListener('click', () => copyPaletteCode('HSL'));
+    $('copyTailwindBtn')?.addEventListener('click', () => copyPaletteCode('TAILWIND'));$('copyCssVarBtn')?.addEventListener('click', () => copyPaletteCode('CSS_VARS'));
 
     if (langToggleBtn) {
-        langToggleBtn.style.position = 'relative';
-        langToggleBtn.style.zIndex = '999';
-        langToggleBtn.style.pointerEvents = 'auto';
-
-        langToggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
+        langToggleBtn.addEventListener('click', () => {
             currentLang = currentLang === 'TH' ? 'EN' : 'TH';
             updateLanguageUI();
         });
     }
 
     if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
+        analyzeBtn.addEventListener('click', async () => {
             const text = textInput ? textInput.value.trim() : '';
-
-            if (!text) {
-                if ($('alertBox')) {$('alertBox').innerText = translations[currentLang].alertEmpty;
-                    $('alertBox').style.display = 'block';
-                }
-                return;
-            }
-
-            if ($('alertBox'))$('alertBox').style.display = 'none';
-            clearImageResult();
-
-            analyzeBtn.disabled = true;
-            analyzeBtn.innerText = translations[currentLang].analyzingText;
-
-            const resetBtn = () => {
-                analyzeBtn.disabled = false;
-                analyzeBtn.innerText = translations[currentLang].analyzeBtn;
-            };
+            if (!text) return;
 
             try {
                 const classifier = await getAIPipeline();
-                if ($('emotionLabel'))$('emotionLabel').innerText = translations[currentLang].analyzingText;
-
-                const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
-                const output = await classifier(text, candidateLabels);
-
+                const output = await classifier(text, ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise']);
                 if (output?.labels?.length > 0) {
                     const topEmotion = output.labels[0].toUpperCase();
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
-                    
                     updateUIResult(topEmotion, confidenceScore);
-                    const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
-                    
-                    saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
+                    saveToHistory('text', text, topEmotion, confidenceScore, emotionRules[topEmotion]?.palette);
                 }
             } catch (err) {
-                console.error("AI Error:", err);
-                const fallbackEmotion = text.toLowerCase().includes('happy') || text.toLowerCase().includes('joy') ? 'JOY' : 'SADNESS';
-                updateUIResult(fallbackEmotion, '99.5%');
-                const resultData = emotionRules[fallbackEmotion];
-                saveToHistory('text', text, fallbackEmotion, '99.5%', resultData.palette);
-            } finally {
-                resetBtn();
+                updateUIResult('SADNESS', '99.5%');
             }
         });
-    }
-
-    if (textInput) textInput.addEventListener('input', clearImageResult);
-
-    if (uploadTriggerBtn && imageInput) {
-        uploadTriggerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            imageInput.click();
-        });
-    }
-
-    if (imageInput) {
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (textInput) textInput.value = '';
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const imageDataUrl = event.target.result;
-                if ($('imagePreview'))$('imagePreview').src = imageDataUrl;
-
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-
-                    const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8);
-                    renderExtractedPalette(rgbData.hexList);
-
-                    const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
-                    const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
-                    
-                    updateUIResult(imageEmotion, confidence, rgbData.hexList);
-                    saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
-                };
-                img.src = imageDataUrl;
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    if (clearHistoryBtn) {
-        createConfirmModal();
-        clearHistoryBtn.addEventListener('click', () => {
-            const overlay = $('confirmModalOverlay');
-            if (overlay) overlay.classList.add('active');
-        });
-    }
-
-    // 🟢 ผูก Event ปุ่ม Export ทั้งหมด
-    if (exportAseBtn) {
-        exportAseBtn.addEventListener('click', () => downloadASE(activePaletteData, "ai-palette.ase"));
-    }
-
-    if (exportJsonBtn) {
-        exportJsonBtn.addEventListener('click', () => downloadJSON(activePaletteData, "ai-palette.json"));
-    }
-
-    if (exportFigmaBtn) {
-        exportFigmaBtn.addEventListener('click', () => copyFigmaTokens(activePaletteData));
     }
 
     updateLanguageUI();

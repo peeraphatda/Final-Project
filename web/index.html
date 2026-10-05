@@ -36,20 +36,38 @@
                 <span id="confidenceValue" style="font-weight: bold; color: #64748b;">0%</span>
             </div>
 
-            <!-- 🟢 ส่วนหัวข้อจานสี + กลุ่มปุ่ม Export (ย้ายมาไว้บรรทัดเดียวกันเรียบร้อย) -->
+            <!-- 🟢 ส่วนหัวข้อจานสี + กลุ่มปุ่ม Export & Copy Code -->
             <div class="palette-header-container" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; flex-wrap: wrap; gap: 10px;">
                 <h3 id="paletteTitle" style="margin: 0;">ชุดจานสีแนะนำสมมาตร (8 Color Palette)</h3>
                 
-                <!-- กลุ่มปุ่ม Export -->
-                <div class="export-container" style="display: flex; gap: 8px; align-items: center;">
-                    <button type="button" id="exportAseBtn" class="btn-export" style="background-color: #3182ce; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem;">
-                        🎨 Adobe ASE (.ase)
+                <!-- กลุ่มปุ่ม Export และ Copy Code -->
+                <div class="export-container" style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <!-- ปุ่ม Export ไฟล์ -->
+                    <button type="button" id="exportAseBtn" class="btn-export" style="background-color: #3182ce; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        🎨 ASE
                     </button>
-                    <button type="button" id="exportJsonBtn" class="btn-export" style="background-color: #475569; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem;">
-                        📄 JSON (.json)
+                    <button type="button" id="exportJsonBtn" class="btn-export" style="background-color: #475569; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        📄 JSON
                     </button>
-                    <button type="button" id="exportFigmaBtn" class="btn-export" style="background-color: #059669; color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem;">
-                        ❖ Figma Tokens
+                    <button type="button" id="exportFigmaBtn" class="btn-export" style="background-color: #059669; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        ❖ Figma
+                    </button>
+
+                    <!-- 🟢 ปุ่ม Copy Code ในรูปแบบต่างๆ -->
+                    <button type="button" id="copyHexBtn" class="btn-export" style="background-color: #8b5cf6; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        📋 HEX
+                    </button>
+                    <button type="button" id="copyRgbBtn" class="btn-export" style="background-color: #ec4899; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        📋 RGB
+                    </button>
+                    <button type="button" id="copyHslBtn" class="btn-export" style="background-color: #10b981; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        📋 HSL
+                    </button>
+                    <button type="button" id="copyTailwindBtn" class="btn-export" style="background-color: #06b6d4; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        📋 Tailwind
+                    </button>
+                    <button type="button" id="copyCssVarBtn" class="btn-export" style="background-color: #f59e0b; color: white; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.8rem;">
+                        📋 CSS Vars
                     </button>
                 </div>
             </div>
