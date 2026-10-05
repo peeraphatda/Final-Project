@@ -3,100 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Sentiment Color Palette</title>
+    <title>AI Sentiment Color Palette Generator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <header>
+        <!-- Header Section -->
+        <header style="position: relative;">
             <h1>AI Color Generator</h1>
             <p id="subTitle">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ UI/UX</p>
-            <!-- 🟢 จุดที่ต้องตรวจสอบ: id ต้องตรงกัน และใส่ type="button" เพื่อป้องกันการ submit form -->
-            <button type="button" id="langToggleBtn">EN</button>
+            <button type="button" id="langToggleBtn" style="position: absolute; right: 0; top: 0;">EN</button>
         </header>
 
+        <!-- Input Section -->
         <section class="input-section">
             <label id="inputLabel" for="textInput" class="input-label">กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model</label>
             <textarea id="textInput" placeholder="พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy..."></textarea>
             
-            <div class="action-buttons">
+            <div class="action-buttons" style="margin-top: 15px; display: flex; gap: 10px;">
                 <button type="button" id="analyzeBtn" class="btn-primary">วิเคราะห์อารมณ์ (Analyze)</button>
                 <button type="button" id="uploadTriggerBtn" class="btn-secondary">อัปโหลดรูปภาพ (Extract Image)</button>
                 <input type="file" id="imageInput" accept="image/*" style="display: none;">
             </div>
             
-            <div id="alertBox" class="alert-box"></div>
+            <div id="alertBox" class="alert-box" style="display: none; color: red; margin-top: 10px;"></div>
         </section>
 
         <!-- Result Section -->
-        <section class="result-section">
-            <div class="result-header">
-                <div>
-                    <span id="emotionLabel" class="emotion-badge">-</span>
-                </div>
-                <div>
-                    <span id="confidenceValue" style="font-weight: bold; color: #64748b;">0%</span>
-                </div>
+        <section class="result-section" style="margin-top: 30px;">
+            <div class="result-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="emotionLabel" class="emotion-badge">-</span>
+                <span id="confidenceValue" style="font-weight: bold; color: #64748b;">0%</span>
             </div>
 
-            <h3 id="paletteTitle">ชุดจานสีแนะนำสมมาตร (8 Color Palette)</h3>
+            <h3 id="paletteTitle" style="margin-top: 20px;">ชุดจานสีแนะนำสมมาตร (8 Color Palette)</h3>
             <div id="paletteDisplay"></div>
 
-            <div class="advisory-section">
+            <div class="advisory-section" style="margin-top: 20px;">
                 <p><strong>ธีมที่แนะนำ:</strong> <span id="themeName">-</span></p>
                 <p><strong>ชุดฟอนต์:</strong> <span id="fontPairing">-</span></p>
                 <p><strong>การนำไปใช้งาน:</strong> <span id="usageContext">-</span></p>
             </div>
+
+            <!-- 🟢 ปุ่ม Export จานสี (ใส่ไว้ตรงนี้) -->
+            <div class="export-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #e2e8f0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <span style="font-weight: bold; font-size: 0.9rem; color: #475569;">Export จานสี:</span>
+                
+                <button type="button" id="exportAseBtn" class="btn-export" style="background-color: #3182ce; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                    🎨 Adobe ASE (.ase)
+                </button>
+                
+                <button type="button" id="exportJsonBtn" class="btn-export" style="background-color: #475569; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                    📄 JSON File (.json)
+                </button>
+
+                <button type="button" id="exportFigmaBtn" class="btn-export" style="background-color: #059669; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                    ❖ Copy Figma Tokens
+                </button>
+            </div>
         </section>
 
         <!-- Image Extracted Palette Section -->
-        <section id="extractedPaletteSection" class="extracted-section" style="display: none;">
+        <section id="extractedPaletteSection" class="extracted-section" style="display: none; margin-top: 30px;">
             <div class="image-preview-container">
-                <img id="imagePreview" src="" alt="Uploaded Preview">
+                <img id="imagePreview" src="" alt="Uploaded Preview" style="max-width: 100%; height: auto;">
             </div>
-            <div id="extractedPalette"></div>
+            <div id="extractedPalette" style="margin-top: 15px;"></div>
         </section>
 
         <!-- History Section -->
-        <section class="history-section">
-            <div class="history-header">
+        <section class="history-section" style="margin-top: 40px;">
+            <div class="history-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="historyTitle">ประวัติการวิเคราะห์ (History)</h3>
-                <button type="button" id="clearHistoryBtn" class="btn-clear">ล้างประวัติ</button>
+                <button type="button" id="clearHistoryBtn" class="btn-clear" style="background-color: #fee2e2; color: #dc2626; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">ล้างประวัติ</button>
             </div>
-            <div id="historyList" class="history-list"></div>
+            <div id="historyList" class="history-list" style="margin-top: 15px;"></div>
         </section>
     </div>
 
-    <!-- 🟢 ใส่ type="module" ในการเรียกใช้ script -->
+    <!-- Script Module -->
     <script type="module" src="app.js"></script>
-
-        <!-- ค้นหาโซนแสดงผลจานสีเดิม -->
-    <div id="paletteDisplay"></div>
-
-    <div class="advisory-section">
-        <p><strong>ธีมที่แนะนำ:</strong> <span id="themeName"></span></p>
-        <p><strong>ชุดฟอนต์:</strong> <span id="fontPairing"></span></p>
-        <p><strong>การนำไปใช้งาน:</strong> <span id="usageContext"></span></p>
-    </div>
-
-    <!-- 🟢 นำโค้ดปุ่ม Export ชุดนี้ไปวางต่อตรงนี้ได้เลยครับ -->
-    <div class="export-container" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #e2e8f0; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <span style="font-weight: bold; font-size: 0.9rem; color: #475569;">Export จานสี:</span>
-    
-     <!-- ปุ่มดาวน์โหลด ASE -->
-     <button type="button" id="exportAseBtn" class="btn-export" style="background-color: #3182ce; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-        🎨 Adobe ASE (.ase)
-     </button>
-    
-     <!-- ปุ่มดาวน์โหลด JSON -->
-     <button type="button" id="exportJsonBtn" class="btn-export" style="background-color: #475569; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-            📄 JSON File (.json)
-      </button>
-
-     <!-- ปุ่ม Copy Figma Tokens -->
-      <button type="button" id="exportFigmaBtn" class="btn-export" style="background-color: #059669; color: white; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-          ❖ Copy Figma Tokens
-        </button>
-    </div>
 </body>
 </html>
