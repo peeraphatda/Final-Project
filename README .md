@@ -10,7 +10,7 @@
 
 | Sprint | หัวข้อ | ผลงานสำคัญที่ส่งมอบ | เอกสารสรุป |
 | :--- | :--- | :--- | :--- |
-| 📦 Sprint 1 | Core System & OOP CLI | Emotion Classifier, Palette Engine, Visualizer, CLI Loop, Unit Test เบื้องต้น | [📄 reports/SPRINT1.md](reports/SPRINT1.md) |
+| 📦 Sprint 1 | Core System & OOP CLI | Emotion Classifier, Palette Engine, Visualizer, CLI Loop, Unit Test เบื้องต้น | [📄 reports/SPRINT1.md](./Sprint1/README.md) |
 | 📦 Sprint 2 | Persistence, Report & AI Advisory | SQLite + Supabase, Export JSON/CSS, Batch CSV, AI Advisory, WCAG Checker | [📄 reports/SPRINT2.md](reports/SPRINT2.md) |
 | 📦 Sprint 3 | Web Dashboard & Deployment | Glassmorphism UI, Bilingual TH/EN, Image Mood Input, GitHub Actions CI/CD | [📄 reports/SPRINT3.md](reports/SPRINT3.md) |
 
