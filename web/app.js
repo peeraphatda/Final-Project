@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return sentimentPipeline;
     }
 
-    // 🟢 ฟังก์ชันบันทึกลง Database ผ่าน API
+    // บันทึกลง Database ผ่าน API
     async function saveToHistory(type, inputContent, emotion, confidence, palette) {
         try {
             await fetch(API_BASE_URL, {
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 🟢 ฟังก์ชันดึงและแสดงรายการประวัติ (รองรับแสดงรูปภาพตัวอย่าง)
+    // ดึงและแสดงรายการประวัติ (History)
     async function renderHistoryList() {
         if (!historyList) return;
 
@@ -205,9 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
                     : '';
 
-                // เช็กประเภท: ถ้าเป็น image ให้แสดงแท็ก <img> รูปภาพ
+                // แสดงข้อความ หรือชื่อไฟล์รูปภาพพร้อมไอคอน 🖼️
                 const contentDisplay = item.type === 'image'
-                    ? `<img src="${item.content}" class="history-thumb" alt="Uploaded Image" />`
+                    ? `<span class="history-text" title="${item.content}">🖼️ ${item.content}</span>`
                     : `<span class="history-text" title="${item.content}">${item.content}</span>`;
 
                 return `
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Analyze Event
+    // Analyze Text Event
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const reader = new FileReader();
             reader.onload = (event) => {
-                const imageDataUrl = event.target.result; // แปลงรูปเป็น Base64 Data URL
+                const imageDataUrl = event.target.result;
                 if (imagePreview) imagePreview.src = imageDataUrl;
 
                 const img = new Image();
@@ -329,8 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                     updateUIResult(imageEmotion, confidence);
 
-                    // 🟢 ส่งรูปภาพ Base64 ไปเก็บบันทึกลง Database
-                    saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
+                    // บันทึกเฉพาะชื่อไฟล์รูปภาพลงในฐานข้อมูล
+                    saveToHistory('image', file.name, imageEmotion, confidence, rgbData.hexList);
                 };
                 img.src = imageDataUrl;
             };
@@ -392,6 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
         extractedPalette.innerHTML = renderSwatches(colors);
     }
 
-    // โหลดประวัติจาก Database เมื่อเปิดหน้าเว็บ
+    // โหลดข้อมูลประวัติเมื่อเริ่มเปิดหน้าเว็บ
     renderHistoryList();
 });
