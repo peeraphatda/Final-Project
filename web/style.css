@@ -1,182 +1,134 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+:root {
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --bg-color: #f0f4f8;
+    --card-bg: #ffffff;
+    --text-color: #1e293b;
+    --border-color: #e2e8f0;
 }
 
 body {
-    background-color: #f0f4f8;
-    color: #333;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 40px 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
 }
 
 .container {
     width: 100%;
-    max-width: 650px;
+    max-width: 700px;
 }
 
-/* Header Styles */
-.header {
+header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     position: relative;
 }
 
 .logo {
-    font-size: 1.6rem;
-    color: #2c3e50;
-    margin-bottom: 5px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
-#subTitle {
-    color: #666;
+.sub-title {
     font-size: 0.95rem;
+    color: #64748b;
 }
 
 .lang-btn {
     position: absolute;
-    top: 0;
     right: 0;
-    background-color: #ffffff;
-    border: 1px solid #cbd5e1;
+    top: 0;
     padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    background: #fff;
     border-radius: 20px;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 0.8rem;
-    color: #475569;
-    transition: all 0.2s;
+    font-weight: 600;
 }
 
-.lang-btn:hover {
-    background-color: #e2e8f0;
-}
-
-/* Card Container */
 .card {
-    background: #ffffff;
+    background: var(--card-bg);
     border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Input Section */
-.input-section {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.input-group {
     margin-bottom: 20px;
 }
 
-.input-section label {
-    font-weight: 600;
+label {
+    display: block;
+    margin-bottom: 8px;
     font-size: 0.9rem;
-    color: #475569;
+    font-weight: 600;
 }
 
 textarea {
     width: 100%;
-    height: 90px;
+    height: 100px;
     padding: 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     resize: none;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-textarea:focus {
-    border-color: #3b82f6;
-}
-
-.alert-box {
-    display: none;
-    color: #ef4444;
-    font-size: 0.85rem;
+    box-sizing: border-box;
 }
 
 .button-group {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .btn {
     flex: 1;
-    padding: 10px 15px;
+    padding: 10px;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s, opacity 0.2s;
-    font-size: 0.9rem;
+    transition: background 0.2s;
 }
 
 .btn-primary {
-    background-color: #3b82f6;
-    color: #ffffff;
+    background: var(--primary-color);
+    color: white;
 }
 
 .btn-primary:hover {
-    background-color: #2563eb;
+    background: var(--primary-hover);
 }
 
 .btn-secondary {
-    background-color: #e2e8f0;
-    color: #334155;
+    background: #e2e8f0;
+    color: #475569;
 }
 
-.btn-secondary:hover {
-    background-color: #cbd5e1;
-}
-
-/* Extracted Section */
-.extracted-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.result-title {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    color: #334155;
-}
-
-.image-preview-container {
-    text-align: center;
-    margin-bottom: 12px;
-}
-
-.image-preview-container img {
-    max-width: 100%;
-    max-height: 200px;
+.alert-box {
+    color: #ef4444;
+    background: #fee2e2;
+    padding: 10px;
     border-radius: 6px;
-    object-fit: cover;
+    margin-bottom: 15px;
+    display: none;
 }
 
-/* Palette Display */
+.result-section {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
 .palette-container {
-    margin-top: 15px;
-}
-
-.palette-container h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    color: #334155;
-}
-
-.palette-grid {
     display: flex;
     gap: 8px;
-    width: 100%;
+    margin-top: 10px;
 }
 
 .color-swatch {
@@ -186,134 +138,74 @@ textarea:focus {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    padding-bottom: 5px;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    padding-bottom: 4px;
 }
 
 .color-swatch span {
     font-size: 0.75rem;
-    font-weight: bold;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 4px;
+    border-radius: 4px;
 }
 
-/* Emotion Box */
-.emotion-box {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 15px;
-    background-color: #f1f5f9;
-    border-radius: 8px;
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 0.95rem;
-}
-
-/* Advisory Section */
-.advisory-section {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f8fafc;
-    border-left: 4px solid #3b82f6;
-    border-radius: 0 8px 8px 0;
-}
-
-.advisory-section h4 {
-    margin-bottom: 8px;
-    color: #1e293b;
-    font-size: 0.95rem;
-}
-
-.advisory-section p {
-    font-size: 0.85rem;
-    color: #475569;
-    margin-bottom: 4px;
-}
-
-/* History Section */
-.history-section {
-    margin-top: 25px;
-    padding-top: 15px;
-    border-top: 1px solid #e2e8f0;
-}
-
+/* 🟢 ตกแต่งส่วน History & รูปตัวอย่าง Thumbnail */
 .history-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 24px;
     margin-bottom: 12px;
 }
 
-.history-header h3 {
-    margin: 0;
-    font-size: 1rem;
-    color: #1e293b;
-}
-
-.clear-btn {
+.btn-clear {
     background: transparent;
-    border: 1px solid #cbd5e1;
     color: #ef4444;
-    padding: 4px 10px;
-    border-radius: 6px;
+    border: 1px solid #fee2e2;
+    padding: 4px 8px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 0.8rem;
-    transition: all 0.2s;
-}
-
-.clear-btn:hover {
-    background-color: #fef2f2;
-    border-color: #fca5a5;
-}
-
-.history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.history-empty {
-    text-align: center;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    padding: 12px 0;
 }
 
 .history-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 12px;
-    background-color: #f8fafc;
-    border-radius: 6px;
-    border: 1px solid #f1f5f9;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .history-info {
     display: flex;
     align-items: center;
-    gap: 8px;
-    overflow: hidden;
+    gap: 10px;
 }
 
 .history-tag {
-    font-size: 0.65rem;
-    font-weight: bold;
-    padding: 2px 5px;
+    font-size: 0.7rem;
+    padding: 2px 6px;
     border-radius: 4px;
-    color: #ffffff;
+    font-weight: bold;
 }
 
-.history-tag.text { background-color: #3b82f6; }
-.history-tag.image { background-color: #f97316; }
+.history-tag.text { background: #dbeafe; color: #1e40af; }
+.history-tag.image { background: #fce7f3; color: #9d174d; }
 
 .history-text {
-    font-size: 0.85rem;
-    color: #334155;
+    max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 180px;
+    font-size: 0.9rem;
+}
+
+/* 🟢 สไตล์รูปภาพตัวอย่างในประวัติ */
+.history-thumb {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
 }
 
 .history-time {
@@ -327,11 +219,6 @@ textarea:focus {
     gap: 10px;
 }
 
-.history-emotion {
-    font-size: 0.8rem;
-    color: #2563eb;
-}
-
 .history-mini-palette {
     display: flex;
     gap: 3px;
@@ -341,5 +228,11 @@ textarea:focus {
     width: 12px;
     height: 12px;
     border-radius: 2px;
-    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.history-empty {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    padding: 10px 0;
 }

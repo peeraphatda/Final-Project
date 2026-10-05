@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyList = $('historyList');
     const clearHistoryBtn = $('clearHistoryBtn');
 
-    // 🟢 URL ของ Backend API ที่รันด้วย Node.js
+    // URL สำหรับเรียกใช้ Backend API
     const API_BASE_URL = 'http://localhost:3000/api/history';
 
     if (logoElement) logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
@@ -167,9 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return sentimentPipeline;
     }
 
-    // ----------------------------------------------------
-    // 🟢 ระบบ History จัดการผ่าน Backend REST API (SQLite)
-    // ----------------------------------------------------
+    // 🟢 ฟังก์ชันบันทึกลง Database ผ่าน API
     async function saveToHistory(type, inputContent, emotion, confidence, palette) {
         try {
             await fetch(API_BASE_URL, {
@@ -183,12 +181,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     palette
                 })
             });
-            renderHistoryList(); // ดึงรายการใหม่ทันทีหลังบันทึก
+            renderHistoryList();
         } catch (error) {
             console.error("Failed to save history to database:", error);
         }
     }
 
+    // 🟢 ฟังก์ชันดึงและแสดงรายการประวัติ (รองรับแสดงรูปภาพตัวอย่าง)
     async function renderHistoryList() {
         if (!historyList) return;
 
@@ -206,11 +205,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
                     : '';
 
+                // เช็กประเภท: ถ้าเป็น image ให้แสดงแท็ก <img> รูปภาพ
+                const contentDisplay = item.type === 'image'
+                    ? `<img src="${item.content}" class="history-thumb" alt="Uploaded Image" />`
+                    : `<span class="history-text" title="${item.content}">${item.content}</span>`;
+
                 return `
                     <div class="history-item">
                         <div class="history-info">
                             <span class="history-tag ${item.type}">${item.type.toUpperCase()}</span>
-                            <span class="history-text" title="${item.content}">${item.content}</span>
+                            ${contentDisplay}
                             <span class="history-time">${timeString}</span>
                         </div>
                         <div class="history-result">
@@ -307,7 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const reader = new FileReader();
             reader.onload = (event) => {
-                if (imagePreview) imagePreview.src = event.target.result;
+                const imageDataUrl = event.target.result; // แปลงรูปเป็น Base64 Data URL
+                if (imagePreview) imagePreview.src = imageDataUrl;
 
                 const img = new Image();
                 img.onload = () => {
@@ -324,9 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                     updateUIResult(imageEmotion, confidence);
 
-                    saveToHistory('image', file.name, imageEmotion, confidence, rgbData.hexList);
+                    // 🟢 ส่งรูปภาพ Base64 ไปเก็บบันทึกลง Database
+                    saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
                 };
-                img.src = event.target.result;
+                img.src = imageDataUrl;
             };
             reader.readAsDataURL(file);
         });
@@ -386,6 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
         extractedPalette.innerHTML = renderSwatches(colors);
     }
 
-    // 🟢 โหลดประวัติจาก SQLite Database ทันทีเมื่อเปิดหน้าเว็บ
+    // โหลดประวัติจาก Database เมื่อเปิดหน้าเว็บ
     renderHistoryList();
 });
