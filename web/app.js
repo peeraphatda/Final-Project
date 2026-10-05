@@ -4,37 +4,11 @@ env.allowLocalModels = false;
 
 const $ = id => document.getElementById(id);
 
-const textInput = $('textInput');
-const analyzeBtn = $('analyzeBtn');
-const alertBox = $('alertBox');
-const subTitle = $('subTitle');
-const inputLabel = $('inputLabel');
-const langToggleBtn = $('langToggleBtn');
-
-const uploadTriggerBtn = $('uploadTriggerBtn');
-const imageInput = $('imageInput');
-const extractedPalette = $('extractedPalette');
-const extractedPaletteSection = $('extractedPaletteSection');
-const imagePreview = $('imagePreview');
-
-const resultEmotionText = $('resultEmotion');
-const resultConfidenceText = $('resultConfidence');
-const emotionLabel = $('emotionLabel');
-const confidenceValue = $('confidenceValue');
-const paletteTitle = $('paletteTitle');
-const paletteDisplay = $('paletteDisplay');
-const themeName = $('themeName');
-const fontPairing = $('fontPairing');
-const usageContext = $('usageContext');
-
-const historyTitle = $('historyTitle');
-const historyList = $('historyList');
-const clearHistoryBtn = $('clearHistoryBtn');
-
 const API_BASE_URL = 'http://localhost:3000/api/history';
 
 let currentLang = 'TH';
 let paletteAnimationTimer = null;
+let sentimentPipeline = null;
 
 const translations = {
     TH: {
@@ -93,39 +67,6 @@ const translations = {
     }
 };
 
-// 🌐 ฟังก์ชันเปลี่ยนภาษา UI
-function updateLanguageUI() {
-    const t = translations[currentLang];
-
-    if (langToggleBtn) langToggleBtn.innerText = t.langBtn;
-    if (subTitle) subTitle.innerText = t.subTitle;
-    if (inputLabel) inputLabel.innerText = t.inputLabel;
-    if (textInput) textInput.placeholder = t.placeholder;
-    if (analyzeBtn && !analyzeBtn.disabled) analyzeBtn.innerText = t.analyzeBtn;
-    if (uploadTriggerBtn) uploadTriggerBtn.innerText = t.uploadBtn;
-    if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
-    if (historyTitle) historyTitle.innerText = t.historyTitle;
-    if (clearHistoryBtn) clearHistoryBtn.innerText = t.clearHistory;
-
-    // อัปเดต Modal Text หากมีใน DOM
-    if ($('modalTitle'))$('modalTitle').innerText = t.modalTitle;
-    if ($('modalDesc'))$('modalDesc').innerText = t.modalDesc;
-    if ($('cancelClearBtn'))$('cancelClearBtn').innerText = t.modalCancel;
-    if ($('confirmClearBtn'))$('confirmClearBtn').innerText = t.modalConfirm;
-
-    renderHistoryList();
-}
-
-// 🟢 สลับภาษาเมื่อกดปุ่ม
-if (langToggleBtn) {
-    langToggleBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        currentLang = currentLang === 'TH' ? 'EN' : 'TH';
-        updateLanguageUI();
-    });
-}
-
-// 🟢 โครงสร้างชุดจานสี 8 สีแบบสมมาตร
 const emotionRules = {
     JOY: { 
         palette: [
@@ -225,6 +166,27 @@ const emotionRules = {
     }
 };
 
+function updateLanguageUI() {
+    const t = translations[currentLang];
+
+    if ($('langToggleBtn'))$('langToggleBtn').innerText = t.langBtn;
+    if ($('subTitle'))$('subTitle').innerText = t.subTitle;
+    if ($('inputLabel'))$('inputLabel').innerText = t.inputLabel;
+    if ($('textInput'))$('textInput').placeholder = t.placeholder;
+    if ($('analyzeBtn') && !$('analyzeBtn').disabled)$('analyzeBtn').innerText = t.analyzeBtn;
+    if ($('uploadTriggerBtn'))$('uploadTriggerBtn').innerText = t.uploadBtn;
+    if ($('paletteTitle'))$('paletteTitle').innerText = t.paletteTitle;
+    if ($('historyTitle'))$('historyTitle').innerText = t.historyTitle;
+    if ($('clearHistoryBtn'))$('clearHistoryBtn').innerText = t.clearHistory;
+
+    if ($('modalTitle'))$('modalTitle').innerText = t.modalTitle;
+    if ($('modalDesc'))$('modalDesc').innerText = t.modalDesc;
+    if ($('cancelClearBtn'))$('cancelClearBtn').innerText = t.modalCancel;
+    if ($('confirmClearBtn'))$('confirmClearBtn').innerText = t.modalConfirm;
+
+    renderHistoryList();
+}
+
 const renderSwatches = colors => {
     return `<div class="palette-grid">` + (colors || []).map(c => {
         const hex = typeof c === 'string' ? c : c.hex;
@@ -241,11 +203,9 @@ const renderSwatches = colors => {
     }).join('') + `</div>`;
 };
 
-let sentimentPipeline = null;
-
 async function getAIPipeline() {
     if (!sentimentPipeline) {
-        if (emotionLabel) emotionLabel.innerText = translations[currentLang].loadingModel;
+        if ($('emotionLabel'))$('emotionLabel').innerText = translations[currentLang].loadingModel;
         sentimentPipeline = await pipeline('zero-shot-classification', 'Xenova/distilbert-base-uncased-mnli');
     }
     return sentimentPipeline;
@@ -307,7 +267,7 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
 }
 
 async function renderHistoryList() {
-    const historyContainer = document.getElementById('historyList');
+    const historyContainer = $('historyList');
     if (!historyContainer) return;
 
     let historyData = [];
@@ -347,7 +307,6 @@ async function renderHistoryList() {
         }
 
         const hexList = paletteArray.map(c => typeof c === 'string' ? c : c.hex);
-
         const isImage = item.type === 'image';
         const isBase64 = isImage && item.content && item.content.startsWith('data:image');
 
@@ -385,7 +344,7 @@ async function renderHistoryList() {
 }
 
 function loadHistoryItem(item) {
-    if (alertBox) alertBox.style.display = 'none';
+    if ($('alertBox'))$('alertBox').style.display = 'none';
 
     let paletteArray = [];
     if (Array.isArray(item.palette)) paletteArray = item.palette;
@@ -395,12 +354,12 @@ function loadHistoryItem(item) {
 
     if (item.type === 'text') {
         clearImageResult();
-        if (textInput) textInput.value = item.content;
+        if ($('textInput'))$('textInput').value = item.content;
         updateUIResult(item.emotion, item.confidence || '95.0%');
     } else if (item.type === 'image') {
-        if (textInput) textInput.value = '';
-        if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
-        if (imagePreview) imagePreview.src = item.content;
+        if ($('textInput'))$('textInput').value = '';
+        if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'block';
+        if ($('imagePreview'))$('imagePreview').src = item.content;
         
         renderExtractedPalette(paletteArray);
         updateUIResult(item.emotion, item.confidence || '95.0%', paletteArray);
@@ -409,107 +368,11 @@ function loadHistoryItem(item) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-if (analyzeBtn) {
-    analyzeBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const text = textInput ? textInput.value.trim() : '';
-
-        if (!text) {
-            if (alertBox) {
-                alertBox.innerText = translations[currentLang].alertEmpty;
-                alertBox.style.display = 'block';
-            }
-            return;
-        }
-
-        if (alertBox) alertBox.style.display = 'none';
-        clearImageResult();
-
-        analyzeBtn.disabled = true;
-        analyzeBtn.innerText = translations[currentLang].analyzingText;
-
-        const resetBtn = () => {
-            analyzeBtn.disabled = false;
-            analyzeBtn.innerText = translations[currentLang].analyzeBtn;
-        };
-
-        try {
-            const classifier = await getAIPipeline();
-            if (emotionLabel) emotionLabel.innerText = translations[currentLang].analyzingText;
-
-            const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
-            const output = await classifier(text, candidateLabels);
-
-            if (output?.labels?.length > 0) {
-                const topEmotion = output.labels[0].toUpperCase();
-                const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
-                
-                updateUIResult(topEmotion, confidenceScore);
-                const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
-                
-                saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
-            }
-        } catch (err) {
-            console.error("AI Error:", err);
-            const fallbackEmotion = text.toLowerCase().includes('happy') || text.toLowerCase().includes('joy') ? 'JOY' : 'SADNESS';
-            updateUIResult(fallbackEmotion, '99.5%');
-            const resultData = emotionRules[fallbackEmotion];
-            saveToHistory('text', text, fallbackEmotion, '99.5%', resultData.palette);
-        } finally {
-            resetBtn();
-        }
-    });
-}
-
 function clearImageResult() {
-    if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
-    if (extractedPalette) extractedPalette.innerHTML = '';
-    if (imagePreview) imagePreview.src = '';
-    if (imageInput) imageInput.value = '';
-}
-
-if (textInput) textInput.addEventListener('input', clearImageResult);
-
-if (uploadTriggerBtn && imageInput) {
-    uploadTriggerBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        imageInput.click();
-    });
-}
-
-if (imageInput) {
-    imageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (textInput) textInput.value = '';
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const imageDataUrl = event.target.result;
-            if (imagePreview) imagePreview.src = imageDataUrl;
-
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-
-                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8);
-                renderExtractedPalette(rgbData.hexList);
-
-                const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
-                const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
-                
-                updateUIResult(imageEmotion, confidence, rgbData.hexList);
-                saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
-            };
-            img.src = imageDataUrl;
-        };
-        reader.readAsDataURL(file);
-    });
+    if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'none';
+    if ($('extractedPalette'))$('extractedPalette').innerHTML = '';
+    if ($('imagePreview'))$('imagePreview').src = '';
+    if ($('imageInput'))$('imageInput').value = '';
 }
 
 function analyzeColorSentiment(rgbColors) {
@@ -548,17 +411,15 @@ function extractRGBColors(ctx, width, height, count) {
 function updateUIResult(emotionKey, confidence, customPalette = null) {
     const resultData = emotionRules[emotionKey] || emotionRules['JOY'];
 
-    if (emotionLabel) emotionLabel.innerText = emotionKey;
-    if (confidenceValue) confidenceValue.innerText = confidence;
-
-    if (themeName) themeName.innerText = resultData.theme;
-    if (fontPairing) fontPairing.innerText = resultData.font;
-    if (usageContext) usageContext.innerText = resultData.context;
+    if ($('emotionLabel'))$('emotionLabel').innerText = emotionKey;
+    if ($('confidenceValue'))$('confidenceValue').innerText = confidence;
+    if ($('themeName'))$('themeName').innerText = resultData.theme;
+    if ($('fontPairing'))$('fontPairing').innerText = resultData.font;
+    if ($('usageContext'))$('usageContext').innerText = resultData.context;
 
     const activePalette = customPalette || resultData.palette;
 
-    if (paletteDisplay) {
-        paletteDisplay.innerHTML = renderSwatches(activePalette);
+    if ($('paletteDisplay')) {$('paletteDisplay').innerHTML = renderSwatches(activePalette);
     }
 
     if (resultData.fontFamily) {
@@ -569,9 +430,8 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
 }
 
 function renderExtractedPalette(colors) {
-    if (!extractedPalette) return;
-    if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
-    extractedPalette.innerHTML = renderSwatches(colors);
+    if (!$('extractedPalette')) return;
+    if ($('extractedPaletteSection')) $('extractedPaletteSection').style.display = 'block';$('extractedPalette').innerHTML = renderSwatches(colors);
 }
 
 function createConfirmModal() {
@@ -611,12 +471,130 @@ function createConfirmModal() {
     });
 }
 
-if (clearHistoryBtn) {
-    createConfirmModal();
-    clearHistoryBtn.addEventListener('click', () => {
-        const overlay = $('confirmModalOverlay');
-        if (overlay) overlay.classList.add('active');
-    });
-}
+// 🟢 ทำงานเมื่อ DOM โหลดเสร็จเรียบร้อย
+document.addEventListener('DOMContentLoaded', () => {
+    const langToggleBtn = $('langToggleBtn');
+    const analyzeBtn = $('analyzeBtn');
+    const textInput = $('textInput');
+    const uploadTriggerBtn = $('uploadTriggerBtn');
+    const imageInput = $('imageInput');
+    const clearHistoryBtn = $('clearHistoryBtn');
 
-updateLanguageUI();
+    // 🟢 ผูก Event ปุ่มสลับภาษา
+    if (langToggleBtn) {
+        langToggleBtn.style.position = 'relative';
+        langToggleBtn.style.zIndex = '999';
+        langToggleBtn.style.pointerEvents = 'auto';
+
+        langToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentLang = currentLang === 'TH' ? 'EN' : 'TH';
+            updateLanguageUI();
+        });
+    }
+
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const text = textInput ? textInput.value.trim() : '';
+
+            if (!text) {
+                if ($('alertBox')) {$('alertBox').innerText = translations[currentLang].alertEmpty;
+                    $('alertBox').style.display = 'block';
+                }
+                return;
+            }
+
+            if ($('alertBox'))$('alertBox').style.display = 'none';
+            clearImageResult();
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerText = translations[currentLang].analyzingText;
+
+            const resetBtn = () => {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerText = translations[currentLang].analyzeBtn;
+            };
+
+            try {
+                const classifier = await getAIPipeline();
+                if ($('emotionLabel'))$('emotionLabel').innerText = translations[currentLang].analyzingText;
+
+                const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
+                const output = await classifier(text, candidateLabels);
+
+                if (output?.labels?.length > 0) {
+                    const topEmotion = output.labels[0].toUpperCase();
+                    const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
+                    
+                    updateUIResult(topEmotion, confidenceScore);
+                    const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
+                    
+                    saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
+                }
+            } catch (err) {
+                console.error("AI Error:", err);
+                const fallbackEmotion = text.toLowerCase().includes('happy') || text.toLowerCase().includes('joy') ? 'JOY' : 'SADNESS';
+                updateUIResult(fallbackEmotion, '99.5%');
+                const resultData = emotionRules[fallbackEmotion];
+                saveToHistory('text', text, fallbackEmotion, '99.5%', resultData.palette);
+            } finally {
+                resetBtn();
+            }
+        });
+    }
+
+    if (textInput) textInput.addEventListener('input', clearImageResult);
+
+    if (uploadTriggerBtn && imageInput) {
+        uploadTriggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            imageInput.click();
+        });
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (textInput) textInput.value = '';
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const imageDataUrl = event.target.result;
+                if ($('imagePreview'))$('imagePreview').src = imageDataUrl;
+
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8);
+                    renderExtractedPalette(rgbData.hexList);
+
+                    const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
+                    const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
+                    
+                    updateUIResult(imageEmotion, confidence, rgbData.hexList);
+                    saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
+                };
+                img.src = imageDataUrl;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (clearHistoryBtn) {
+        createConfirmModal();
+        clearHistoryBtn.addEventListener('click', () => {
+            const overlay = $('confirmModalOverlay');
+            if (overlay) overlay.classList.add('active');
+        });
+    }
+
+    updateLanguageUI();
+});

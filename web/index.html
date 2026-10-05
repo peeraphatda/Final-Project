@@ -3,95 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Art & Palette Sentiment Analyzer</title>
+    <title>AI Sentiment Color Palette</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,400;0,700&family=Montserrat:wght@500;700&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,600;1,400&family=Plus+Jakarta+Sans:wght@500;700&family=Poppins:wght@400;600&family=Roboto:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <div class="container">
-        <!-- Header Section -->
         <header>
-            <h1 class="logo">Smart Art & Palette Sentiment Analyzer</h1>
-            <p id="subTitle" class="sub-title">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี</p>
-            <button id="langToggleBtn" class="lang-btn">TH / EN</button>
+            <h1>AI Color Generator</h1>
+            <p id="subTitle">ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ UI/UX</p>
+            <!-- 🟢 จุดที่ต้องตรวจสอบ: id ต้องตรงกัน และใส่ type="button" เพื่อป้องกันการ submit form -->
+            <button type="button" id="langToggleBtn">EN</button>
         </header>
 
-        <!-- Main Card Container -->
-        <main class="card">
+        <section class="input-section">
+            <label id="inputLabel" for="textInput" class="input-label">กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model</label>
+            <textarea id="textInput" placeholder="พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy..."></textarea>
             
-            <!-- Input Section -->
-            <div class="input-group">
-                <label id="inputLabel" for="textInput">กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model</label>
-                <textarea id="textInput" placeholder="พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy..."></textarea>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button id="analyzeBtn" class="btn btn-primary">วิเคราะห์อารมณ์ (Analyze)</button>
-                <button id="uploadTriggerBtn" class="btn btn-secondary">อัปโหลดรูปภาพ (Extract Image)</button>
+            <div class="action-buttons">
+                <button type="button" id="analyzeBtn" class="btn-primary">วิเคราะห์อารมณ์ (Analyze)</button>
+                <button type="button" id="uploadTriggerBtn" class="btn-secondary">อัปโหลดรูปภาพ (Extract Image)</button>
                 <input type="file" id="imageInput" accept="image/*" style="display: none;">
             </div>
-
-            <!-- Alert Box -->
+            
             <div id="alertBox" class="alert-box"></div>
+        </section>
 
-            <!-- Section: Extracted Palette from Image Upload -->
-            <div id="extractedPaletteSection" class="result-section" style="display: none;">
-                <h3 class="result-title">รูปภาพที่อัปโหลดและจานสีที่สกัดได้</h3>
-                
-                <!-- Preview Image Frame -->
-                <div style="text-align: center; margin-bottom: 12px;">
-                    <img id="imagePreview" alt="Uploaded Preview" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0;" />
+        <!-- Result Section -->
+        <section class="result-section">
+            <div class="result-header">
+                <div>
+                    <span id="emotionLabel" class="emotion-badge">-</span>
                 </div>
-                
-                <div id="extractedPalette" class="palette-container"></div>
-            </div>
-
-            <!-- Section: Sentiment Analysis Result -->
-            <div id="analysisResultSection" class="result-section">
-                <p id="resultEmotion" class="result-text">
-                    ผลลัพธ์อารมณ์: <strong id="emotionLabel">-</strong>
-                </p>
-                <p id="resultConfidence" class="result-text">
-                    ค่าความเชื่อมั่น: <strong id="confidenceValue">-</strong>
-                </p>
-            </div>
-
-            <!-- Section: Recommended Color Palette & AI Advisory -->
-            <div class="recommendation-section">
-                <h3 id="paletteTitle" class="section-title">ชุดจานสีแนะนำ (WCAG Compliant)</h3>
-                <div id="paletteDisplay" class="palette-container">
-                    <!-- Color swatches generated dynamically -->
-                </div>
-
-                <div class="advisory-section" style="margin-top: 20px;">
-                    <h4>คำแนะนำการออกแบบโดย AI</h4>
-                    <p><strong>ธีมที่แนะนำ: </strong><span id="themeName">-</span></p>
-                    <p><strong>ชุดฟอนต์: </strong><span id="fontPairing">-</span></p>
-                    <p><strong>การนำไปใช้งาน: </strong><span id="usageContext">-</span></p>
+                <div>
+                    <span id="confidenceValue" style="font-weight: bold; color: #64748b;">0%</span>
                 </div>
             </div>
 
-            <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e2e8f0;">
+            <h3 id="paletteTitle">ชุดจานสีแนะนำสมมาตร (8 Color Palette)</h3>
+            <div id="paletteDisplay"></div>
 
-            <!-- Section: Analysis History -->
-            <div class="history-section">
-                <div class="history-header">
-                    <h3 id="historyTitle" class="section-title">ประวัติการวิเคราะห์ (History)</h3>
-                    <button id="clearHistoryBtn" class="btn-clear">ล้างประวัติ</button>
-                </div>
-                <!-- Container แสดงรายการประวัติ -->
-                <div id="historyList" class="history-list"></div>
+            <div class="advisory-section">
+                <p><strong>ธีมที่แนะนำ:</strong> <span id="themeName">-</span></p>
+                <p><strong>ชุดฟอนต์:</strong> <span id="fontPairing">-</span></p>
+                <p><strong>การนำไปใช้งาน:</strong> <span id="usageContext">-</span></p>
             </div>
+        </section>
 
-        </main>
+        <!-- Image Extracted Palette Section -->
+        <section id="extractedPaletteSection" class="extracted-section" style="display: none;">
+            <div class="image-preview-container">
+                <img id="imagePreview" src="" alt="Uploaded Preview">
+            </div>
+            <div id="extractedPalette"></div>
+        </section>
+
+        <!-- History Section -->
+        <section class="history-section">
+            <div class="history-header">
+                <h3 id="historyTitle">ประวัติการวิเคราะห์ (History)</h3>
+                <button type="button" id="clearHistoryBtn" class="btn-clear">ล้างประวัติ</button>
+            </div>
+            <div id="historyList" class="history-list"></div>
+        </section>
     </div>
 
-    <!-- JavaScript Application Script -->
+    <!-- 🟢 ใส่ type="module" ในการเรียกใช้ script -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
