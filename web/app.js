@@ -1,13 +1,8 @@
-// นำเข้า Transformers.js ในรูปแบบ ES Module
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-// ปิดการดึง Local Model เพื่อบังคับให้ดึงไฟล์จาก CDN ของ Xenova
 env.allowLocalModels = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ----------------------------------------------------
-    // DOM Elements
-    // ----------------------------------------------------
     const $ = id => document.getElementById(id);
     const textInput = $('textInput');
     const analyzeBtn = $('analyzeBtn');
@@ -34,11 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontPairing = $('fontPairing');
     const usageContext = $('usageContext');
 
+    // 🟢 DOM Elements สำหรับ History
+    const historyTitle = $('historyTitle');
+    const historyList = $('historyList');
+    const clearHistoryBtn = $('clearHistoryBtn');
+
     if (logoElement) logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
 
-    // ----------------------------------------------------
-    // 1. ระบบสลับภาษา UI (TH / EN)
-    // ----------------------------------------------------
     let currentLang = 'TH';
 
     const translations = {
@@ -58,7 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
             typography: 'ชุดฟอนต์: ',
             usageContext: 'การนำไปใช้งาน: ',
             loadingModel: 'กำลังโหลด AI Model',
-            analyzingText: 'AI กำลังประมวลผล'
+            analyzingText: 'AI กำลังประมวลผล',
+            historyTitle: 'ประวัติการวิเคราะห์ (History)',
+            clearHistory: 'ล้างประวัติ',
+            emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์'
         },
         EN: {
             subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
@@ -76,7 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
             typography: 'Typography: ',
             usageContext: 'Usage Context: ',
             loadingModel: 'Loading AI Model',
-            analyzingText: 'AI is Analyzing'
+            analyzingText: 'AI is Analyzing',
+            historyTitle: 'Analysis History',
+            clearHistory: 'Clear History',
+            emptyHistory: 'No analysis history found'
         }
     };
 
@@ -96,6 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (uploadTriggerBtn) uploadTriggerBtn.innerText = t.uploadBtn;
         if (extractedTitle) extractedTitle.innerText = t.extractedTitle;
         if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
+        if (historyTitle) historyTitle.innerText = t.historyTitle;
+        if (clearHistoryBtn) clearHistoryBtn.innerText = t.clearHistory;
 
         if (resultEmotionText && emotionLabel) resultEmotionText.childNodes[0].nodeValue = t.resultEmotionLabel;
         if (resultConfidenceText && confidenceValue) resultConfidenceText.childNodes[0].nodeValue = t.resultConfidenceLabel;
@@ -109,11 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
             advisoryParagraphs[1].innerText = t.typography;
             advisoryParagraphs[2].innerText = t.usageContext;
         }
+
+        renderHistoryList();
     }
 
-    // ----------------------------------------------------
-    // 2. ระบบ Loading Animation
-    // ----------------------------------------------------
+    // Loading Animation
     let loadingInterval = null;
 
     function startLoadingAnimation(baseText) {
@@ -135,58 +140,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ----------------------------------------------------
-    // 3. ฐานข้อมูลและกฎจิตวิทยาของสี (6 อารมณ์)
-    // ----------------------------------------------------
     const emotionRules = {
-        JOY: {
-            palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'],
-            theme: 'Vibrant Sunburst',
-            font: 'Poppins / Montserrat',
-            context: 'E-Commerce, Festival Branding, UI Dashboard'
-        },
-        SADNESS: {
-            palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'],
-            theme: 'Melancholic Mist',
-            font: 'Lora / Merriweather',
-            context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps'
-        },
-        ANGER: {
-            palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'],
-            theme: 'Fiery Passion',
-            font: 'Oswald / Roboto',
-            context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign'
-        },
-        FEAR: {
-            palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'],
-            theme: 'Mystic Shadow',
-            font: 'Cinzel / Inter',
-            context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools'
-        },
-        LOVE: {
-            palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'],
-            theme: 'Romantic Bloom',
-            font: 'Playfair Display / Great Vibes',
-            context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms'
-        },
-        SURPRISE: {
-            palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'],
-            theme: 'Electric Wonder',
-            font: 'Plus Jakarta Sans / Space Grotesk',
-            context: 'Entertainment Apps, Promotional Banners, Interactive Art'
-        }
+        JOY: { palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], theme: 'Vibrant Sunburst', font: 'Poppins / Montserrat', context: 'E-Commerce, Festival Branding, UI Dashboard' },
+        SADNESS: { palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], theme: 'Melancholic Mist', font: 'Lora / Merriweather', context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps' },
+        ANGER: { palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], theme: 'Fiery Passion', font: 'Oswald / Roboto', context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign' },
+        FEAR: { palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], theme: 'Mystic Shadow', font: 'Cinzel / Inter', context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools' },
+        LOVE: { palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], theme: 'Romantic Bloom', font: 'Playfair Display / Great Vibes', context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms' },
+        SURPRISE: { palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], theme: 'Electric Wonder', font: 'Plus Jakarta Sans / Space Grotesk', context: 'Entertainment Apps, Promotional Banners, Interactive Art' }
     };
 
-    // Helper ในการสร้าง Swatch สีแบบกระชับ
     const renderSwatches = colors => colors.map(c => `
         <div class="color-swatch" style="background-color: ${c}">
             <span>${c}</span>
         </div>
     `).join('');
 
-    // ----------------------------------------------------
-    // 4. AI Pipeline Engine (Transformers.js Zero-Shot)
-    // ----------------------------------------------------
+    // AI Pipeline Engine
     let sentimentPipeline = null;
 
     async function getAIPipeline() {
@@ -197,9 +166,58 @@ document.addEventListener('DOMContentLoaded', () => {
         return sentimentPipeline;
     }
 
-    // ----------------------------------------------------
-    // 5. ปุ่มวิเคราะห์อารมณ์ด้วย AI Model
-    // ----------------------------------------------------
+    // 🟢 ระบบจัดการ LocalStorage สำหรับ History
+    function saveToHistory(type, inputContent, emotion, confidence, palette) {
+        const history = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
+        const newItem = {
+            id: Date.now(),
+            type, // 'text' หรือ 'image'
+            content: inputContent,
+            emotion,
+            confidence,
+            palette,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        history.unshift(newItem); // เอาอันล่าสุดไว้ข้างบน
+        if (history.length > 10) history.pop(); // เก็บไม่เกิน 10 รายการล่าสุด
+        localStorage.setItem('sentiment_history', JSON.stringify(history));
+        renderHistoryList();
+    }
+
+    function renderHistoryList() {
+        if (!historyList) return;
+        const history = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
+
+        if (history.length === 0) {
+            historyList.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
+            return;
+        }
+
+        historyList.innerHTML = history.map(item => `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-tag ${item.type}">${item.type.toUpperCase()}</span>
+                    <span class="history-text" title="${item.content}">${item.content}</span>
+                    <span class="history-time">${item.timestamp}</span>
+                </div>
+                <div class="history-result">
+                    <strong class="history-emotion">${item.emotion}</strong>
+                    <div class="history-mini-palette">
+                        ${item.palette.map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            localStorage.removeItem('sentiment_history');
+            renderHistoryList();
+        });
+    }
+
+    // Analyze Event
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -231,6 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const topEmotion = output.labels[0].toUpperCase();
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
                     updateUIResult(topEmotion, confidenceScore);
+                    
+                    // 🟢 บันทึกลงประวัติ
+                    const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
+                    saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
                 }
             } catch (err) {
                 stopLoadingAnimation();
@@ -244,9 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ----------------------------------------------------
-    // 6. การประมวลผลรูปภาพและการจัดการ UI
-    // ----------------------------------------------------
+    // Image Upload Events
     function clearImageResult() {
         if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
         if (extractedPalette) extractedPalette.innerHTML = '';
@@ -280,7 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderExtractedPalette(rgbData.hexList);
 
                     const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
-                    updateUIResult(imageEmotion, (90 + Math.floor(Math.random() * 9)) + '.0%');
+                    const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
+                    updateUIResult(imageEmotion, confidence);
+
+                    // 🟢 บันทึกลงประวัติ
+                    saveToHistory('image', file.name, imageEmotion, confidence, rgbData.hexList);
                 };
                 img.src = event.target.result;
             };
@@ -341,4 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
         extractedPalette.innerHTML = renderSwatches(colors);
     }
+
+    // 🟢 แสดงรายการประวัติทันทีเมื่อเปิดหน้าเว็บ
+    renderHistoryList();
 });

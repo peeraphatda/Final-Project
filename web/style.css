@@ -309,3 +309,108 @@ textarea:focus {
         width: 100%;
     }
 }
+/* ----------------------------------------------------
+   7. History Section Styles
+   ---------------------------------------------------- */
+.history-section {
+    margin-top: 1.5rem;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.btn-clear {
+    background: transparent;
+    border: none;
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-clear:hover {
+    text-decoration: underline;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.history-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 1rem 0;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    gap: 1rem;
+}
+
+.history-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    overflow: hidden;
+}
+
+.history-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #ffffff;
+}
+
+.history-tag.text { background-color: var(--primary-color); }
+.history-tag.image { background-color: var(--secondary-color); }
+
+.history-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+    color: var(--text-main);
+}
+
+.history-time {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.history-result {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.history-emotion {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+}
+
+.history-mini-palette {
+    display: flex;
+    gap: 2px;
+}
+
+.mini-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}

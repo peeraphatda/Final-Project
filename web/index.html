@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Art & Palette Sentiment Analyzer</title>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -60,9 +59,7 @@
 
                 <div class="palette-container">
                     <h3 id="paletteTitle" class="section-subtitle">ชุดจานสีแนะนำ (WCAG Compliant)</h3>
-                    <div id="paletteDisplay" class="palette-display">
-                        <!-- Swatches rendered dynamically -->
-                    </div>
+                    <div id="paletteDisplay" class="palette-display"></div>
                 </div>
 
                 <!-- AI Design Advisory -->
@@ -71,6 +68,19 @@
                     <p><strong>ธีมที่แนะนำ: </strong><span id="themeName">-</span></p>
                     <p><strong>ชุดฟอนต์: </strong><span id="fontPairing">-</span></p>
                     <p><strong>การนำไปใช้งาน: </strong><span id="usageContext">-</span></p>
+                </div>
+            </section>
+
+            <hr class="divider">
+
+            <!-- 🟢 เพิ่มส่วน History Section -->
+            <section class="history-section">
+                <div class="history-header">
+                    <h3 id="historyTitle" class="section-subtitle">ประวัติการวิเคราะห์ (History)</h3>
+                    <button id="clearHistoryBtn" class="btn-clear" type="button">ล้างประวัติ</button>
+                </div>
+                <div id="historyList" class="history-list">
+                    <p class="history-empty">ยังไม่มีประวัติการวิเคราะห์</p>
                 </div>
             </section>
         </main>
