@@ -10,7 +10,6 @@ let currentLang = 'TH';
 let paletteAnimationTimer = null;
 let sentimentPipeline = null;
 
-// ตัวแปรสำหรับเก็บข้อมูล Palette ปัจจุบัน
 let activePaletteData = [];
 
 // ==========================================
@@ -257,6 +256,10 @@ const translations = {
         historyTitle: 'ประวัติการวิเคราะห์ (History)',
         clearHistory: 'ล้างประวัติ',
         emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์',
+        modalTitle: 'ยืนยันการล้างประวัติ',
+        modalDesc: 'คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการวิเคราะห์ทั้งหมด? รายการที่ลบแล้วจะไม่สามารถกู้คืนได้',
+        modalCancel: 'ยกเลิก',
+        modalConfirm: 'ลบประวัติ',
         copySuccess: 'คัดลอกสี'
     },
     EN: {
@@ -270,6 +273,10 @@ const translations = {
         historyTitle: 'Analysis History',
         clearHistory: 'Clear History',
         emptyHistory: 'No analysis history found',
+        modalTitle: 'Confirm Clear History',
+        modalDesc: 'Are you sure you want to delete all analysis history? Deleted items cannot be restored.',
+        modalCancel: 'Cancel',
+        modalConfirm: 'Delete All',
         copySuccess: 'Copied color'
     }
 };
@@ -385,6 +392,11 @@ function updateLanguageUI() {
     if ($('paletteTitle'))$('paletteTitle').innerText = t.paletteTitle;
     if ($('historyTitle'))$('historyTitle').innerText = t.historyTitle;
     if ($('clearHistoryBtn'))$('clearHistoryBtn').innerText = t.clearHistory;
+    
+    if ($('modalTitle'))$('modalTitle').innerText = t.modalTitle;
+    if ($('modalDesc'))$('modalDesc').innerText = t.modalDesc;
+    if ($('modalCancelBtn'))$('modalCancelBtn').innerText = t.modalCancel;
+    if ($('modalConfirmBtn'))$('modalConfirmBtn').innerText = t.modalConfirm;
 
     renderHistoryList();
 }
@@ -468,12 +480,19 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
-// 🟢 ฟังก์ชันล้างประวัติการใช้งาน
-function clearHistory() {
-    if (confirm("คุณต้องการลบประวัติการวิเคราะห์ทั้งหมดหรือไม่?")) {
-        localStorage.removeItem('sentiment_history');
-        renderHistoryList();
-    }
+// 🟢 ฟังก์ชันควบคุม Modal ป๊อปอัพสำหรับยืนยันการล้างประวัติ
+function openConfirmModal() {
+    if ($('confirmModal'))$('confirmModal').style.display = 'flex';
+}
+
+function closeConfirmModal() {
+    if ($('confirmModal'))$('confirmModal').style.display = 'none';
+}
+
+function executeClearHistory() {
+    localStorage.removeItem('sentiment_history');
+    renderHistoryList();
+    closeConfirmModal();
 }
 
 async function renderHistoryList() {
@@ -593,10 +612,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = $('imageInput');
     const clearHistoryBtn = $('clearHistoryBtn');
 
-    // 🟢 Event Listener ปุ่มล้างประวัติ
-    if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', clearHistory);
-    }
+    // 🟢 Event Listeners สำหรับ Modal ล้างประวัติ
+    if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', openConfirmModal);
+    if ($('modalCancelBtn'))$('modalCancelBtn').addEventListener('click', closeConfirmModal);
+    if ($('modalConfirmBtn'))$('modalConfirmBtn').addEventListener('click', executeClearHistory);
 
     // Event Listeners ปุ่ม Export & Copy Code
     $('exportAseBtn')?.addEventListener('click', () => downloadASE(activePaletteData));
@@ -606,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('copyRgbBtn')?.addEventListener('click', () => copyPaletteCode('RGB'));$('copyHslBtn')?.addEventListener('click', () => copyPaletteCode('HSL'));
     $('copyTailwindBtn')?.addEventListener('click', () => copyPaletteCode('TAILWIND'));$('copyCssVarBtn')?.addEventListener('click', () => copyPaletteCode('CSS_VARS'));
 
-    // Event Listeners สำหรับปุ่มอัปโหลดรูปภาพ
+    // Event Listeners สำหรับอัปโหลดรูปภาพ
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();

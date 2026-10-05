@@ -31,19 +31,20 @@
 
         <!-- Result Section -->
         <section class="result-section" style="margin-top: 30px;">
+            <!-- 1. ส่วนบอกอารมณ์ -->
             <div class="result-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <span id="emotionLabel" class="emotion-badge">-</span>
                 <span id="confidenceValue" style="font-weight: bold; color: #64748b;">0%</span>
             </div>
 
-            <!-- 🟢 ย้ายส่วนพรีวิวรูปภาพที่อัปโหลดมาไว้ตรงนี้ (ด้านบนคำว่า ชุดจานสีแนะนำ) -->
-            <div id="extractedPaletteSection" class="extracted-section" style="display: none; margin-top: 20px; text-align: center;">
-                <div class="image-preview-container" style="max-width: 100%; overflow: hidden; border-radius: 12px; max-height: 400px; display: inline-block;">
-                    <img id="imagePreview" src="" alt="Uploaded Preview" style="max-width: 100%; height: auto; object-fit: contain;">
+            <!-- 2. 🟢 ส่วนแสดงรูปภาพ (อยู่ระหว่างคำบอกอารมณ์ และ ชุดจานสีแนะนำสมมาตร) -->
+            <div id="extractedPaletteSection" class="extracted-section" style="display: none; margin: 20px 0; text-align: center;">
+                <div class="image-preview-container" style="max-width: 100%; overflow: hidden; border-radius: 12px; max-height: 400px; display: inline-block; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <img id="imagePreview" src="" alt="Uploaded Preview" style="max-width: 100%; height: auto; display: block; object-fit: contain;">
                 </div>
             </div>
 
-            <!-- ส่วนหัวข้อจานสี + กลุ่มปุ่ม Export และ Copy Code -->
+            <!-- 3. หัวข้อชุดจานสี + ปุ่ม Export/Copy -->
             <div class="palette-header-container" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; flex-wrap: wrap; gap: 10px;">
                 <h3 id="paletteTitle" style="margin: 0;">ชุดจานสีแนะนำสมมาตร (8 Color Palette)</h3>
                 
@@ -60,7 +61,7 @@
                 </div>
             </div>
 
-            <!-- แสดงผลการ์ดจานสีหลัก -->
+            <!-- การ์ดแสดงจานสี -->
             <div id="paletteDisplay" style="margin-top: 15px;"></div>
 
             <!-- คำแนะนำการออกแบบ -->
@@ -79,6 +80,18 @@
             </div>
             <div id="historyList" class="history-list" style="margin-top: 15px;"></div>
         </section>
+    </div>
+
+    <!-- 🟢 Pop-up (Modal) สำหรับยืนยันการล้างประวัติ -->
+    <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h3 id="modalTitle" style="margin-top: 0; color: #1e293b;">ยืนยันการล้างประวัติ</h3>
+            <p id="modalDesc" style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการวิเคราะห์ทั้งหมด? รายการที่ลบแล้วจะไม่สามารถกู้คืนได้</p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" id="modalCancelBtn" style="padding: 8px 16px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 500;">ยกเลิก</button>
+                <button type="button" id="modalConfirmBtn" style="padding: 8px 16px; border: none; background: #dc2626; color: white; border-radius: 6px; cursor: pointer; font-weight: 500;">ลบประวัติ</button>
+            </div>
+        </div>
     </div>
 
     <!-- Script Module -->
