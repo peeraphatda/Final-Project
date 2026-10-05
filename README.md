@@ -1,11 +1,11 @@
-# Smart Art & Palette — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
+# Smart Art & Palette Sentiment Analyzer — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
 
 รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)  
 อาจารย์ผู้สอน: ผศ. บุญสืบ ไวคำ
 
 ---
 
-## 👥 รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members)
+## รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members)
 
 1. **ปฏิภาณ นามสีลี (ท็อป)**  
    * **รหัสนักศึกษา:** 683380425-3 | **Email:** patiphan.na@kkumail.com
@@ -21,7 +21,7 @@
 
 ---
 
-## 🔄 สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
+## สมาชิกในทีมและการหมุนเวียนบทบาท (Role Rotation Matrix)
 
 เพื่อให้สมาชิกทุกคนในทีมได้ฝึกฝนทั้ง 3 บทบาทหลัก (**Planner / Architect**, **Coder / Dev**, **Debugger / QA & DevOps**) ครบทุกคน 100%:
 
@@ -34,31 +34,31 @@
 
 ---
 
-## ✨ สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview - Fully Implemented)
+## สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview - Fully Implemented)
 
-#### 🟢 ฟีเจอร์แกนหลักและระบบวิเคราะห์ (Core Engine & NLP - Complete)
-* 🎭 **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping (ใช้ `isinstance` Check) ป้องกันข้อผิดพลาด[cite: 1]
-* 🎨 **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
-* 📊 **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib` ในโทน Dark Theme[cite: 1]
-* 💻 **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface พร้อมระบบ Input Validation[cite: 1]
+#### ฟีเจอร์แกนหลักและระบบวิเคราะห์ (Core Engine & NLP - Complete)
+* **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping (ใช้ `isinstance` Check) ป้องกันข้อผิดพลาด[cite: 1]
+* **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
+* **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib` ในโทน Dark Theme[cite: 1]
+* **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface พร้อมระบบ Input Validation[cite: 1]
 
-#### 🟢 ระบบบันทึกข้อมูล รายงานผล และ AI คำแนะนำ (Persistence & AI Advisory - Complete)
-* 💾 **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite (`palette_history.db`)
-* ☁️ **Cloud Database Migration (`src/data_store.py`):** รองรับโครงสร้างการจัดเก็บข้อมูลย้ายไปยัง Cloud Database (Supabase PostgreSQL)
-* 📤 **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์ `.json` และ `CSS variables` เพื่อให้นักพัฒนานำไปใช้งานต่อได้ทันที
-* 📊 **Batch Processing (`src/report_generator.py`):** อ่านข้อความหลายบรรทัดจากไฟล์ `.csv` สรุปผลการวิเคราะห์เป็นชุดข้อมูลส่งออก
-* 🧠 **AI Design Advisory (`src/ai_advisory.py`):** ประมวลผลคำแนะนำด้านการออกแบบ เช่น ชื่อแนวคิดธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการใช้งาน UI
-* ♿ **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 แจ้งเตือนสถานะ PASS (AAA) / PASS (AA) / FAIL
+#### ระบบบันทึกข้อมูล รายงานผล และ AI คำแนะนำ (Persistence & AI Advisory - Complete)
+* **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite (`palette_history.db`)
+* **Cloud Database Migration (`src/data_store.py`):** รองรับโครงสร้างการจัดเก็บข้อมูลย้ายไปยัง Cloud Database (Supabase PostgreSQL)
+* **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์ `.json` และ `CSS variables` เพื่อให้นักพัฒนานำไปใช้งานต่อได้ทันที
+* **Batch Processing (`src/report_generator.py`):** อ่านข้อความหลายบรรทัดจากไฟล์ `.csv` สรุปผลการวิเคราะห์เป็นชุดข้อมูลส่งออก
+* **AI Design Advisory (`src/ai_advisory.py`):** ประมวลผลคำแนะนำด้านการออกแบบ เช่น ชื่อแนวคิดธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และเทคนิคการใช้งาน UI
+* **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 แจ้งเตือนสถานะ PASS (AAA) / PASS (AA) / FAIL
 
-#### 🟢 หน้าเว็บแอปพลิเคชันและการติดตั้งระบบ (Web Dashboard & Deployment - Complete)
-* 🌐 **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และแสดงจานสี
-* 🌐 **Bilingual UI Support (`web/style.css`, `web/app.js`):** ระบบสลับภาษาการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
-* 🖼️ **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
-* 🚀 **GitHub Actions CI/CD (`.github/workflows/deploy-web.yml`):** ระบบ CI/CD จัดส่งหน้าเว็บไปยัง GitHub Pages อัตโนมัติเมื่อมี commit บนกิ่งหลัก
+#### หน้าเว็บแอปพลิเคชันและการติดตั้งระบบ (Web Dashboard & Deployment - Complete)
+* **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และแสดงจานสี
+* **Bilingual UI Support (`web/style.css`, `web/app.js`):** ระบบสลับภาษาการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
+* **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
+* **GitHub Actions CI/CD (`.github/workflows/deploy-web.yml`):** ระบบ CI/CD จัดส่งหน้าเว็บไปยัง GitHub Pages อัตโนมัติเมื่อมี commit บนกิ่งหลัก
 
 ---
 
-## 📅 สรุปผลการทำงานจริงตามแผนงาน (3 Sprints Roadmap)
+## สรุปผลการทำงานจริงตามแผนงาน (3 Sprints Roadmap)
 
 #### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture (Completed)**
 * **สถานะ:** เสร็จสมบูรณ์
@@ -86,7 +86,7 @@
 
 ---
 
-## 🧩 โมดูลหลักของระบบ (Core Components)
+## โมดูลหลักของระบบ (Core Components)
 
 1. **`src/emotion_client.py` (`EmotionClient`):**
    * ทำหน้าที่เป็น Client Gateway รับข้อความภาษาอังกฤษ[cite: 1]
@@ -117,7 +117,7 @@
 
 ---
 
-#### 📂 โครงสร้างไดเรกทอรีล่าสุด (Directory Structure)
+#### โครงสร้างไดเรกทอรีล่าสุด (Directory Structure)
 
 ```text
 Final-Project/
@@ -152,5 +152,45 @@ Final-Project/
 ├── main.py                     # Main Entry Point (--cli, --batch)
 ├── requirements.txt            # Project Dependencies
 ├── README.md                   # Project Documentation
-├── CHANGELOG.md                # Version History
-└── LEARNINGLOG.md              # Development Reflection Log
+
+## วิธีใช้งานและการติดตั้งระบบ (Installation & Live Deployment)
+
+### 1. ความต้องการของระบบ (Prerequisites)
+* **สำหรับฝั่ง Web Dashboard (Online):** สามารถใช้งานผ่านเว็บเบราว์เซอร์ยุคใหม่ (Chrome, Edge, Safari, Firefox) ได้ทันทีโดยไม่ต้องติดตั้งโปรแกรมใดๆ
+* **สำหรับฝั่ง Python CLI / Local Testing:**
+  * Python 3.9 ขึ้นไป
+  * Git
+
+```
+---
+
+## การเข้าใช้งานผ่านระบบออนไลน์ (Live Web Dashboard)
+
+คุณสามารถทดลองใช้งานเว็บแอปพลิเคชันรูปแบบออนไลน์ (Client-Side AI Processing 100%) ได้ทันทีผ่าน **GitHub Pages** โดยไม่ต้องติดตั้งระบบภายในเครื่อง:
+
+**[เข้าใช้งาน Smart Art & Palette Sentiment Analyzer Web Dashboard](https://peeraphatda.github.io/Final-Project/)**
+
+> **Note:** ระบบวิเคราะห์อารมณ์และสกัดสีจากรูปภาพบนหน้าเว็บ ประมวลผลผ่าน WebAssembly / ONNX Runtime บนเบราว์เซอร์ของผู้ใช้โดยตรง จึงรับประกันความเร็ว ความเป็นส่วนตัว และไม่ต้องพึ่งพา Backend API ภายนอก
+
+---
+
+## วิธีการติดตั้งและรันโปรแกรม
+
+```bash
+# 1. ติดตั้ง Dependencies
+pip install -r requirements.txt
+
+# 2. รันหน้าเว็บแดชบอร์ด (Web Dashboard) – แนะนำ
+python -m http.server 8000
+# หรือ
+python main.py --web
+
+# 3. รันโปรแกรมในโหมดโต้ตอบ (Interactive CLI)
+python main.py --cli
+# (สามารถเลือกเมนูเพื่อวิเคราะห์อารมณ์และสร้างจานสีได้เช่นกัน)
+
+# 4. รันโปรแกรมในโหมดประมวลผลเป็นชุด (Batch Processing Mode)
+python main.py --batch data/sample_batch.csv
+
+# 5. รันชุดทดสอบระบบอัตโนมัติ (Automated Testing)
+pytest
