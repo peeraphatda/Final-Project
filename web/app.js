@@ -5,37 +5,36 @@ import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers
 env.allowLocalModels = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // UI Elements
-    const textInput = document.getElementById('textInput');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const alertBox = document.getElementById('alertBox');
-    const subTitle = document.getElementById('subTitle');
-    const inputLabel = document.getElementById('inputLabel');
-    const langToggleBtn = document.getElementById('langToggleBtn');
-    const logoElement = document.querySelector('.logo'); // สำหรับอัปเดตชื่อแบรนด์ส่วนหัว
-    
-    const uploadTriggerBtn = document.getElementById('uploadTriggerBtn');
-    const imageInput = document.getElementById('imageInput');
-    const extractedPalette = document.getElementById('extractedPalette');
-    const extractedPaletteSection = document.getElementById('extractedPaletteSection');
+    // ----------------------------------------------------
+    // DOM Elements
+    // ----------------------------------------------------
+    const $ = id => document.getElementById(id);
+    const textInput = $('textInput');
+    const analyzeBtn = $('analyzeBtn');
+    const alertBox = $('alertBox');
+    const subTitle = $('subTitle');
+    const inputLabel = $('inputLabel');
+    const langToggleBtn = $('langToggleBtn');
+    const logoElement = document.querySelector('.logo');
+
+    const uploadTriggerBtn = $('uploadTriggerBtn');
+    const imageInput = $('imageInput');
+    const extractedPalette = $('extractedPalette');
+    const extractedPaletteSection = $('extractedPaletteSection');
     const extractedTitle = document.querySelector('#extractedPaletteSection .result-title');
-    const imagePreview = document.getElementById('imagePreview');
+    const imagePreview = $('imagePreview');
 
-    // UI Result Elements
-    const resultEmotionText = document.getElementById('resultEmotion');
-    const resultConfidenceText = document.getElementById('resultConfidence');
-    const emotionLabel = document.getElementById('emotionLabel');
-    const confidenceValue = document.getElementById('confidenceValue');
-    const paletteTitle = document.getElementById('paletteTitle');
-    const paletteDisplay = document.getElementById('paletteDisplay');
-    const themeName = document.getElementById('themeName');
-    const fontPairing = document.getElementById('fontPairing');
-    const usageContext = document.getElementById('usageContext');
+    const resultEmotionText = $('resultEmotion');
+    const resultConfidenceText = $('resultConfidence');
+    const emotionLabel = $('emotionLabel');
+    const confidenceValue = $('confidenceValue');
+    const paletteTitle = $('paletteTitle');
+    const paletteDisplay = $('paletteDisplay');
+    const themeName = $('themeName');
+    const fontPairing = $('fontPairing');
+    const usageContext = $('usageContext');
 
-    // อัปเดตชื่อหลักเป็น Smart Art & Palette Sentiment Analyzer
-    if (logoElement) {
-        logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
-    }
+    if (logoElement) logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
 
     // ----------------------------------------------------
     // 1. ระบบสลับภาษา UI (TH / EN)
@@ -98,12 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (extractedTitle) extractedTitle.innerText = t.extractedTitle;
         if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
 
-        if (resultEmotionText && emotionLabel) {
-            resultEmotionText.childNodes[0].nodeValue = t.resultEmotionLabel;
-        }
-        if (resultConfidenceText && confidenceValue) {
-            resultConfidenceText.childNodes[0].nodeValue = t.resultConfidenceLabel;
-        }
+        if (resultEmotionText && emotionLabel) resultEmotionText.childNodes[0].nodeValue = t.resultEmotionLabel;
+        if (resultConfidenceText && confidenceValue) resultConfidenceText.childNodes[0].nodeValue = t.resultConfidenceLabel;
 
         const advisoryHeader = document.querySelector('.advisory-section h4');
         if (advisoryHeader) advisoryHeader.innerText = t.advisoryTitle;
@@ -117,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 2. ระบบ Loading Animation (จุดวิ่ง ...)
+    // 2. ระบบ Loading Animation
     // ----------------------------------------------------
     let loadingInterval = null;
 
@@ -129,9 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingInterval = setInterval(() => {
             dotCount = (dotCount + 1) % 4;
             const dots = '.'.repeat(dotCount === 0 ? 1 : dotCount);
-            if (emotionLabel) {
-                emotionLabel.innerText = baseText + dots;
-            }
+            if (emotionLabel) emotionLabel.innerText = baseText + dots;
         }, 350);
     }
 
@@ -143,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 3. ฐานข้อมูลและกฎจิตวิทยาของสี (รองรับ 6 อารมณ์)
+    // 3. ฐานข้อมูลและกฎจิตวิทยาของสี (6 อารมณ์)
     // ----------------------------------------------------
     const emotionRules = {
         JOY: {
@@ -184,20 +177,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Helper ในการสร้าง Swatch สีแบบกระชับ
+    const renderSwatches = colors => colors.map(c => `
+        <div class="color-swatch" style="background-color: ${c}">
+            <span>${c}</span>
+        </div>
+    `).join('');
+
     // ----------------------------------------------------
-    // 4. AI Pipeline Engine (ใช้ DistilBERT MNLI เปิดสิทธิ์ Public 100%)
+    // 4. AI Pipeline Engine (Transformers.js Zero-Shot)
     // ----------------------------------------------------
     let sentimentPipeline = null;
 
     async function getAIPipeline() {
         if (!sentimentPipeline) {
             startLoadingAnimation(translations[currentLang].loadingModel);
-            
-            // ใช้ Xenova/distilbert-base-uncased-mnli ที่ไฟล์ Config/Tokenizer ไม่ติด Gate Access
-            sentimentPipeline = await pipeline(
-                'zero-shot-classification', 
-                'Xenova/distilbert-base-uncased-mnli'
-            );
+            sentimentPipeline = await pipeline('zero-shot-classification', 'Xenova/distilbert-base-uncased-mnli');
         }
         return sentimentPipeline;
     }
@@ -219,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (alertBox) alertBox.style.display = 'none';
-
             clearImageResult();
 
             analyzeBtn.disabled = true;
@@ -227,20 +221,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const classifier = await getAIPipeline();
-                
                 startLoadingAnimation(translations[currentLang].analyzingText);
 
-                // กำหนดอารมณ์เป้าหมาย 6 หมวดหมู่
                 const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
-
-                // ส่งข้อความประมวลผล Zero-Shot Classification
                 const output = await classifier(text, candidateLabels);
                 stopLoadingAnimation();
 
-                if (output && output.labels && output.labels.length > 0) {
+                if (output?.labels?.length > 0) {
                     const topEmotion = output.labels[0].toUpperCase();
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
-                    
                     updateUIResult(topEmotion, confidenceScore);
                 }
             } catch (err) {
@@ -265,13 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (imageInput) imageInput.value = '';
     }
 
-    if (textInput) {
-        textInput.addEventListener('input', () => clearImageResult());
-    }
-
-    if (uploadTriggerBtn && imageInput) {
-        uploadTriggerBtn.addEventListener('click', () => imageInput.click());
-    }
+    if (textInput) textInput.addEventListener('input', clearImageResult);
+    if (uploadTriggerBtn && imageInput) uploadTriggerBtn.addEventListener('click', () => imageInput.click());
 
     if (imageInput) {
         imageInput.addEventListener('change', (e) => {
@@ -348,34 +332,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (usageContext) usageContext.innerText = resultData.context;
 
         if (paletteDisplay) {
-            paletteDisplay.innerHTML = '';
-            resultData.palette.forEach(color => {
-                const swatch = document.createElement('div');
-                swatch.className = 'color-swatch';
-                swatch.style.backgroundColor = color;
-                
-                const span = document.createElement('span');
-                span.innerText = color;
-                swatch.appendChild(span);
-                paletteDisplay.appendChild(swatch);
-            });
+            paletteDisplay.innerHTML = renderSwatches(resultData.palette);
         }
     }
 
     function renderExtractedPalette(colors) {
         if (!extractedPalette) return;
-        extractedPalette.innerHTML = '';
         if (extractedPaletteSection) extractedPaletteSection.style.display = 'block';
-
-        colors.forEach(color => {
-            const box = document.createElement('div');
-            box.className = 'color-swatch';
-            box.style.backgroundColor = color;
-            
-            const span = document.createElement('span');
-            span.innerText = color;
-            box.appendChild(span);
-            extractedPalette.appendChild(box);
-        });
+        extractedPalette.innerHTML = renderSwatches(colors);
     }
 });

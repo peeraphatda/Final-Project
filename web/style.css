@@ -1,363 +1,311 @@
-/* ====================================================
-   1. GLOBAL & THEME VARIABLES
-   ==================================================== */
+/* ----------------------------------------------------
+   1. CSS Variables & Reset
+   ---------------------------------------------------- */
 :root {
-    --bg-gradient: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 60%, #080d1a 100%);
-    --card-bg: rgba(30, 41, 59, 0.6);
-    --card-border: rgba(255, 255, 255, 0.1);
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --accent-color: #6366f1;
-    --accent-hover: #4f46e5;
-    --accent-glow: rgba(99, 102, 241, 0.4);
-    --secondary-bg: rgba(255, 255, 255, 0.05);
-    --secondary-hover: rgba(255, 255, 255, 0.12);
-    --radius-lg: 24px;
-    --radius-md: 14px;
-    --radius-sm: 10px;
-    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #0d9488;
+    --secondary-hover: #0f766e;
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --danger-color: #ef4444;
+    --radius: 12px;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
 }
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Plus Jakarta Sans', 'Prompt', system-ui, -apple-system, sans-serif;
 }
 
 body {
+    font-family: 'Kanit', 'Poppins', sans-serif;
     background: var(--bg-gradient);
-    background-attachment: fixed;
-    color: var(--text-primary);
+    color: var(--text-main);
     min-height: 100vh;
+    padding: 2rem 1rem;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
-    line-height: 1.6;
+    align-items: flex-start;
 }
 
-/* ====================================================
-   2. CONTAINER & CARD LAYOUT
-   ==================================================== */
 .container {
     width: 100%;
-    max-width: 760px;
+    max-width: 800px;
 }
 
-.header {
-    margin-bottom: 24px;
+/* ----------------------------------------------------
+   2. Header & Language Toggle
+   ---------------------------------------------------- */
+.app-header {
     text-align: center;
+    margin-bottom: 1.5rem;
 }
 
 .header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
-    gap: 12px;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .logo {
-    font-size: 1.9rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #a5b4fc 0%, #38bdf8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.btn-lang {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+}
+
+.btn-lang:hover {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
 }
 
 .subtitle {
-    color: var(--text-secondary);
-    font-size: 0.92rem;
-    font-weight: 400;
-    text-align: left;
+    color: var(--text-muted);
+    font-size: 0.95rem;
 }
 
-.lang-btn {
-    background: var(--secondary-bg);
-    border: 1px solid var(--card-border);
-    color: var(--text-primary);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    backdrop-filter: blur(10px);
-}
-
-.lang-btn:hover {
-    background: var(--secondary-hover);
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-1px);
-}
-
+/* ----------------------------------------------------
+   3. Main Card & Form Components
+   ---------------------------------------------------- */
 .main-card {
     background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
 }
 
-/* ====================================================
-   3. INPUT SECTION & BUTTONS
-   ==================================================== */
-.input-section {
+.input-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
-.input-label {
+.input-group label {
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--text-main);
 }
 
-.text-input {
+textarea {
     width: 100%;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    color: var(--text-primary);
-    font-size: 0.95rem;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
     resize: vertical;
+    transition: border-color 0.2s ease;
+}
+
+textarea:focus {
     outline: none;
-    transition: var(--transition);
-}
-
-.text-input:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 4px var(--accent-glow);
-    background: rgba(15, 23, 42, 0.85);
-}
-
-.text-input::placeholder {
-    color: #475569;
+    border-color: var(--primary-color);
 }
 
 .alert-box {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
+    display: none;
+    background-color: #fef2f2;
+    color: var(--danger-color);
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    border: 1px solid #fecaca;
 }
 
-.button-group {
+.action-buttons {
     display: flex;
-    gap: 12px;
-    margin-top: 6px;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .btn {
     flex: 1;
-    padding: 12px 20px;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: var(--transition);
+    min-width: 180px;
+    padding: 0.8rem 1.2rem;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    background-color: var(--primary-color);
     color: #ffffff;
-    box-shadow: 0 4px 14px var(--accent-glow);
 }
 
-.btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px var(--accent-glow);
+.btn-primary:hover {
+    background-color: var(--primary-hover);
 }
 
 .btn-secondary {
-    background: var(--secondary-bg);
-    border: 1px solid var(--card-border);
-    color: var(--text-primary);
+    background-color: var(--secondary-color);
+    color: #ffffff;
 }
 
 .btn-secondary:hover {
-    background: var(--secondary-hover);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--secondary-hover);
 }
 
 .divider {
     border: 0;
     height: 1px;
-    background: var(--card-border);
-    margin: 28px 0;
+    background: var(--border-color);
+    margin: 1.5rem 0;
 }
 
-/* ====================================================
-   4. EXTRACTED IMAGE SECTION
-   ==================================================== */
+/* ----------------------------------------------------
+   4. Extracted Image Section
+   ---------------------------------------------------- */
 .extracted-section {
-    margin-top: 24px;
-    background: rgba(15, 23, 42, 0.4);
-    padding: 20px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--card-border);
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.result-title {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 14px;
+.result-title, .section-subtitle {
+    font-size: 1rem;
     font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-main);
 }
 
-.image-preview-container {
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.image-preview {
-    max-height: 220px;
-    border-radius: var(--radius-sm);
-    object-fit: contain;
-    border: 1px solid var(--card-border);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* ====================================================
-   5. RESULT & PALETTE DISPLAY (GRID 5 COLUMNS)
-   ==================================================== */
-.result-section {
+.extracted-content {
     display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.emotion-info {
-    display: flex;
-    justify-content: space-between;
+    gap: 1rem;
     align-items: center;
-    background: rgba(15, 23, 42, 0.5);
-    padding: 18px 24px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--card-border);
+    flex-wrap: wrap;
 }
 
-.emotion-title {
-    font-size: 1.1rem;
-    font-weight: 600;
+.preview-wrapper img {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
 
-.highlight-emotion {
-    color: #38bdf8;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+.palette-wrapper {
+    flex: 1;
 }
 
-.confidence-text {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.section-subtitle {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
-    font-weight: 500;
-}
-
-/* จัดการแท่งสีให้เป็นแนวนอน 5 คอลัมน์ */
+/* ----------------------------------------------------
+   5. Swatch & Palette Displays
+   ---------------------------------------------------- */
 .palette-display {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: 12px;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .color-swatch {
-    height: 90px;
-    border-radius: var(--radius-sm);
+    flex: 1;
+    min-width: 60px;
+    height: 70px;
+    border-radius: 6px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    padding-bottom: 8px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    transition: var(--transition);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    position: relative;
-    overflow: hidden;
+    padding-bottom: 0.3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
 }
 
 .color-swatch:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    z-index: 2;
+    transform: translateY(-2px);
 }
 
 .color-swatch span {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #ffffff;
-    background: rgba(15, 23, 42, 0.75);
-    padding: 3px 8px;
-    border-radius: 6px;
-    backdrop-filter: blur(6px);
-    letter-spacing: 0.5px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #000000;
 }
 
-/* ====================================================
-   6. AI DESIGN ADVISORY BOX
-   ==================================================== */
+/* ----------------------------------------------------
+   6. AI Results & Advisory Section
+   ---------------------------------------------------- */
+.result-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.highlight {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.palette-container {
+    margin-bottom: 1.5rem;
+}
+
 .advisory-section {
-    background: rgba(99, 102, 241, 0.06);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: var(--radius-md);
-    padding: 20px 24px;
+    background: #f1f5f9;
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
 }
 
 .advisory-section h4 {
-    color: #a5b4fc;
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
 }
 
 .advisory-section p {
-    font-size: 0.88rem;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-}
-
-.advisory-section p:last-child {
-    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
 }
 
 .advisory-section p strong {
-    color: var(--text-primary);
+    color: var(--text-main);
 }
 
-/* Responsive Layout */
-@media (max-width: 640px) {
-    .main-card {
-        padding: 20px;
-    }
-    .button-group {
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .header-top {
         flex-direction: column;
     }
-    .palette-display {
-        grid-template-columns: repeat(3, 1fr) !important;
-    }
-    .emotion-info {
+    .action-buttons {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+    }
+    .btn {
+        width: 100%;
     }
 }
