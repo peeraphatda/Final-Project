@@ -43,7 +43,7 @@
             <div id="extractedPaletteSection" class="result-section" style="display: none;">
                 <h3 class="result-title">รูปภาพที่อัปโหลดและจานสีที่สกัดได้</h3>
                 
-                <!-- ควบคุมขนาดรูปภาพ Preview ไม่ให้ขยายใหญ่ล้นจอ -->
+                <!-- Preview Image Frame -->
                 <div style="text-align: center; margin-bottom: 12px;">
                     <img id="imagePreview" alt="Uploaded Preview" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; border: 1px solid #e2e8f0;" />
                 </div>
@@ -65,7 +65,7 @@
             <div class="recommendation-section">
                 <h3 id="paletteTitle" class="section-title">ชุดจานสีแนะนำ (WCAG Compliant)</h3>
                 <div id="paletteDisplay" class="palette-container">
-                    <!-- Color swatches will be dynamically injected here -->
+                    <!-- Color swatches generated dynamically -->
                 </div>
 
                 <div class="advisory-section" style="margin-top: 20px;">
@@ -84,15 +84,14 @@
                     <h3 id="historyTitle" class="section-title">ประวัติการวิเคราะห์ (History)</h3>
                     <button id="clearHistoryBtn" class="btn-clear">ล้างประวัติ</button>
                 </div>
-                <div id="historyList" class="history-list">
-                    <!-- History items will be dynamically injected here -->
-                </div>
+                <!-- Container แสดงรายการประวัติ -->
+                <div id="historyList" class="history-list"></div>
             </div>
 
         </main>
     </div>
 
-    <!-- Main Application Script (ES Module Support) -->
+    <!-- JavaScript Application Script -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
