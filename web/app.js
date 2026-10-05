@@ -17,19 +17,106 @@ const extractedPalette = $('extractedPalette');
 const extractedPaletteSection = $('extractedPaletteSection');
 const imagePreview = $('imagePreview');
 
+const resultEmotionText = $('resultEmotion');
+const resultConfidenceText = $('resultConfidence');
 const emotionLabel = $('emotionLabel');
 const confidenceValue = $('confidenceValue');
+const paletteTitle = $('paletteTitle');
 const paletteDisplay = $('paletteDisplay');
 const themeName = $('themeName');
 const fontPairing = $('fontPairing');
 const usageContext = $('usageContext');
 
+const historyTitle = $('historyTitle');
 const historyList = $('historyList');
 const clearHistoryBtn = $('clearHistoryBtn');
 
 const API_BASE_URL = 'http://localhost:3000/api/history';
 
 let currentLang = 'TH';
+
+const translations = {
+    TH: {
+        subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสี',
+        inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
+        placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
+        analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
+        uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
+        extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
+        resultEmotionLabel: 'ผลลัพธ์อารมณ์: ',
+        resultConfidenceLabel: 'ค่าความเชื่อมั่น: ',
+        paletteTitle: 'ชุดจานสีแนะนำ (WCAG Compliant)',
+        alertEmpty: 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!',
+        advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
+        recTheme: 'ธีมที่แนะนำ: ',
+        typography: 'ชุดฟอนต์: ',
+        usageContext: 'การนำไปใช้งาน: ',
+        loadingModel: 'กำลังโหลด AI Model...',
+        analyzingText: 'กำลังประมวลผล...',
+        historyTitle: 'ประวัติการวิเคราะห์ (History)',
+        clearHistory: 'ล้างประวัติ',
+        emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์'
+    },
+    EN: {
+        subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
+        inputLabel: 'Enter text to analyze sentiment via AI Model',
+        placeholder: 'i feel happy or feel sad...',
+        analyzeBtn: 'Analyze Sentiment',
+        uploadBtn: 'Upload Image (Extract)',
+        extractedTitle: 'Uploaded Image & Extracted Palette',
+        resultEmotionLabel: 'Emotion Result: ',
+        resultConfidenceLabel: 'Confidence Score: ',
+        paletteTitle: 'Recommended Color Palette (WCAG Compliant)',
+        alertEmpty: 'Please enter text before analyzing!',
+        advisoryTitle: 'AI Design Advisory',
+        recTheme: 'Recommended Theme: ',
+        typography: 'Typography: ',
+        usageContext: 'Usage Context: ',
+        loadingModel: 'Loading AI Model...',
+        analyzingText: 'Analyzing...',
+        historyTitle: 'Analysis History',
+        clearHistory: 'Clear History',
+        emptyHistory: 'No analysis history found'
+    }
+};
+
+// 🟢 1. ระบบสลับภาษา (TH / EN)
+if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+        currentLang = currentLang === 'TH' ? 'EN' : 'TH';
+        applyLanguage(currentLang);
+    });
+}
+
+function applyLanguage(lang) {
+    const t = translations[lang];
+    if (subTitle) subTitle.innerText = t.subTitle;
+    if (inputLabel) inputLabel.innerText = t.inputLabel;
+    if (textInput) textInput.placeholder = t.placeholder;
+    if (analyzeBtn && !analyzeBtn.disabled) analyzeBtn.innerText = t.analyzeBtn;
+    if (uploadTriggerBtn) uploadTriggerBtn.innerText = t.uploadBtn;
+    
+    const extractedTitle = document.querySelector('#extractedPaletteSection .result-title');
+    if (extractedTitle) extractedTitle.innerText = t.extractedTitle;
+    if (paletteTitle) paletteTitle.innerText = t.paletteTitle;
+    if (historyTitle) historyTitle.innerText = t.historyTitle;
+    if (clearHistoryBtn) clearHistoryBtn.innerText = t.clearHistory;
+
+    if (resultEmotionText && emotionLabel) resultEmotionText.childNodes[0].nodeValue = t.resultEmotionLabel;
+    if (resultConfidenceText && confidenceValue) resultConfidenceText.childNodes[0].nodeValue = t.resultConfidenceLabel;
+
+    const advisoryHeader = document.querySelector('.advisory-section h4');
+    if (advisoryHeader) advisoryHeader.innerText = t.advisoryTitle;
+
+    const advisoryParagraphs = document.querySelectorAll('.advisory-section p strong');
+    if (advisoryParagraphs.length >= 3) {
+        advisoryParagraphs[0].innerText = t.recTheme;
+        advisoryParagraphs[1].innerText = t.typography;
+        advisoryParagraphs[2].innerText = t.usageContext;
+    }
+
+    renderHistoryList();
+}
 
 const emotionRules = {
     JOY: { palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], theme: 'Vibrant Sunburst', font: 'Poppins / Montserrat', context: 'E-Commerce, Festival Branding, UI Dashboard' },
@@ -50,13 +137,13 @@ let sentimentPipeline = null;
 
 async function getAIPipeline() {
     if (!sentimentPipeline) {
-        if (emotionLabel) emotionLabel.innerText = "กำลังโหลด AI Model...";
+        if (emotionLabel) emotionLabel.innerText = translations[currentLang].loadingModel;
         sentimentPipeline = await pipeline('zero-shot-classification', 'Xenova/distilbert-base-uncased-mnli');
     }
     return sentimentPipeline;
 }
 
-// 🟢 1. ระบบบันทึกประวัติ (ไม่สั่ง await ติดค้าง เพื่อไม่ให้ปุ่มล็อก)
+// 🟢 2. ระบบบันทึกประวัติ
 function saveToHistory(type, inputContent, emotion, confidence, palette) {
     const newItem = {
         type,
@@ -67,7 +154,6 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
         createdAt: new Date().toISOString()
     };
 
-    // เซฟลง LocalStorage ทันที
     try {
         const localData = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
         localData.unshift(newItem);
@@ -77,10 +163,8 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
         console.error("LocalStorage error:", e);
     }
 
-    // วาดแสดงประวัติบนหน้าเว็บทันที
     renderHistoryList();
 
-    // ส่งเข้า SQLite ในพื้นหลัง (ไม่ใช้ await ให้บล็อกการทำงาน)
     fetch(API_BASE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -88,21 +172,19 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
-// 🟢 2. ระบบดึงประวัติขึ้นมาโชว์
+// 🟢 3. ระบบวาดแถบประวัติ
 async function renderHistoryList() {
     const historyContainer = document.getElementById('historyList');
     if (!historyContainer) return;
 
     let historyData = [];
 
-    // ดึงข้อมูลจาก LocalStorage เป็นหลักก่อนเพื่อความรวดเร็ว
     try {
         historyData = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
     } catch (e) {
         historyData = [];
     }
 
-    // หากไม่มีใน LocalStorage ลองดึงจาก API
     if (!historyData || historyData.length === 0) {
         try {
             const response = await fetch(API_BASE_URL);
@@ -115,7 +197,7 @@ async function renderHistoryList() {
     }
 
     if (!historyData || historyData.length === 0) {
-        historyContainer.innerHTML = `<p class="history-empty" style="text-align:center; color:#94a3b8; padding:15px 0;">ยังไม่มีประวัติการวิเคราะห์</p>`;
+        historyContainer.innerHTML = `<p class="history-empty" style="text-align:center; color:#94a3b8; padding:15px 0;">${translations[currentLang].emptyHistory}</p>`;
         return;
     }
 
@@ -158,7 +240,7 @@ async function renderHistoryList() {
     }).join('');
 }
 
-// 🟢 3. ปุ่มวิเคราะห์ข้อความ (แก้ไขกลไกการปลดล็อกปุ่มชัวร์ 100%)
+// 🟢 4. ปุ่มวิเคราะห์ข้อความ
 if (analyzeBtn) {
     analyzeBtn.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -166,7 +248,7 @@ if (analyzeBtn) {
 
         if (!text) {
             if (alertBox) {
-                alertBox.innerText = 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!';
+                alertBox.innerText = translations[currentLang].alertEmpty;
                 alertBox.style.display = 'block';
             }
             return;
@@ -175,18 +257,17 @@ if (analyzeBtn) {
         if (alertBox) alertBox.style.display = 'none';
         clearImageResult();
 
-        // เปลี่ยนสถานะปุ่ม
         analyzeBtn.disabled = true;
-        analyzeBtn.innerText = "กำลังวิเคราะห์...";
+        analyzeBtn.innerText = translations[currentLang].analyzingText;
 
         const resetBtn = () => {
             analyzeBtn.disabled = false;
-            analyzeBtn.innerText = "วิเคราะห์อารมณ์ (Analyze)";
+            analyzeBtn.innerText = translations[currentLang].analyzeBtn;
         };
 
         try {
             const classifier = await getAIPipeline();
-            if (emotionLabel) emotionLabel.innerText = "กำลังประมวลผล...";
+            if (emotionLabel) emotionLabel.innerText = translations[currentLang].analyzingText;
 
             const candidateLabels = ['fear', 'anger', 'sadness', 'joy', 'love', 'surprise'];
             const output = await classifier(text, candidateLabels);
@@ -198,24 +279,21 @@ if (analyzeBtn) {
                 updateUIResult(topEmotion, confidenceScore);
                 const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
                 
-                // บันทึกประวัติ
                 saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
             }
         } catch (err) {
             console.error("AI Error:", err);
-            // กรณีเกิดข้อผิดพลาด ให้ใช้วิเคราะห์คำหลักเพื่อไม่ให้ค้าง
             const fallbackEmotion = text.toLowerCase().includes('happy') || text.toLowerCase().includes('joy') ? 'JOY' : 'SADNESS';
             updateUIResult(fallbackEmotion, '99.5%');
             const resultData = emotionRules[fallbackEmotion];
             saveToHistory('text', text, fallbackEmotion, '99.5%', resultData.palette);
         } finally {
-            // คืนค่าปุ่มให้ใช้งานได้เสมอ
             resetBtn();
         }
     });
 }
 
-// 🟢 4. ปุ่มอัปโหลดรูปภาพ
+// 🟢 5. ปุ่มอัปโหลดรูปภาพ
 function clearImageResult() {
     if (extractedPaletteSection) extractedPaletteSection.style.display = 'none';
     if (extractedPalette) extractedPalette.innerHTML = '';
@@ -259,7 +337,6 @@ if (imageInput) {
                 const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                 updateUIResult(imageEmotion, confidence);
 
-                // บันทึกประวัติรูปภาพ
                 saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
             };
             img.src = imageDataUrl;
@@ -322,7 +399,7 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-// 🟢 5. ปุ่มล้างประวัติ
+// 🟢 6. ปุ่มล้างประวัติ
 if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', () => {
         fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
@@ -331,5 +408,5 @@ if (clearHistoryBtn) {
     });
 }
 
-// เรียกโหลดประวัติทันทีเมื่อสคริปต์รัน
+// เริ่มต้นวาดรายการประวัติ
 renderHistoryList();
