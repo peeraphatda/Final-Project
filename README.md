@@ -2,7 +2,7 @@
 
 **รายวิชา:** CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
 **หัวข้อ:** Smart Art & Palette Sentiment Analyzer (ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ)
-**อาจารย์ผู้สอน:** ผศ. บุญสืบ ไวคำ
+**อาจารย์ผู้สอน:** ผศ.บุญทรัพย์ ไวคำ
 
 ---
 
@@ -10,9 +10,9 @@
 
 | Sprint | หัวข้อ | ผลงานสำคัญที่ส่งมอบ | เอกสารสรุป |
 | :--- | :--- | :--- | :--- |
-| 📦 Sprint 1 | Core System & OOP CLI | Emotion Classifier, Palette Engine, Visualizer, CLI Loop, Unit Test เบื้องต้น | [📄 reports/SPRINT1.md](reports/SPRINT1.md) |
-| 📦 Sprint 2 | Persistence, Report & AI Advisory | SQLite + Supabase, Export JSON/CSS, Batch CSV, AI Advisory, WCAG Checker | [📄 reports/SPRINT2.md](reports/SPRINT2.md) |
-| 📦 Sprint 3 | Web Dashboard & Deployment | Glassmorphism UI, Bilingual TH/EN, Image Mood Input, GitHub Actions CI/CD | [📄 reports/SPRINT3.md](reports/SPRINT3.md) |
+| 📦 Sprint 1 | Core System & OOP CLI | Emotion Classifier, Palette Engine, Visualizer, CLI Loop, Unit Test เบื้องต้น | [📄SPRINT1](./Sprint1/README.md) |
+| 📦 Sprint 2 | Persistence, Report & AI Advisory | SQLite + Supabase, Export JSON/CSS, Batch CSV, AI Advisory, WCAG Checker | [📄SPRINT2](./Sprint2/README.md) |
+| 📦 Sprint 3 | Web Dashboard & Deployment | Glassmorphism UI, Bilingual TH/EN, Image Mood Input, GitHub Actions CI/CD | [📄SPRINT3](./Sprint3/README.md) |
 
 ---
 
