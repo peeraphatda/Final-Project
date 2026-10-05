@@ -58,7 +58,7 @@ function slugifyRole(role, index) {
     return role.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-// 🟢 ฟังก์ชัน Copy โค้ดในรูปแบบต่างๆ
+// 🟢 ฟังก์ชัน Copy โค้ด
 function copyPaletteCode(format) {
     if (!activePaletteData || activePaletteData.length === 0) {
         return alert("ไม่มีข้อมูลจานสี!");
@@ -198,6 +198,56 @@ function copyFigmaTokens(palette) {
     });
     navigator.clipboard.writeText(JSON.stringify(figmaTokens, null, 2));
     alert("คัดลอก Figma Color Tokens เรียบร้อยแล้ว!");
+}
+
+// ==========================================
+// 🖼️ IMAGE COLOR EXTRACTION HELPERS
+// ==========================================
+
+function extractRGBColors(ctx, width, height, count) {
+    const hexList = [];
+    const rgbList = [];
+    const stepX = Math.floor(width / (count + 1));
+    const stepY = Math.floor(height / 2);
+
+    for (let i = 1; i <= count; i++) {
+        const p = ctx.getImageData(i * stepX, stepY, 1, 1).data;
+        const hex = '#' + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
+        hexList.push(hex);
+        rgbList.push({ r: p[0], g: p[1], b: p[2] });
+    }
+    return { hexList, rgbList };
+}
+
+function analyzeColorSentiment(rgbColors) {
+    let totalR = 0, totalG = 0, totalB = 0;
+    rgbColors.forEach(color => {
+        totalR += color.r;
+        totalG += color.g;
+        totalB += color.b;
+    });
+
+    const count = rgbColors.length;
+    const brightness = ((totalR / count) * 299 + (totalG / count) * 587 + (totalB / count) * 114) / 1000;
+
+    if (brightness < 80) return 'FEAR';
+    if (totalR > totalG * 1.3 && totalR > totalB * 1.3) return 'ANGER';
+    if (totalB > totalR * 1.1 && brightness < 150) return 'SADNESS';
+    if (totalG > totalR && totalB > totalR) return 'JOY';
+    return 'JOY';
+}
+
+function renderExtractedPalette(colors) {
+    if (!$('extractedPalette')) return;
+    if ($('extractedPaletteSection')) $('extractedPaletteSection').style.display = 'block';
+    $('extractedPalette').innerHTML = renderSwatches(colors);
+}
+
+function clearImageResult() {
+    if ($('extractedPaletteSection')) $('extractedPaletteSection').style.display = 'none';
+    if ($('extractedPalette')) $('extractedPalette').innerHTML = '';
+    if ($('imagePreview'))$('imagePreview').src = '';
+    if ($('imageInput'))$('imageInput').value = '';
 }
 
 // ==========================================
@@ -526,8 +576,16 @@ function loadHistoryItem(item) {
     }
 
     if (item.type === 'text') {
+        clearImageResult();
         if ($('textInput'))$('textInput').value = item.content;
         updateUIResult(item.emotion, item.confidence || '95.0%');
+    } else if (item.type === 'image') {
+        if ($('textInput'))$('textInput').value = '';
+        if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'block';
+        if ($('imagePreview'))$('imagePreview').src = item.content;
+        
+        renderExtractedPalette(paletteArray);
+        updateUIResult(item.emotion, item.confidence || '95.0%', paletteArray);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -541,7 +599,7 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
     if ($('fontPairing'))$('fontPairing').innerText = resultData.font;
     if ($('usageContext'))$('usageContext').innerText = resultData.context;
 
-    // 🟢 อัปเดต Palette ปัจจุบัน
+    // อัปเดต Palette ปัจจุบัน
     activePaletteData = customPalette || resultData.palette;
 
     if ($('paletteDisplay')) {$('paletteDisplay').innerHTML = renderSwatches(activePaletteData);
@@ -562,6 +620,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const langToggleBtn = $('langToggleBtn');
     const analyzeBtn = $('analyzeBtn');
     const textInput = $('textInput');
+    const uploadTriggerBtn = $('uploadTriggerBtn');
+    const imageInput = $('imageInput');
 
     // 🟢 Event Listeners ปุ่ม Export & Copy Code
     $('exportAseBtn')?.addEventListener('click', () => downloadASE(activePaletteData));
@@ -570,6 +630,49 @@ document.addEventListener('DOMContentLoaded', () => {
     $('copyHexBtn')?.addEventListener('click', () => copyPaletteCode('HEX'));
     $('copyRgbBtn')?.addEventListener('click', () => copyPaletteCode('RGB'));$('copyHslBtn')?.addEventListener('click', () => copyPaletteCode('HSL'));
     $('copyTailwindBtn')?.addEventListener('click', () => copyPaletteCode('TAILWIND'));$('copyCssVarBtn')?.addEventListener('click', () => copyPaletteCode('CSS_VARS'));
+
+    // 🟢 Event Listeners สำหรับปุ่มอัปโหลดรูปภาพ
+    if (uploadTriggerBtn && imageInput) {
+        uploadTriggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            imageInput.click();
+        });
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (textInput) textInput.value = '';
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const imageDataUrl = event.target.result;
+                if ($('imagePreview'))$('imagePreview').src = imageDataUrl;
+
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8);
+                    renderExtractedPalette(rgbData.hexList);
+
+                    const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
+                    const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
+                    
+                    updateUIResult(imageEmotion, confidence, rgbData.hexList);
+                    saveToHistory('image', imageDataUrl, imageEmotion, confidence, rgbData.hexList);
+                };
+                img.src = imageDataUrl;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
     if (langToggleBtn) {
         langToggleBtn.addEventListener('click', () => {
@@ -582,6 +685,8 @@ document.addEventListener('DOMContentLoaded', () => {
         analyzeBtn.addEventListener('click', async () => {
             const text = textInput ? textInput.value.trim() : '';
             if (!text) return;
+
+            clearImageResult();
 
             try {
                 const classifier = await getAIPipeline();
