@@ -248,11 +248,11 @@ const translations = {
     TH: {
         langBtn: 'EN',
         subTitle: 'ระบบวิเคราะห์อารมณ์จากข้อความพร้อมแนะนำจานสีสำหรับงานออกแบบ UI/UX',
-        inputLabel: 'กรอกข้อความภาษาไทยหรืออังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
+        inputLabel: 'กรอกข้อความภาษาอังกฤษเพื่อวิเคราะห์อารมณ์ด้วย AI Model',
         placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
         analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
         uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
-        paletteTitle: 'ชุดจานสีแนะนำสมมาตร (8 Color Palette)',
+        paletteTitle: 'ชุดจานสีที่แนะนำ',
         historyTitle: 'ประวัติการวิเคราะห์ (History)',
         clearHistory: 'ล้างประวัติ',
         emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์',
@@ -264,12 +264,12 @@ const translations = {
     },
     EN: {
         langBtn: 'TH',
-        subTitle: 'Text Sentiment Analysis & Symmetric Color Palette Recommendation',
-        inputLabel: 'Enter text to analyze sentiment via AI Model',
+        subTitle: 'Text Sentiment Analysis & Color Palette Recommendation',
+        inputLabel: 'Enter English text to analyze sentiment via AI Model',
         placeholder: 'i feel happy or feel sad...',
         analyzeBtn: 'Analyze Sentiment',
         uploadBtn: 'Upload Image (Extract)',
-        paletteTitle: 'Recommended Symmetric Color Palette',
+        paletteTitle: 'Recommended Color Palette',
         historyTitle: 'Analysis History',
         clearHistory: 'Clear History',
         emptyHistory: 'No analysis history found',
@@ -480,7 +480,6 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
-// 🟢 ฟังก์ชันควบคุม Modal ป๊อปอัพสำหรับยืนยันการล้างประวัติ
 function openConfirmModal() {
     if ($('confirmModal'))$('confirmModal').style.display = 'flex';
 }
@@ -612,12 +611,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = $('imageInput');
     const clearHistoryBtn = $('clearHistoryBtn');
 
-    // 🟢 Event Listeners สำหรับ Modal ล้างประวัติ
     if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', openConfirmModal);
     if ($('modalCancelBtn'))$('modalCancelBtn').addEventListener('click', closeConfirmModal);
     if ($('modalConfirmBtn'))$('modalConfirmBtn').addEventListener('click', executeClearHistory);
 
-    // Event Listeners ปุ่ม Export & Copy Code
     $('exportAseBtn')?.addEventListener('click', () => downloadASE(activePaletteData));
     $('exportJsonBtn')?.addEventListener('click', () => downloadJSON(activePaletteData));$('exportFigmaBtn')?.addEventListener('click', () => copyFigmaTokens(activePaletteData));
 
@@ -625,7 +622,6 @@ document.addEventListener('DOMContentLoaded', () => {
     $('copyRgbBtn')?.addEventListener('click', () => copyPaletteCode('RGB'));$('copyHslBtn')?.addEventListener('click', () => copyPaletteCode('HSL'));
     $('copyTailwindBtn')?.addEventListener('click', () => copyPaletteCode('TAILWIND'));$('copyCssVarBtn')?.addEventListener('click', () => copyPaletteCode('CSS_VARS'));
 
-    // Event Listeners สำหรับอัปโหลดรูปภาพ
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();
