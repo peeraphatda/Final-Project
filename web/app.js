@@ -46,7 +46,7 @@ const translations = {
         extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
         resultEmotionLabel: 'ผลลัพธ์อารมณ์: ',
         resultConfidenceLabel: 'ค่าความเชื่อมั่น: ',
-        paletteTitle: 'ชุดจานสีแนะนำขยายพิเศษ (Expanded Palette)',
+        paletteTitle: 'ชุดจานสีแนะนำสมมาตร (8 Color Palette)',
         alertEmpty: 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!',
         advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
         recTheme: 'ธีมที่แนะนำ: ',
@@ -59,7 +59,7 @@ const translations = {
         emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์'
     },
     EN: {
-        subTitle: 'Text Sentiment Analysis & Expanded Color Palette Recommendation',
+        subTitle: 'Text Sentiment Analysis & Symmetric Color Palette Recommendation',
         inputLabel: 'Enter text to analyze sentiment via AI Model',
         placeholder: 'i feel happy or feel sad...',
         analyzeBtn: 'Analyze Sentiment',
@@ -67,7 +67,7 @@ const translations = {
         extractedTitle: 'Uploaded Image & Extracted Palette',
         resultEmotionLabel: 'Emotion Result: ',
         resultConfidenceLabel: 'Confidence Score: ',
-        paletteTitle: 'Recommended Expanded Color Palette',
+        paletteTitle: 'Recommended Symmetric Color Palette',
         alertEmpty: 'Please enter text before analyzing!',
         advisoryTitle: 'AI Design Advisory',
         recTheme: 'Recommended Theme: ',
@@ -81,7 +81,7 @@ const translations = {
     }
 };
 
-// 🟢 โครงสร้างชุดจานสีแบบจุใจ (8 สีต่ออารมณ์ พร้อมระบุประเภทการใช้งาน)
+// 🟢 โครงสร้างชุดจานสี 8 สีแบบสมมาตร
 const emotionRules = {
     JOY: { 
         palette: [
@@ -181,13 +181,13 @@ const emotionRules = {
     }
 };
 
-// 🟢 วาดการ์ดแสดงสีสวยงามแยกตามประเภท
+// 🟢 วาดการ์ดแสดงสีแบบ Grid สมมาตร + เพิ่มระบบคลิกคัดลอก Hex Code
 const renderSwatches = colors => {
     return `<div class="palette-grid">` + (colors || []).map(c => {
         const hex = typeof c === 'string' ? c : c.hex;
-        const role = typeof c === 'object' && c.role ? c.role : 'Color';
+        const role = typeof c === 'object' && c.role ? c.role : 'COLOR';
         return `
-            <div class="color-card">
+            <div class="color-card" onclick="navigator.clipboard.writeText('${hex}'); alert('คัดลอกสี ${hex} แล้ว!')" title="คลิกเพื่อคัดลอกโค้ดสี">
                 <div class="color-swatch-box" style="background-color: ${hex}"></div>
                 <div class="color-info">
                     <span class="color-hex">${hex}</span>
@@ -208,7 +208,7 @@ async function getAIPipeline() {
     return sentimentPipeline;
 }
 
-function hexToSoftRgba(hex, opacity = 0.2) {
+function hexToSoftRgba(hex, opacity = 0.22) {
     let c = hex.replace('#', '');
     if (c.length === 3) c = c.split('').map(x => x + x).join('');
     const num = parseInt(c, 16);
@@ -218,7 +218,6 @@ function hexToSoftRgba(hex, opacity = 0.2) {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
-// 🟢 วนลูปสลับสีพื้นหลังเรียบหรูตามรายการสี Hex
 function startPaletteBackgroundAnimation(colorList) {
     if (paletteAnimationTimer) clearInterval(paletteAnimationTimer);
     if (!colorList || colorList.length === 0) return;
@@ -228,7 +227,7 @@ function startPaletteBackgroundAnimation(colorList) {
 
     const changeBg = () => {
         const hexColor = hexList[currentIndex];
-        document.body.style.backgroundColor = hexToSoftRgba(hexColor, 0.22);
+        document.body.style.backgroundColor = hexToSoftRgba(hexColor, 0.25);
         currentIndex = (currentIndex + 1) % hexList.length;
     };
 
@@ -311,10 +310,10 @@ async function renderHistoryList() {
 
         const contentDisplay = isBase64
             ? `<img src="${item.content}" style="width:36px; height:36px; object-fit:cover; border-radius:6px;" alt="thumb" />`
-            : `<span class="history-text" title="${item.content}">${isImage ? '🖼️ ' : ''}${item.content}</span>`;
+            : `<span class="history-text" title="${item.content}">${isImage ? '🖼️️ ' : ''}${item.content}</span>`;
 
         return `
-            <div class="history-item" data-index="${index}" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; cursor:pointer; transition: all 0.2s;">
+            <div class="history-item" data-index="${index}">
                 <div class="history-info" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
                     <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:3px 8px; border-radius:6px; font-weight:bold; background:${isImage ? '#fce7f3' : '#dbeafe'}; color:${isImage ? '#9d174d' : '#1e40af'};">
                         ${(item.type || 'TEXT').toUpperCase()}
@@ -325,7 +324,7 @@ async function renderHistoryList() {
                 <div class="history-result" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
                     <strong class="history-emotion">${item.emotion || '-'}</strong>
                     <div class="history-mini-palette" style="display:flex; gap:3px;">
-                        ${hexList.slice(0, 5).map(c => `<div class="mini-swatch" style="width:12px; height:12px; border-radius:3px; background:${c}"></div>`).join('')}
+                        ${hexList.slice(0, 5).map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
                     </div>
                 </div>
             </div>
@@ -455,7 +454,7 @@ if (imageInput) {
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
 
-                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 6);
+                const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8); // ปรับเป็น 8 สีเพื่อให้สมมาตร
                 renderExtractedPalette(rgbData.hexList);
 
                 const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
@@ -532,13 +531,48 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-if (clearHistoryBtn) {
-    clearHistoryBtn.addEventListener('click', () => {
+// 🟢 8. ระบบ Popup Confirmation ล้างประวัติการใช้งาน
+function createConfirmModal() {
+    if ($('confirmModalOverlay')) return;
+
+    const modalHTML = `
+        <div id="confirmModalOverlay" class="modal-overlay">
+            <div class="modal-card">
+                <div class="modal-icon">🗑️</div>
+                <div class="modal-title">ยืนยันการล้างประวัติ</div>
+                <div class="modal-desc">คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการวิเคราะห์ทั้งหมด? รายการที่ลบแล้วจะไม่สามารถกู้คืนได้</div>
+                <div class="modal-actions">
+                    <button id="cancelClearBtn" class="btn-modal-cancel">ยกเลิก</button>
+                    <button id="confirmClearBtn" class="btn-modal-confirm">ลบประวัติ</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    const overlay = $('confirmModalOverlay');
+    const cancelBtn = $('cancelClearBtn');
+    const confirmBtn = $('confirmClearBtn');
+
+    cancelBtn.addEventListener('click', () => {
+        overlay.classList.remove('active');
+    });
+
+    confirmBtn.addEventListener('click', () => {
         fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
         localStorage.removeItem('sentiment_history');
         if (paletteAnimationTimer) clearInterval(paletteAnimationTimer);
-        document.body.style.backgroundColor = '#f8fafc';
+        document.body.style.backgroundColor = '#f1f5f9';
         renderHistoryList();
+        overlay.classList.remove('active');
+    });
+}
+
+if (clearHistoryBtn) {
+    createConfirmModal();
+    clearHistoryBtn.addEventListener('click', () => {
+        const overlay = $('confirmModalOverlay');
+        if (overlay) overlay.classList.add('active');
     });
 }
 
