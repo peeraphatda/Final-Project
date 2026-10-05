@@ -1,47 +1,60 @@
-"""
-Module: data_store.py
-Role: Debugger (ภีม) & Planner (กาย)
-Description: ระบบบันทึกประวัติย้อนหลังด้วย SQLite และรองรับ Cloud Migration
-"""
 import sqlite3
 import json
 from datetime import datetime
 
 class DataStore:
-    def __init__(self, db_path: str = "data/palette_history.db"):
+    def __init__(self, db_path="data/palette_history.db"):
         self.db_path = db_path
         self._init_db()
 
     def _init_db(self):
+        """สร้างตารางเก็บบันทึกประวัติหากยังไม่มี"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                CREATE TABLE IF NOT EXISTS history (
+                CREATE TABLE IF NOT EXISTS palette_history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    text TEXT NOT NULL,
-                    emotion TEXT NOT NULL,
-                    score REAL NOT NULL,
-                    palette TEXT NOT NULL,
-                    timestamp TEXT NOT NULL
+                    input_text TEXT NOT NULL,
+                    predicted_emotion TEXT NOT NULL,
+                    confidence_score REAL NOT NULL,
+                    hex_colors TEXT NOT NULL, -- เก็บเป็น JSON List เช่น ["#1A1A2E", "#16213E", ...]
+                    palette_size INTEGER DEFAULT 8,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
             conn.commit()
 
-    def save_analysis(self, text: str, emotion: str, score: float, palette: list):
+    def save_palette(self, input_text: str, emotion: str, confidence: float, hex_colors: list):
+        """บันทึกประวัติจานสีใหม่ลง Database"""
+        colors_json = json.dumps(hex_colors)
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO history (text, emotion, score, palette, timestamp)
+                INSERT INTO palette_history (input_text, predicted_emotion, confidence_score, hex_colors, palette_size)
                 VALUES (?, ?, ?, ?, ?)
-            """, (text, emotion, score, json.dumps(palette), datetime.now().isoformat()))
+            """, (input_text, emotion, confidence, colors_json, len(hex_colors)))
             conn.commit()
 
-    def get_history(self, limit: int = 5) -> list:
+    def get_history(self, limit=10):
+        """ดึงประวัติย้อนหลังมาแสดงผล"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT text, emotion, score, palette, timestamp FROM history ORDER BY id DESC LIMIT ?", (limit,))
+            cursor.execute("""
+                SELECT id, input_text, predicted_emotion, confidence_score, hex_colors, created_at
+                FROM palette_history
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (limit,))
             rows = cursor.fetchall()
-            return [
-                {"text": r[0], "emotion": r[1], "score": r[2], "palette": json.loads(r[3]), "timestamp": r[4]}
-                for r in rows
-            ]
+            
+            history = []
+            for row in rows:
+                history.append({
+                    "id": row[0],
+                    "input_text": row[1],
+                    "emotion": row[2],
+                    "confidence": row[3],
+                    "hex_colors": json.loads(row[4]), # แปลง JSON String กลับเป็น List
+                    "created_at": row[5]
+                })
+            return history
