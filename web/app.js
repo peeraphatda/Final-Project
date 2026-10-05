@@ -118,13 +118,14 @@ function applyLanguage(lang) {
     renderHistoryList();
 }
 
+// โครงสร้างข้อมูลจานสี + กำหนดโทนสีพื้นหลัง (bgRgb) แบบซอฟต์นุ่มนวล
 const emotionRules = {
-    JOY: { palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], theme: 'Vibrant Sunburst', font: 'Poppins / Montserrat', context: 'E-Commerce, Festival Branding, UI Dashboard' },
-    SADNESS: { palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], theme: 'Melancholic Mist', font: 'Lora / Merriweather', context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps' },
-    ANGER: { palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], theme: 'Fiery Passion', font: 'Oswald / Roboto', context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign' },
-    FEAR: { palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], theme: 'Mystic Shadow', font: 'Cinzel / Inter', context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools' },
-    LOVE: { palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], theme: 'Romantic Bloom', font: 'Playfair Display / Great Vibes', context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms' },
-    SURPRISE: { palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], theme: 'Electric Wonder', font: 'Plus Jakarta Sans / Space Grotesk', context: 'Entertainment Apps, Promotional Banners, Interactive Art' }
+    JOY: { palette: ['#FFD700', '#FF8C00', '#FF69B4', '#00BFFF', '#32CD32'], bgRgb: 'rgb(255, 248, 220)', theme: 'Vibrant Sunburst', font: 'Poppins / Montserrat', context: 'E-Commerce, Festival Branding, UI Dashboard' },
+    SADNESS: { palette: ['#1C2541', '#3A506B', '#5BC0BE', '#6C757D', '#ADB5BD'], bgRgb: 'rgb(224, 231, 239)', theme: 'Melancholic Mist', font: 'Lora / Merriweather', context: 'Editorial Blogs, Personal Portfolios, Mental Health Apps' },
+    ANGER: { palette: ['#D00000', '#9D0208', '#370617', '#E85D04', '#FAA307'], bgRgb: 'rgb(255, 230, 230)', theme: 'Fiery Passion', font: 'Oswald / Roboto', context: 'Sports Apps, Gaming Dashboards, High-Energy Campaign' },
+    FEAR: { palette: ['#2B1E3A', '#4A3E3D', '#2C3539', '#5C5470', '#B8C0C2'], bgRgb: 'rgb(230, 226, 236)', theme: 'Mystic Shadow', font: 'Cinzel / Inter', context: 'Cybersecurity Platforms, Horror/Thriller Content, Security Tools' },
+    LOVE: { palette: ['#FF758F', '#FF4D6D', '#C9184A', '#800F2F', '#FFF0F3'], bgRgb: 'rgb(255, 235, 240)', theme: 'Romantic Bloom', font: 'Playfair Display / Great Vibes', context: 'Wedding Sites, Lifestyle Apps, Relationship Platforms' },
+    SURPRISE: { palette: ['#7209B7', '#3F37C9', '#4CC9F0', '#F72585', '#4895EF'], bgRgb: 'rgb(235, 230, 255)', theme: 'Electric Wonder', font: 'Plus Jakarta Sans / Space Grotesk', context: 'Entertainment Apps, Promotional Banners, Interactive Art' }
 };
 
 const renderSwatches = colors => (colors || []).map(c => `
@@ -172,7 +173,7 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
-// 🟢 3. ระบบวาดแถบประวัติ (รองรับการคลิกเพื่อโหลดข้อมูล)
+// 🟢 3. ระบบวาดแถบประวัติ
 async function renderHistoryList() {
     const historyContainer = document.getElementById('historyList');
     if (!historyContainer) return;
@@ -201,7 +202,6 @@ async function renderHistoryList() {
         return;
     }
 
-    // เก็บข้อมูลไว้ในตัวแประดับ window เพื่อให้กดดึงย้อนหลังได้ง่าย
     window.currentHistoryData = historyData;
 
     historyContainer.innerHTML = historyData.map((item, index) => {
@@ -242,7 +242,6 @@ async function renderHistoryList() {
         `;
     }).join('');
 
-    // ผูก Event Listener คลิกรายการประวัติ
     document.querySelectorAll('.history-item').forEach(itemEl => {
         itemEl.addEventListener('click', (e) => {
             const idx = e.currentTarget.getAttribute('data-index');
@@ -253,7 +252,7 @@ async function renderHistoryList() {
     });
 }
 
-// 🟢 4. ฟังก์ชันดึงประวัติมาแสดงผลหน้าจอหลัก
+// 🟢 4. ฟังก์ชันดึงประวัติมาแสดงผล + เปลี่ยนสีพื้นหลังตามธีมอารมณ์
 function loadHistoryItem(item) {
     if (alertBox) alertBox.style.display = 'none';
 
@@ -274,8 +273,6 @@ function loadHistoryItem(item) {
     }
 
     updateUIResult(item.emotion, item.confidence || '95.0%');
-
-    // เลื่อนหน้าจอขึ้นไปที่ผลลัพธ์แบบนุ่มนวล
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -417,6 +414,7 @@ function extractRGBColors(ctx, width, height, count) {
     return { hexList, rgbList };
 }
 
+// 🟢 7. ฟังก์ชันอัปเดต UI ผลลัพธ์ + สลับสีพื้นหลังเว็บตามธีมอารมณ์
 function updateUIResult(emotionKey, confidence) {
     const resultData = emotionRules[emotionKey] || emotionRules['JOY'];
 
@@ -430,6 +428,11 @@ function updateUIResult(emotionKey, confidence) {
     if (paletteDisplay) {
         paletteDisplay.innerHTML = renderSwatches(resultData.palette);
     }
+
+    // 🔴 เปลี่ยนสีพื้นหลังหน้าเว็บ (body background-color) ตามสี RGB ของธีมอารมณ์
+    if (resultData.bgRgb) {
+        document.body.style.backgroundColor = resultData.bgRgb;
+    }
 }
 
 function renderExtractedPalette(colors) {
@@ -438,7 +441,7 @@ function renderExtractedPalette(colors) {
     extractedPalette.innerHTML = renderSwatches(colors);
 }
 
-// 🟢 7. ปุ่มล้างประวัติ
+// 🟢 8. ปุ่มล้างประวัติ
 if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', () => {
         fetch(API_BASE_URL, { method: 'DELETE' }).catch(() => {});
