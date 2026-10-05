@@ -10,7 +10,7 @@ let currentLang = 'TH';
 let paletteAnimationTimer = null;
 let sentimentPipeline = null;
 
-// 🟢 ตัวแปรสำหรับเก็บข้อมูล Palette ปัจจุบัน
+// ตัวแปรสำหรับเก็บข้อมูล Palette ปัจจุบัน
 let activePaletteData = [];
 
 // ==========================================
@@ -58,7 +58,6 @@ function slugifyRole(role, index) {
     return role.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-// 🟢 ฟังก์ชัน Copy โค้ด
 function copyPaletteCode(format) {
     if (!activePaletteData || activePaletteData.length === 0) {
         return alert("ไม่มีข้อมูลจานสี!");
@@ -108,7 +107,6 @@ function copyPaletteCode(format) {
     alert(`คัดลอกโค้ดรูปแบบ ${format} เรียบร้อยแล้ว!`);
 }
 
-// ฟังก์ชันสร้าง Binary Buffer สำหรับไฟล์ ASE (.ase)
 function createASEBuffer(palette) {
     const blocks = [];
 
@@ -237,15 +235,8 @@ function analyzeColorSentiment(rgbColors) {
     return 'JOY';
 }
 
-function renderExtractedPalette(colors) {
-    if (!$('extractedPalette')) return;
-    if ($('extractedPaletteSection')) $('extractedPaletteSection').style.display = 'block';
-    $('extractedPalette').innerHTML = renderSwatches(colors);
-}
-
 function clearImageResult() {
-    if ($('extractedPaletteSection')) $('extractedPaletteSection').style.display = 'none';
-    if ($('extractedPalette')) $('extractedPalette').innerHTML = '';
+    if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'none';
     if ($('imagePreview'))$('imagePreview').src = '';
     if ($('imageInput'))$('imageInput').value = '';
 }
@@ -262,24 +253,10 @@ const translations = {
         placeholder: 'พิมพ์ความรู้สึกของคุณ เช่น I feel sad หรือ I feel happy...',
         analyzeBtn: 'วิเคราะห์อารมณ์ (Analyze)',
         uploadBtn: 'อัปโหลดรูปภาพ (Extract Image)',
-        extractedTitle: 'รูปภาพที่อัปโหลดและจานสีที่สกัดได้',
-        resultEmotionLabel: 'ผลลัพธ์อารมณ์: ',
-        resultConfidenceLabel: 'ค่าความเชื่อมั่น: ',
         paletteTitle: 'ชุดจานสีแนะนำสมมาตร (8 Color Palette)',
-        alertEmpty: 'กรุณากรอกข้อความก่อนทำการวิเคราะห์!',
-        advisoryTitle: 'คำแนะนำการออกแบบโดย AI',
-        recTheme: 'ธีมที่แนะนำ: ',
-        typography: 'ชุดฟอนต์: ',
-        usageContext: 'การนำไปใช้งาน: ',
-        loadingModel: 'กำลังโหลด AI Model...',
-        analyzingText: 'กำลังประมวลผล...',
         historyTitle: 'ประวัติการวิเคราะห์ (History)',
         clearHistory: 'ล้างประวัติ',
         emptyHistory: 'ยังไม่มีประวัติการวิเคราะห์',
-        modalTitle: 'ยืนยันการล้างประวัติ',
-        modalDesc: 'คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการวิเคราะห์ทั้งหมด? รายการที่ลบแล้วจะไม่สามารถกู้คืนได้',
-        modalCancel: 'ยกเลิก',
-        modalConfirm: 'ลบประวัติ',
         copySuccess: 'คัดลอกสี'
     },
     EN: {
@@ -289,24 +266,10 @@ const translations = {
         placeholder: 'i feel happy or feel sad...',
         analyzeBtn: 'Analyze Sentiment',
         uploadBtn: 'Upload Image (Extract)',
-        extractedTitle: 'Uploaded Image & Extracted Palette',
-        resultEmotionLabel: 'Emotion Result: ',
-        resultConfidenceLabel: 'Confidence Score: ',
         paletteTitle: 'Recommended Symmetric Color Palette',
-        alertEmpty: 'Please enter text before analyzing!',
-        advisoryTitle: 'AI Design Advisory',
-        recTheme: 'Recommended Theme: ',
-        typography: 'Typography: ',
-        usageContext: 'Usage Context: ',
-        loadingModel: 'Loading AI Model...',
-        analyzingText: 'Analyzing...',
         historyTitle: 'Analysis History',
         clearHistory: 'Clear History',
         emptyHistory: 'No analysis history found',
-        modalTitle: 'Confirm Clear History',
-        modalDesc: 'Are you sure you want to delete all analysis history? Deleted items cannot be restored.',
-        modalCancel: 'Cancel',
-        modalConfirm: 'Delete All',
         copySuccess: 'Copied color'
     }
 };
@@ -444,7 +407,7 @@ const renderSwatches = colors => {
 
 async function getAIPipeline() {
     if (!sentimentPipeline) {
-        if ($('emotionLabel'))$('emotionLabel').innerText = translations[currentLang].loadingModel;
+        if ($('emotionLabel'))$('emotionLabel').innerText = "Loading AI...";
         sentimentPipeline = await pipeline('zero-shot-classification', 'Xenova/distilbert-base-uncased-mnli');
     }
     return sentimentPipeline;
@@ -505,6 +468,14 @@ function saveToHistory(type, inputContent, emotion, confidence, palette) {
     }).catch(err => console.warn("Backend API not reachable:", err));
 }
 
+// 🟢 ฟังก์ชันล้างประวัติการใช้งาน
+function clearHistory() {
+    if (confirm("คุณต้องการลบประวัติการวิเคราะห์ทั้งหมดหรือไม่?")) {
+        localStorage.removeItem('sentiment_history');
+        renderHistoryList();
+    }
+}
+
 async function renderHistoryList() {
     const historyContainer = $('historyList');
     if (!historyContainer) return;
@@ -545,7 +516,7 @@ async function renderHistoryList() {
                     <span class="history-tag ${item.type || 'text'}" style="font-size:0.7rem; padding:3px 8px; border-radius:6px; font-weight:bold; background:${isImage ? '#fce7f3' : '#dbeafe'}; color:${isImage ? '#9d174d' : '#1e40af'};">
                         ${(item.type || 'TEXT').toUpperCase()}
                     </span>
-                    <span class="history-text">${isImage ? '🖼 ' : ''}${item.content}</span>
+                    <span class="history-text">${isImage ? '🖼 ' : ''}${item.content.length > 30 ? item.content.substring(0, 30) + '...' : item.content}</span>
                     <span class="history-time" style="font-size:0.75rem; color:#94a3b8;">${timeString}</span>
                 </div>
                 <div class="history-result" style="display:flex; align-items:center; gap:10px; pointer-events:none;">
@@ -584,7 +555,6 @@ function loadHistoryItem(item) {
         if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'block';
         if ($('imagePreview'))$('imagePreview').src = item.content;
         
-        renderExtractedPalette(paletteArray);
         updateUIResult(item.emotion, item.confidence || '95.0%', paletteArray);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -599,7 +569,6 @@ function updateUIResult(emotionKey, confidence, customPalette = null) {
     if ($('fontPairing'))$('fontPairing').innerText = resultData.font;
     if ($('usageContext'))$('usageContext').innerText = resultData.context;
 
-    // อัปเดต Palette ปัจจุบัน
     activePaletteData = customPalette || resultData.palette;
 
     if ($('paletteDisplay')) {$('paletteDisplay').innerHTML = renderSwatches(activePaletteData);
@@ -622,8 +591,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const textInput = $('textInput');
     const uploadTriggerBtn = $('uploadTriggerBtn');
     const imageInput = $('imageInput');
+    const clearHistoryBtn = $('clearHistoryBtn');
 
-    // 🟢 Event Listeners ปุ่ม Export & Copy Code
+    // 🟢 Event Listener ปุ่มล้างประวัติ
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', clearHistory);
+    }
+
+    // Event Listeners ปุ่ม Export & Copy Code
     $('exportAseBtn')?.addEventListener('click', () => downloadASE(activePaletteData));
     $('exportJsonBtn')?.addEventListener('click', () => downloadJSON(activePaletteData));$('exportFigmaBtn')?.addEventListener('click', () => copyFigmaTokens(activePaletteData));
 
@@ -631,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('copyRgbBtn')?.addEventListener('click', () => copyPaletteCode('RGB'));$('copyHslBtn')?.addEventListener('click', () => copyPaletteCode('HSL'));
     $('copyTailwindBtn')?.addEventListener('click', () => copyPaletteCode('TAILWIND'));$('copyCssVarBtn')?.addEventListener('click', () => copyPaletteCode('CSS_VARS'));
 
-    // 🟢 Event Listeners สำหรับปุ่มอัปโหลดรูปภาพ
+    // Event Listeners สำหรับปุ่มอัปโหลดรูปภาพ
     if (uploadTriggerBtn && imageInput) {
         uploadTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -650,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (event) => {
                 const imageDataUrl = event.target.result;
                 if ($('imagePreview'))$('imagePreview').src = imageDataUrl;
+                if ($('extractedPaletteSection'))$('extractedPaletteSection').style.display = 'block';
 
                 const img = new Image();
                 img.onload = () => {
@@ -660,8 +636,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.drawImage(img, 0, 0);
 
                     const rgbData = extractRGBColors(ctx, canvas.width, canvas.height, 8);
-                    renderExtractedPalette(rgbData.hexList);
-
                     const imageEmotion = analyzeColorSentiment(rgbData.rgbList);
                     const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                     
