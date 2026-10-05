@@ -3,7 +3,10 @@ import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers
 env.allowLocalModels = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Helper Selector
     const $ = id => document.getElementById(id);
+
+    // DOM Elements
     const textInput = $('textInput');
     const analyzeBtn = $('analyzeBtn');
     const alertBox = $('alertBox');
@@ -29,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontPairing = $('fontPairing');
     const usageContext = $('usageContext');
 
-    // 🟢 DOM Elements สำหรับ History
+    // History Elements
     const historyTitle = $('historyTitle');
     const historyList = $('historyList');
     const clearHistoryBtn = $('clearHistoryBtn');
@@ -166,48 +169,68 @@ document.addEventListener('DOMContentLoaded', () => {
         return sentimentPipeline;
     }
 
-    // 🟢 ระบบจัดการ LocalStorage สำหรับ History
+    // ----------------------------------------------------
+    // ระบบ History (แก้ไขปัญหาการบันทึก)
+    // ----------------------------------------------------
     function saveToHistory(type, inputContent, emotion, confidence, palette) {
-        const history = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
-        const newItem = {
-            id: Date.now(),
-            type, // 'text' หรือ 'image'
-            content: inputContent,
-            emotion,
-            confidence,
-            palette,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        history.unshift(newItem); // เอาอันล่าสุดไว้ข้างบน
-        if (history.length > 10) history.pop(); // เก็บไม่เกิน 10 รายการล่าสุด
-        localStorage.setItem('sentiment_history', JSON.stringify(history));
-        renderHistoryList();
+        try {
+            let history = [];
+            const savedData = localStorage.getItem('sentiment_history');
+            if (savedData) {
+                history = JSON.parse(savedData);
+            }
+
+            const newItem = {
+                id: Date.now(),
+                type: type, // 'text' หรือ 'image'
+                content: String(inputContent),
+                emotion: String(emotion),
+                confidence: String(confidence),
+                palette: Array.isArray(palette) ? palette : [],
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            history.unshift(newItem);
+            if (history.length > 10) history = history.slice(0, 10);
+
+            localStorage.setItem('sentiment_history', JSON.stringify(history));
+            renderHistoryList();
+        } catch (e) {
+            console.error("Failed to save to localStorage:", e);
+        }
     }
 
     function renderHistoryList() {
         if (!historyList) return;
-        const history = JSON.parse(localStorage.getItem('sentiment_history') || '[]');
 
-        if (history.length === 0) {
-            historyList.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
-            return;
-        }
+        try {
+            const savedData = localStorage.getItem('sentiment_history');
+            const history = savedData ? JSON.parse(savedData) : [];
 
-        historyList.innerHTML = history.map(item => `
-            <div class="history-item">
-                <div class="history-info">
-                    <span class="history-tag ${item.type}">${item.type.toUpperCase()}</span>
-                    <span class="history-text" title="${item.content}">${item.content}</span>
-                    <span class="history-time">${item.timestamp}</span>
-                </div>
-                <div class="history-result">
-                    <strong class="history-emotion">${item.emotion}</strong>
-                    <div class="history-mini-palette">
-                        ${item.palette.map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
+            if (!history || history.length === 0) {
+                historyList.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div class="history-info">
+                        <span class="history-tag ${item.type}">${item.type.toUpperCase()}</span>
+                        <span class="history-text" title="${item.content}">${item.content}</span>
+                        <span class="history-time">${item.timestamp}</span>
+                    </div>
+                    <div class="history-result">
+                        <strong class="history-emotion">${item.emotion}</strong>
+                        <div class="history-mini-palette">
+                            ${(item.palette || []).map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (e) {
+            console.error("Failed to render history:", e);
+            historyList.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
+        }
     }
 
     if (clearHistoryBtn) {
@@ -250,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
                     updateUIResult(topEmotion, confidenceScore);
                     
-                    // 🟢 บันทึกลงประวัติ
+                    // บันทึกลงประวัติ
                     const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
                     saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
                 }
@@ -303,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                     updateUIResult(imageEmotion, confidence);
 
-                    // 🟢 บันทึกลงประวัติ
+                    // บันทึกลงประวัติ
                     saveToHistory('image', file.name, imageEmotion, confidence, rgbData.hexList);
                 };
                 img.src = event.target.result;
@@ -366,6 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
         extractedPalette.innerHTML = renderSwatches(colors);
     }
 
-    // 🟢 แสดงรายการประวัติทันทีเมื่อเปิดหน้าเว็บ
+    // โหลดประวัติทันทีเมื่อเปิดหน้าเว็บ
     renderHistoryList();
 });
