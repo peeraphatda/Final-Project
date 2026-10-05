@@ -3,10 +3,8 @@ import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers
 env.allowLocalModels = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Helper Selector
     const $ = id => document.getElementById(id);
 
-    // DOM Elements
     const textInput = $('textInput');
     const analyzeBtn = $('analyzeBtn');
     const alertBox = $('alertBox');
@@ -32,10 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontPairing = $('fontPairing');
     const usageContext = $('usageContext');
 
-    // History Elements
     const historyTitle = $('historyTitle');
     const historyList = $('historyList');
     const clearHistoryBtn = $('clearHistoryBtn');
+
+    // 🟢 URL ของ Backend API ที่รันด้วย Node.js
+    const API_BASE_URL = 'http://localhost:3000/api/history';
 
     if (logoElement) logoElement.innerText = 'Smart Art & Palette Sentiment Analyzer';
 
@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHistoryList();
     }
 
-    // Loading Animation
     let loadingInterval = null;
 
     function startLoadingAnimation(baseText) {
@@ -158,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `).join('');
 
-    // AI Pipeline Engine
     let sentimentPipeline = null;
 
     async function getAIPipeline() {
@@ -170,73 +168,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // ระบบ History (แก้ไขปัญหาการบันทึก)
+    // 🟢 ระบบ History จัดการผ่าน Backend REST API (SQLite)
     // ----------------------------------------------------
-    function saveToHistory(type, inputContent, emotion, confidence, palette) {
+    async function saveToHistory(type, inputContent, emotion, confidence, palette) {
         try {
-            let history = [];
-            const savedData = localStorage.getItem('sentiment_history');
-            if (savedData) {
-                history = JSON.parse(savedData);
-            }
-
-            const newItem = {
-                id: Date.now(),
-                type: type, // 'text' หรือ 'image'
-                content: String(inputContent),
-                emotion: String(emotion),
-                confidence: String(confidence),
-                palette: Array.isArray(palette) ? palette : [],
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            history.unshift(newItem);
-            if (history.length > 10) history = history.slice(0, 10);
-
-            localStorage.setItem('sentiment_history', JSON.stringify(history));
-            renderHistoryList();
-        } catch (e) {
-            console.error("Failed to save to localStorage:", e);
+            await fetch(API_BASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type,
+                    content: inputContent,
+                    emotion,
+                    confidence,
+                    palette
+                })
+            });
+            renderHistoryList(); // ดึงรายการใหม่ทันทีหลังบันทึก
+        } catch (error) {
+            console.error("Failed to save history to database:", error);
         }
     }
 
-    function renderHistoryList() {
+    async function renderHistoryList() {
         if (!historyList) return;
 
         try {
-            const savedData = localStorage.getItem('sentiment_history');
-            const history = savedData ? JSON.parse(savedData) : [];
+            const response = await fetch(API_BASE_URL);
+            const history = await response.json();
 
             if (!history || history.length === 0) {
                 historyList.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
                 return;
             }
 
-            historyList.innerHTML = history.map(item => `
-                <div class="history-item">
-                    <div class="history-info">
-                        <span class="history-tag ${item.type}">${item.type.toUpperCase()}</span>
-                        <span class="history-text" title="${item.content}">${item.content}</span>
-                        <span class="history-time">${item.timestamp}</span>
-                    </div>
-                    <div class="history-result">
-                        <strong class="history-emotion">${item.emotion}</strong>
-                        <div class="history-mini-palette">
-                            ${(item.palette || []).map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
+            historyList.innerHTML = history.map(item => {
+                const timeString = item.createdAt 
+                    ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+                    : '';
+
+                return `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <span class="history-tag ${item.type}">${item.type.toUpperCase()}</span>
+                            <span class="history-text" title="${item.content}">${item.content}</span>
+                            <span class="history-time">${timeString}</span>
+                        </div>
+                        <div class="history-result">
+                            <strong class="history-emotion">${item.emotion}</strong>
+                            <div class="history-mini-palette">
+                                ${(item.palette || []).map(c => `<div class="mini-swatch" style="background:${c}"></div>`).join('')}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
-        } catch (e) {
-            console.error("Failed to render history:", e);
-            historyList.innerHTML = `<p class="history-empty">${translations[currentLang].emptyHistory}</p>`;
+                `;
+            }).join('');
+        } catch (error) {
+            console.error("Failed to fetch history:", error);
+            historyList.innerHTML = `<p class="history-empty">ไม่สามารถเชื่อมต่อฐานข้อมูลได้</p>`;
         }
     }
 
     if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', () => {
-            localStorage.removeItem('sentiment_history');
-            renderHistoryList();
+        clearHistoryBtn.addEventListener('click', async () => {
+            try {
+                await fetch(API_BASE_URL, { method: 'DELETE' });
+                renderHistoryList();
+            } catch (error) {
+                console.error("Failed to clear history:", error);
+            }
         });
     }
 
@@ -273,7 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const confidenceScore = (output.scores[0] * 100).toFixed(1) + "%";
                     updateUIResult(topEmotion, confidenceScore);
                     
-                    // บันทึกลงประวัติ
                     const resultData = emotionRules[topEmotion] || emotionRules['JOY'];
                     saveToHistory('text', text, topEmotion, confidenceScore, resultData.palette);
                 }
@@ -326,7 +324,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const confidence = (90 + Math.floor(Math.random() * 9)) + '.0%';
                     updateUIResult(imageEmotion, confidence);
 
-                    // บันทึกลงประวัติ
                     saveToHistory('image', file.name, imageEmotion, confidence, rgbData.hexList);
                 };
                 img.src = event.target.result;
@@ -389,6 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
         extractedPalette.innerHTML = renderSwatches(colors);
     }
 
-    // โหลดประวัติทันทีเมื่อเปิดหน้าเว็บ
+    // 🟢 โหลดประวัติจาก SQLite Database ทันทีเมื่อเปิดหน้าเว็บ
     renderHistoryList();
 });
