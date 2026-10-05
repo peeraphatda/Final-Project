@@ -5,7 +5,7 @@ Description: Unit Testing ความถูกต้องของการบ
 """
 import pytest
 import os
-from src.data_store import DataStore
+from Sprint4.src.data_store import DataStore
 
 def test_sqlite_save_and_retrieve():
     test_db = "data/test_history.db"

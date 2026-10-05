@@ -1,0 +1,128 @@
+/* Smart Art & Palette - Sprint 3
+ * The generated palette (--c1..--c8, set by app.js) recolors the aurora backdrop,
+ * so the whole page shows the emotion it just analyzed. */
+:root {
+  --c1: #2B2D42; --c2: #8D99AE; --c3: #EDF2F4; --c4: #F8F9FA;
+  --c5: #6C757D; --c6: #343A40; --c7: #E9ECEF; --c8: #ADB5BD;
+  --ink: #f4f3fa;
+  --ink-soft: #c9c7d8;
+  --base: #14131c;
+  --glass: rgba(255, 255, 255, .09);
+  --glass-edge: rgba(255, 255, 255, .22);
+  --focus: #ffffff;
+  --font: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-sizing: border-box;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: 1rem; }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink); background: var(--base);
+  font: 400 1rem/1.6 var(--font);
+}
+
+.aurora {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(60vmax 45vmax at 12% 8%, color-mix(in srgb, var(--c1) 85%, transparent), transparent 70%),
+    radial-gradient(55vmax 40vmax at 92% 18%, color-mix(in srgb, var(--c3) 70%, transparent), transparent 70%),
+    radial-gradient(60vmax 45vmax at 70% 100%, color-mix(in srgb, var(--c4) 75%, transparent), transparent 70%),
+    radial-gradient(45vmax 35vmax at 0% 90%, color-mix(in srgb, var(--c2) 70%, transparent), transparent 70%),
+    var(--base);
+  transition: background .6s ease;
+}
+
+.top {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+  max-width: 68rem; margin: 0 auto; padding: 2rem 1.25rem 1rem;
+}
+h1 { margin: 0; font-size: clamp(1.7rem, 4.5vw, 2.6rem); font-weight: 700; letter-spacing: -.01em; line-height: 1.15; }
+h2 { margin: 0 0 .25rem; font-size: 1.15rem; font-weight: 700; }
+.sub { margin: .5rem 0 0; max-width: 40rem; color: var(--ink-soft); }
+
+main {
+  display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 68rem; margin: 0 auto; padding: 0 1.25rem 3rem;
+}
+.glass {
+  padding: 1.25rem; border-radius: 1.25rem;
+  background: var(--glass); border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .25);
+}
+.wide { grid-column: 1 / -1; }
+
+.hint { margin: 0 0 .75rem; color: var(--ink-soft); max-width: 60ch; }
+.small { font-size: .85rem; margin: .75rem 0 0; }
+.row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.between { justify-content: space-between; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+textarea, select {
+  width: 100%; padding: .7rem .85rem; color: var(--ink); font: inherit;
+  background: rgba(0, 0, 0, .3); border: 1px solid var(--glass-edge); border-radius: .8rem;
+}
+textarea { resize: vertical; margin-bottom: .75rem; }
+select option { color: #111; }
+
+button { font: inherit; cursor: pointer; }
+.primary, .ghost, .lang, .chip {
+  padding: .5rem 1rem; border-radius: 999px; color: var(--ink);
+  border: 1px solid var(--glass-edge); background: rgba(255, 255, 255, .08);
+}
+.primary { background: var(--ink); color: #14131c; font-weight: 700; border-color: var(--ink); }
+.lang { font-weight: 700; min-width: 3.2rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: #14131c; border-color: var(--ink); }
+.primary:hover, .ghost:hover, .lang:hover, .chip:hover { filter: brightness(1.15); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.drop {
+  display: grid; place-items: center; gap: .75rem; min-height: 9rem; padding: 1rem; text-align: center;
+  border: 2px dashed var(--glass-edge); border-radius: 1rem; cursor: pointer; color: var(--ink-soft);
+}
+.drop.over, .drop:hover, .drop:focus-within { border-color: var(--ink); color: var(--ink); background: rgba(255, 255, 255, .06); }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop img { max-width: 100%; max-height: 9rem; border-radius: .6rem; }
+
+.result { margin: 0; color: var(--ink-soft); }
+.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; margin: .75rem 0; }
+.swatch {
+  display: flex; flex-direction: column; justify-content: flex-end; gap: .1rem; min-height: 6.5rem; padding: .7rem;
+  text-align: left; border-radius: 1rem; background: var(--sw); border: 1px solid rgba(255, 255, 255, .3);
+}
+.swatch[data-tone="dark"] { color: #fff; }
+.swatch[data-tone="light"] { color: #14131c; }
+.swatch .hex { font-weight: 700; letter-spacing: .02em; }
+.swatch .role { font-size: .8rem; opacity: .85; }
+.swatch:hover { transform: translateY(-2px); transition: transform .15s; }
+
+.advice { display: grid; grid-template-columns: max-content 1fr; gap: .4rem 1rem; margin: .5rem 0 0; }
+.advice dt { color: var(--ink-soft); }
+.advice dd { margin: 0; font-weight: 500; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: .5rem 0 .75rem; }
+.pair label { display: grid; gap: .25rem; color: var(--ink-soft); font-size: .9rem; }
+.sample { padding: 1rem; border-radius: .8rem; font-size: 1.4rem; font-weight: 700; border: 1px solid var(--glass-edge); }
+.ratio { font-size: 1.5rem; }
+.badge { padding: .15rem .7rem; border-radius: 999px; font-weight: 700; font-size: .9rem; }
+.badge[data-ok="true"] { background: #b9f6ca; color: #0b3d1e; }
+.badge[data-ok="false"] { background: #ffc9c9; color: #5c0a0a; }
+
+.toast {
+  position: fixed; left: 50%; bottom: max(1.25rem, env(safe-area-inset-bottom)); transform: translate(-50%, 1rem);
+  padding: .55rem 1.1rem; border-radius: 999px; background: var(--ink); color: #14131c; font-weight: 500;
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 760px) {
+  main { grid-template-columns: 1fr; }
+  .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pair { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: rgba(30, 28, 44, .85); }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Art &amp; Palette</title>
+  <meta name="description" content="Emotion to color palette generator with WCAG contrast check and image color extractor.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"></div>
+
+  <header class="top">
+    <div>
+      <h1 data-i18n="title">Smart Art &amp; Palette</h1>
+      <p class="sub" data-i18n="subtitle"></p>
+    </div>
+    <button id="lang-toggle" class="lang" type="button">EN</button>
+  </header>
+
+  <main>
+    <section class="glass" aria-labelledby="h-text">
+      <h2 id="h-text" data-i18n="textTitle"></h2>
+      <p class="hint" data-i18n="textHint"></p>
+      <label class="sr" for="text-input">Text</label>
+      <textarea id="text-input" rows="3"></textarea>
+      <div class="row">
+        <button id="analyze" class="primary" type="button" data-i18n="analyze"></button>
+        <div id="chips" class="chips" role="group" aria-label="Emotion"></div>
+      </div>
+      <p class="hint small" data-i18n="demoNote"></p>
+    </section>
+
+    <section class="glass" aria-labelledby="h-img">
+      <h2 id="h-img" data-i18n="imageTitle"></h2>
+      <label id="drop" class="drop" for="file">
+        <input id="file" type="file" accept="image/*">
+        <span data-i18n="imageHint"></span>
+        <img id="preview" alt="" hidden>
+      </label>
+      <canvas id="canvas" hidden></canvas>
+    </section>
+
+    <section class="glass wide" aria-labelledby="h-pal">
+      <div class="row between">
+        <h2 id="h-pal" data-i18n="paletteTitle"></h2>
+        <p id="result" class="result" aria-live="polite"></p>
+      </div>
+      <div id="swatches" class="swatches"></div>
+      <div class="row between">
+        <p class="hint small" data-i18n="copyHint"></p>
+        <div class="row">
+          <button id="export-css" class="ghost" type="button" data-i18n="exportCss"></button>
+          <button id="export-json" class="ghost" type="button" data-i18n="exportJson"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass" aria-labelledby="h-adv">
+      <h2 id="h-adv" data-i18n="adviceTitle"></h2>
+      <dl class="advice">
+        <dt data-i18n="theme"></dt><dd id="adv-theme"></dd>
+        <dt data-i18n="font"></dt><dd id="adv-font"></dd>
+        <dt data-i18n="usage"></dt><dd id="adv-usage"></dd>
+      </dl>
+    </section>
+
+    <section class="glass" aria-labelledby="h-wcag">
+      <h2 id="h-wcag" data-i18n="wcagTitle"></h2>
+      <div class="pair">
+        <label><span data-i18n="fg"></span><select id="sel-fg"></select></label>
+        <label><span data-i18n="bg"></span><select id="sel-bg"></select></label>
+      </div>
+      <div id="wcag-sample" class="sample"></div>
+      <p class="row"><strong id="wcag-ratio" class="ratio"></strong><span id="wcag-status" class="badge"></span></p>
+    </section>
+  </main>
+
+  <div id="status" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

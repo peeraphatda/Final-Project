@@ -5,7 +5,7 @@ Description: Unit Testing การส่งออกไฟล์ .css และ
 """
 import os
 import pytest
-from src.report_generator import ReportGenerator
+from Sprint4.src.report_generator import ReportGenerator
 
 def test_export_to_css():
     palette = ["#FFD700", "#FF8C00", "#FF69B4"]

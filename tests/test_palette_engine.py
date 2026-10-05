@@ -4,7 +4,7 @@ Role: Debugger (ภีม)
 Description: Unit Testing การแมปสีและ WCAG Contrast Ratio
 """
 import pytest
-from src.palette_engine import PaletteEngine
+from Sprint4.src.palette_engine import PaletteEngine
 
 def test_get_palette_valid_emotion():
     palette = PaletteEngine.get_palette("joy")

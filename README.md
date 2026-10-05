@@ -1,22 +1,23 @@
 # Smart Art & Palette Sentiment Analyzer — ระบบวิเคราะห์อารมณ์จากข้อความและสร้างจานสีอัจฉริยะ
 
-รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)  
+รายวิชา: CP352301 การเขียนโปรแกรมสคริปต์ (1/2569)
 อาจารย์ผู้สอน: ผศ. บุญสืบ ไวคำ
 
 ---
 
 ## รายชื่อสมาชิกในกลุ่มและบทบาทหน้าที่ (Team Members)
 
-1. **ปฏิภาณ นามสีลี (ท็อป)**  
+1. **ปฏิภาณ นามสีลี (ท็อป)**
+
    * **รหัสนักศึกษา:** 683380425-3 | **Email:** patiphan.na@kkumail.com
+2. **กฤษฎา สายวัน (กาย)**
 
-2. **กฤษฎา สายวัน (กาย)**  
    * **รหัสนักศึกษา:** 683380646-7 | **Email:** kitsada.sai@kkumail.com
+3. **ภีรภัทร ด่านภูมิพัฒนา (ภีม)**
 
-3. **ภีรภัทร ด่านภูมิพัฒนา (ภีม)**  
    * **รหัสนักศึกษา:** 683380436-8 | **Email:** peeraphat.da@kkumail.com
+4. **ปฏิพัฒน์ หอทอง (ปลั๊ก)**
 
-4. **ปฏิพัฒน์ หอทอง (ปลั๊ก)**  
    * **รหัสนักศึกษา:** 683380424-5 | **Email:** patipat.ho@kkumail.com
 
 ---
@@ -25,24 +26,26 @@
 
 เพื่อให้สมาชิกทุกคนในทีมได้ฝึกฝนทั้ง 3 บทบาทหลัก (**Planner / Architect**, **Coder / Dev**, **Debugger / QA & DevOps**) ครบทุกคน 100%:
 
-| สมาชิก | ชื่อเล่น | Sprint 1 : OOP & SQLite | Sprint 2 : AI, Report & Supabase | Sprint 3 : Web & Deployment |
-| :--- | :---: | :---: | :---: | :---: |
-| **นายกฤษฎา สายวัน** | กาย | **Planner** | **Coder** | **Debugger** |
-| **นายปฏิภาณ นามสีลี** | ท็อป | **Coder** | **Planner** | **Coder** |
-| **นายปฏิพัฒน์ หอทอง** | ปลั๊ก | **Coder** | **Debugger** | **Coder** |
-| **นายภีรภัทร ด่านภูมิพัฒนา** | ภีม | **Debugger** | **Coder** | **Planner** |
+| สมาชิก                                              | ชื่อเล่น | Sprint 1 : OOP & SQLite | Sprint 2 : AI, Report & Supabase | Sprint 3 : Web & Deployment | Final           |
+| :-------------------------------------------------------- | :--------------: | :---------------------: | :------------------------------: | :-------------------------: | --------------- |
+| **นายกฤษฎา สายวัน**                   |      กาย      |    **Planner**    |         **Coder**         |     **Debugger**     | **Coder** |
+| **นายปฏิภาณ นามสีลี**               |     ท็อป     |     **Coder**     |        **Planner**        |       **Coder**       | **Debugger**   |
+| **นายปฏิพัฒน์ หอทอง**               |    ปลั๊ก    |     **Coder**     |        **Debugger**        |       **Coder**       | **Planner**    |
+| **นายภีรภัทร ด่านภูมิพัฒนา** |      ภีม      |   **Debugger**   |         **Coder**         |      **Planner**      | **Coder**      |
 
 ---
 
 ## สรุปฟีเจอร์ทั้งหมดของระบบ (Features Overview - Fully Implemented)
 
 #### ฟีเจอร์แกนหลักและระบบวิเคราะห์ (Core Engine & NLP - Complete)
+
 * **Emotion Classifier (`src/emotion_client.py`):** ประมวลผลและจำแนกอารมณ์ความรู้สึกจากข้อความ 6 อารมณ์หลัก (`joy`, `sadness`, `anger`, `fear`, `love`, `surprise`) ด้วย Hugging Face DistilBERT พร้อมระบบ Defensive Fallback Unwrapping (ใช้ `isinstance` Check) ป้องกันข้อผิดพลาด[cite: 1]
 * **Color Psychology Mapping (`src/palette_engine.py`):** แมปอารมณ์ความรู้สึกเข้ากับกลุ่มโค้ดสี Hex 5 สี ตามหลักจิตวิทยาของสี (Color Psychology)
 * **Palette Visualizer (`src/visualizer.py`):** สร้างภาพตัวอย่างการจัดวางแถบสี (Color Swatch) ด้วย `matplotlib` ในโทน Dark Theme[cite: 1]
 * **CLI Interactive Loop (`src/cli_app.py` & `main.py`):** หน้าต่างปฏิสัมพันธ์ Command Line Interface พร้อมระบบ Input Validation[cite: 1]
 
 #### ระบบบันทึกข้อมูล รายงานผล และ AI คำแนะนำ (Persistence & AI Advisory - Complete)
+
 * **History Database (`src/data_store.py`):** บันทึกประวัติการวิเคราะห์ (ข้อความ, อารมณ์, confidence, palette, timestamp) ลง Local SQLite (`palette_history.db`)
 * **Cloud Database Migration (`src/data_store.py`):** รองรับโครงสร้างการจัดเก็บข้อมูลย้ายไปยัง Cloud Database (Supabase PostgreSQL)
 * **Palette Export (`src/report_generator.py`):** ส่งออกจานสีเป็นไฟล์ `.json` และ `CSS variables` เพื่อให้นักพัฒนานำไปใช้งานต่อได้ทันที
@@ -51,6 +54,7 @@
 * **Accessibility Checker (`src/palette_engine.py`):** คำนวณ Contrast Ratio ตามมาตรฐาน WCAG 2.1 แจ้งเตือนสถานะ PASS (AAA) / PASS (AA) / FAIL
 
 #### หน้าเว็บแอปพลิเคชันและการติดตั้งระบบ (Web Dashboard & Deployment - Complete)
+
 * **Web Dashboard Interface (`web/index.html`):** หน้าเว็บแดชบอร์ดสไตล์ Glassmorphism UI สำหรับพิมพ์ข้อความ วิเคราะห์อารมณ์ และแสดงจานสี
 * **Bilingual UI Support (`web/style.css`, `web/app.js`):** ระบบสลับภาษาการแสดงผลหน้าเว็บได้ 2 ภาษา (ไทย/อังกฤษ - TH/EN Toggle)
 * **Image Mood Input (`web/index.html`):** อัปโหลดรูปภาพเพื่อสกัดโทนสีหลัก (Color Palette Extraction) นำมาเปรียบเทียบกับชุดสีที่ระบบแนะนำ
@@ -61,6 +65,7 @@
 ## สรุปผลการทำงานจริงตามแผนงาน (3 Sprints Roadmap)
 
 #### 1. **Sprint 1: Core System Foundation & OOP CLI Architecture (Completed)**
+
 * **สถานะ:** เสร็จสมบูรณ์
 * **รายละเอียดงาน:**
   * พัฒนา `src/emotion_client.py` เชื่อมต่อ Hugging Face DistilBERT Pipeline พร้อมระบบ Defensive Fallback[cite: 1]
@@ -70,6 +75,7 @@
   * พัฒนาชุดทดสอบระบบอัตโนมัติเบื้องต้นใน `tests/test_emotion_client.py`[cite: 1]
 
 #### 2. **Sprint 2: Persistence, Report & AI Advisory (Completed)**
+
 * **สถานะ:** เสร็จสมบูรณ์
 * **รายละเอียดงาน:**
   * พัฒนา `src/data_store.py` บันทึกข้อมูลลง SQLite (`data/palette_history.db`) พร้อมรองรับการ Sync ขึ้น Cloud
@@ -78,6 +84,7 @@
   * เพิ่มฟังก์ชันคำนวณอัตราส่วนความต่างสี (WCAG Contrast Ratio) ใน `palette_engine.py`
 
 #### 3. **Sprint 3: Web Dashboard & Deployment (Completed)**
+
 * **สถานะ:** เสร็จสมบูรณ์
 * **รายละเอียดงาน:**
   * พัฒนา `web/index.html`, `style.css`, `app.js` สร้าง Frontend Responsive Glassmorphic UI
@@ -89,30 +96,31 @@
 ## โมดูลหลักของระบบ (Core Components)
 
 1. **`src/emotion_client.py` (`EmotionClient`):**
+
    * ทำหน้าที่เป็น Client Gateway รับข้อความภาษาอังกฤษ[cite: 1]
    * ประมวลผลด้วยโมเดล `bhadresh-savani/distilbert-base-uncased-emotion`[cite: 1]
    * มีระบบ **Defensive Fallback Unwrapping** เช็ก `isinstance` เพื่อป้องกัน `TypeError` จาก Nested List Structure[cite: 1]
-
 2. **`src/palette_engine.py` (`PaletteEngine`):**
+
    * ทำหน้าที่แปลงอารมณ์ความรู้สึกให้เป็นกลุ่มสี Hex Code 5 สี ตามหลัก Color Psychology
    * คำนวณค่าสัมพัทธ์ความสว่าง (Relative Luminance) และค่า **Contrast Ratio** ตามมาตรฐาน WCAG 2.1
-
 3. **`src/data_store.py` (`DataStore`):**
+
    * จัดเก็บข้อมูลยั่งยืน (Persistence Storage) ลงฐานข้อมูล **SQLite3** (`data/palette_history.db`)
    * มีฟังก์ชันรองรับการ Migrate และ Sync ข้อมูลไปยัง **Supabase Cloud Database**
-
 4. **`src/ai_advisory.py` (`AIAdvisory`):**
-   * ทำหน้าที่เป็นผู้ช่วยดีไซเนอร์ ประมวลผลและเสนอชื่อธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และคำแนะนำการนำไปใช้งานตามอารมณ์
 
+   * ทำหน้าที่เป็นผู้ช่วยดีไซเนอร์ ประมวลผลและเสนอชื่อธีม (Theme Name), การจับคู่ฟอนต์ (Font Pairings), และคำแนะนำการนำไปใช้งานตามอารมณ์
 5. **`src/report_generator.py` (`ReportGenerator`):**
+
    * อ่านไฟล์ข้อมูลชุด (`.csv`) วิเคราะห์อารมณ์และแนะนำจานสีแบบยกชุด
    * แปลงข้อมูลจานสีให้อยู่ในรูปแบบไฟล์ `.json` และ `.css` (CSS Variables) เพื่อให้นักพัฒนานำไปใช้ต่อได้ทันที
-
 6. **`src/cli_app.py` (`CLIApp`):**
+
    * หน้าต่างปฏิสัมพันธ์ Command Line Interface (CLI) รับอินพุต ทำความสะอาดข้อความ[cite: 1]
    * แสดงผลอารมณ์ ค่าความมั่นใจ จานสีแนะนำ พร้อมสั่งวาด Swatches และบันทึกประวัติอัตโนมัติ[cite: 1]
-
 7. **`main.py` (Main Controller):**
+
    * จุดเริ่มต้นหลักของแอปพลิเคชัน รองรับทั้ง **Interactive CLI Mode** (`python main.py --cli`) และ **Batch File Processing Mode** (`python main.py --batch <file_path>`)
 
 ---
@@ -162,13 +170,14 @@ Final-Project/
   * Git
 
 ```
+
 ---
 
 ## การเข้าใช้งานผ่านระบบออนไลน์ (Live Web Dashboard)
 
 คุณสามารถทดลองใช้งานเว็บแอปพลิเคชันรูปแบบออนไลน์ (Client-Side AI Processing 100%) ได้ทันทีผ่าน **GitHub Pages** โดยไม่ต้องติดตั้งระบบภายในเครื่อง:
 
-**[เข้าใช้งาน Smart Art & Palette Sentiment Analyzer Web Dashboard](https://peeraphatda.github.io/Final-Project/)**
+**[เข้าใช้งาน Smart Art &amp; Palette Sentiment Analyzer Web Dashboard](https://peeraphatda.github.io/Final-Project/)**
 
 > **Note:** ระบบวิเคราะห์อารมณ์และสกัดสีจากรูปภาพบนหน้าเว็บ ประมวลผลผ่าน WebAssembly / ONNX Runtime บนเบราว์เซอร์ของผู้ใช้โดยตรง จึงรับประกันความเร็ว ความเป็นส่วนตัว และไม่ต้องพึ่งพา Backend API ภายนอก
 
@@ -194,3 +203,4 @@ python main.py --batch data/sample_batch.csv
 
 # 5. รันชุดทดสอบระบบอัตโนมัติ (Automated Testing)
 pytest
+```

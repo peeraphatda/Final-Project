@@ -4,12 +4,12 @@ Description: Entry Point หลักสำหรับสลับโหมด�
 """
 import sys
 import argparse
-from src.emotion_client import EmotionClient
-from src.palette_engine import PaletteEngine
-from src.visualizer import PaletteVisualizer
-from src.data_store import DataStore
-from src.cli_app import CLIApp
-from src.report_generator import ReportGenerator
+from Sprint4.src.emotion_client import EmotionClient
+from Sprint4.src.palette_engine import PaletteEngine
+from Sprint4.src.visualizer import PaletteVisualizer
+from Sprint4.src.data_store import DataStore
+from Sprint4.src.cli_app import CLIApp
+from Sprint4.src.report_generator import ReportGenerator
 
 def main():
     parser = argparse.ArgumentParser(description="Smart Art & Palette Sentiment Analyzer")
